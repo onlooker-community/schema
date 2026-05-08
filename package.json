@@ -1,6 +1,6 @@
 {
   "name": "@onlooker-community/schema",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Canonical event schema for the Onlooker ecosystem",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,7 +12,10 @@
     },
     "./schemas/*": "./schemas/*"
   },
-  "files": ["dist", "schemas"],
+  "files": [
+    "dist",
+    "schemas"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",

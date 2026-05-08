@@ -4,6 +4,19 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.0 (2026-05-08)
+
+
+### Features
+
+* add tool payload schemas and validation scripts ([f0a4f97](https://github.com/onlooker-community/schema/commit/f0a4f97d41405006e03e62aca63b8b9cc04cb02d))
+* add tool payload schemas and validation scripts ([390a5ea](https://github.com/onlooker-community/schema/commit/390a5ea078fa6a808c65f363b870e3fe2ba3ce78))
+
+
+### Bug Fixes
+
+* revert version number to 0.1.0 in package-lock.json ([12c4fbe](https://github.com/onlooker-community/schema/commit/12c4fbedc7b864449979b68d85c36e145459de5b))
+
 ## [1.0.0] — 2026-05-07
 
 Initial public release. Establishes the canonical event envelope and the first wave of per-namespace payload schemas for the Onlooker ecosystem.
