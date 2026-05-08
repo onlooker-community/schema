@@ -1,136 +1,136 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://onlooker.community/schemas/event.v1.json",
-  "title": "OnlookerEvent",
-  "description": "Canonical event envelope for the Onlooker ecosystem.",
-  "type": "object",
-  "required": [
-    "id",
-    "schema_version",
-    "runtime",
-    "plugin",
-    "machine_id",
-    "timestamp",
-    "session_id",
-    "sequence",
-    "event_type",
-    "payload"
-  ],
-  "additionalProperties": false,
-  "properties": {
-    "id": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Unique event identifier (UUID)."
-    },
-    "schema_version": {
-      "type": "string",
-      "const": "1.0",
-      "description": "Schema version. Always \"1.0\" for this envelope."
-    },
-    "runtime": {
-      "type": "string",
-      "enum": ["claude-code", "cursor", "copilot", "gemini", "custom"],
-      "description": "Runtime that produced the event."
-    },
-    "adapter_id": {
-      "type": "string",
-      "description": "Optional identifier of the adapter that translated a runtime-specific event to canonical form."
-    },
-    "plugin": {
-      "type": "string",
-      "description": "Plugin name that emitted the event."
-    },
-    "machine_id": {
-      "type": "string",
-      "format": "uuid",
-      "description": "Stable, anonymous machine identifier (UUID)."
-    },
-    "timestamp": {
-      "type": "string",
-      "format": "date-time",
-      "description": "ISO 8601 / RFC 3339 timestamp in UTC."
-    },
-    "session_id": {
-      "type": "string",
-      "description": "Session identifier."
-    },
-    "sequence": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Monotonically increasing sequence number within the emitting process."
-    },
-    "event_type": {
-      "type": "string",
-      "enum": [
-        "session.start",
-        "session.end",
-        "session.compact",
-        "session.prompt",
-        "task.start",
-        "task.complete",
-        "task.fail",
-        "tool.file.read",
-        "tool.file.write",
-        "tool.file.edit",
-        "tool.shell.exec",
-        "tool.web.fetch",
-        "tool.agent.spawn",
-        "tool.agent.complete",
-        "sentinel.blocked",
-        "sentinel.allowed",
-        "sentinel.reviewed",
-        "tribunal.verdict",
-        "tribunal.actor.complete",
-        "tribunal.meta.complete",
-        "warden.threat.detected",
-        "warden.threat.cleared",
-        "warden.gate.blocked",
-        "oracle.calibration.requested",
-        "oracle.calibration.complete",
-        "archivist.extract.complete",
-        "archivist.inject.complete",
-        "relay.handoff.captured",
-        "relay.handoff.injected",
-        "scribe.capture.complete",
-        "scribe.distill.complete",
-        "cues.matched",
-        "cues.applied",
-        "ledger.budget.warning",
-        "ledger.budget.exceeded",
-        "ledger.session.complete",
-        "echo.suite.started",
-        "echo.suite.complete",
-        "echo.regression.detected",
-        "cartographer.audit.complete",
-        "cartographer.issue.found",
-        "counsel.brief.generated",
-        "onlooker.session.summary",
-        "meridian.hint.generated",
-        "meridian.hint.delivered",
-        "meridian.outcome.recorded",
-        "meridian.reliance.measured",
-        "meridian.lesson.curated",
-        "meridian.playbook.updated"
-      ]
-    },
-    "payload": {
-      "type": "object",
-      "description": "Event-type-specific payload. Validated separately against per-type schemas."
-    },
-    "cost_usd": {
-      "type": "number",
-      "minimum": 0,
-      "description": "Monetary cost in USD attributable to this event."
-    },
-    "token_count": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Token count attributable to this event."
-    },
-    "redacted": {
-      "type": "boolean",
-      "description": "Whether sensitive payload fields have been stripped."
-    }
-  }
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://onlooker.community/schemas/event.v1.json",
+	"title": "OnlookerEvent",
+	"description": "Canonical event envelope for the Onlooker ecosystem.",
+	"type": "object",
+	"required": [
+		"id",
+		"schema_version",
+		"runtime",
+		"plugin",
+		"machine_id",
+		"timestamp",
+		"session_id",
+		"sequence",
+		"event_type",
+		"payload"
+	],
+	"additionalProperties": false,
+	"properties": {
+		"id": {
+			"type": "string",
+			"format": "uuid",
+			"description": "Unique event identifier (UUID)."
+		},
+		"schema_version": {
+			"type": "string",
+			"const": "1.0",
+			"description": "Schema version. Always \"1.0\" for this envelope."
+		},
+		"runtime": {
+			"type": "string",
+			"enum": ["claude-code", "cursor", "copilot", "gemini", "custom"],
+			"description": "Runtime that produced the event."
+		},
+		"adapter_id": {
+			"type": "string",
+			"description": "Optional identifier of the adapter that translated a runtime-specific event to canonical form."
+		},
+		"plugin": {
+			"type": "string",
+			"description": "Plugin name that emitted the event."
+		},
+		"machine_id": {
+			"type": "string",
+			"format": "uuid",
+			"description": "Stable, anonymous machine identifier (UUID)."
+		},
+		"timestamp": {
+			"type": "string",
+			"format": "date-time",
+			"description": "ISO 8601 / RFC 3339 timestamp in UTC."
+		},
+		"session_id": {
+			"type": "string",
+			"description": "Session identifier."
+		},
+		"sequence": {
+			"type": "integer",
+			"minimum": 0,
+			"description": "Monotonically increasing sequence number within the emitting process."
+		},
+		"event_type": {
+			"type": "string",
+			"enum": [
+				"session.start",
+				"session.end",
+				"session.compact",
+				"session.prompt",
+				"task.start",
+				"task.complete",
+				"task.fail",
+				"tool.file.read",
+				"tool.file.write",
+				"tool.file.edit",
+				"tool.shell.exec",
+				"tool.web.fetch",
+				"tool.agent.spawn",
+				"tool.agent.complete",
+				"sentinel.blocked",
+				"sentinel.allowed",
+				"sentinel.reviewed",
+				"tribunal.verdict",
+				"tribunal.actor.complete",
+				"tribunal.meta.complete",
+				"warden.threat.detected",
+				"warden.threat.cleared",
+				"warden.gate.blocked",
+				"oracle.calibration.requested",
+				"oracle.calibration.complete",
+				"archivist.extract.complete",
+				"archivist.inject.complete",
+				"relay.handoff.captured",
+				"relay.handoff.injected",
+				"scribe.capture.complete",
+				"scribe.distill.complete",
+				"cues.matched",
+				"cues.applied",
+				"ledger.budget.warning",
+				"ledger.budget.exceeded",
+				"ledger.session.complete",
+				"echo.suite.started",
+				"echo.suite.complete",
+				"echo.regression.detected",
+				"cartographer.audit.complete",
+				"cartographer.issue.found",
+				"counsel.brief.generated",
+				"onlooker.session.summary",
+				"meridian.hint.generated",
+				"meridian.hint.delivered",
+				"meridian.outcome.recorded",
+				"meridian.reliance.measured",
+				"meridian.lesson.curated",
+				"meridian.playbook.updated"
+			]
+		},
+		"payload": {
+			"type": "object",
+			"description": "Event-type-specific payload. Validated separately against per-type schemas."
+		},
+		"cost_usd": {
+			"type": "number",
+			"minimum": 0,
+			"description": "Monetary cost in USD attributable to this event."
+		},
+		"token_count": {
+			"type": "integer",
+			"minimum": 0,
+			"description": "Token count attributable to this event."
+		},
+		"redacted": {
+			"type": "boolean",
+			"description": "Whether sensitive payload fields have been stripped."
+		}
+	}
 }
