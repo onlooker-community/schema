@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onlooker.community/schemas/payload/session.json",
+  "title": "Session payloads",
+  "description": "Payload schemas for the session.* event family.",
+  "$defs": {
+    "session.start": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["working_directory"],
+      "properties": {
+        "working_directory": { "type": "string" },
+        "git_branch": { "type": "string" },
+        "git_commit": { "type": "string" },
+        "resume_of_session_id": { "type": "string" }
+      }
+    },
+    "session.end": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duration_ms", "turn_count"],
+      "properties": {
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "turn_count": { "type": "integer", "minimum": 0 },
+        "total_cost_usd": { "type": "number", "minimum": 0 },
+        "total_tokens": { "type": "integer", "minimum": 0 },
+        "end_reason": {
+          "type": "string",
+          "enum": ["user_exit", "timeout", "error", "task_complete", "unknown"]
+        }
+      }
+    },
+    "session.compact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokens_before", "tokens_after"],
+      "properties": {
+        "tokens_before": { "type": "integer", "minimum": 0 },
+        "tokens_after": { "type": "integer", "minimum": 0 },
+        "compression_ratio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "session.prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["turn_number"],
+      "properties": {
+        "turn_number": { "type": "integer", "minimum": 1 },
+        "input_summary": { "type": "string" },
+        "context_tokens": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onlooker.community/schemas/payload/tool.json",
+  "title": "Tool payloads",
+  "description": "Payload schemas for the tool.* event family.",
+  "$defs": {
+    "tool.file.read": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string" },
+        "lines_read": { "type": "integer", "minimum": 0 },
+        "file_size_bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "tool.file.write": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "operation"],
+      "properties": {
+        "path": { "type": "string" },
+        "operation": { "type": "string", "enum": ["create", "overwrite"] },
+        "bytes_written": { "type": "integer", "minimum": 0 },
+        "lines_written": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "tool.file.edit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string" },
+        "lines_changed": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "tool.shell.exec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command"],
+      "properties": {
+        "command": { "type": "string" },
+        "exit_code": { "type": "integer" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "working_directory": { "type": "string" },
+        "blocked": { "type": "boolean" }
+      }
+    },
+    "tool.web.fetch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "status_code": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "response_bytes": { "type": "integer", "minimum": 0 },
+        "blocked": { "type": "boolean" }
+      }
+    },
+    "tool.agent.spawn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subagent_id"],
+      "properties": {
+        "subagent_id": { "type": "string" },
+        "agent_name": { "type": "string" },
+        "task_summary": { "type": "string" },
+        "blocked": { "type": "boolean" }
+      }
+    },
+    "tool.agent.complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subagent_id", "success"],
+      "properties": {
+        "subagent_id": { "type": "string" },
+        "success": { "type": "boolean" },
+        "agent_name": { "type": "string" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "cost_usd": { "type": "number", "minimum": 0 },
+        "output_summary": { "type": "string" }
+      }
+    }
+  }
+}

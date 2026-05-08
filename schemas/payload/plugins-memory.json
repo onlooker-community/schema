@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onlooker.community/schemas/payload/plugins-memory.json",
+  "title": "Memory plugin payloads",
+  "description": "Payload schemas for archivist.*, relay.*, scribe.*, oracle.*, cues.*, and cartographer.* events.",
+  "$defs": {
+    "archivist.extract.complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_id", "item_count"],
+      "properties": {
+        "session_id": { "type": "string" },
+        "item_count": { "type": "integer", "minimum": 0 },
+        "decision_count": { "type": "integer", "minimum": 0 },
+        "dead_end_count": { "type": "integer", "minimum": 0 },
+        "open_question_count": { "type": "integer", "minimum": 0 },
+        "file_count": { "type": "integer", "minimum": 0 },
+        "trigger": {
+          "type": "string",
+          "enum": ["pre_compact", "session_end", "manual"]
+        }
+      }
+    },
+    "archivist.inject.complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_session_id", "items_injected"],
+      "properties": {
+        "source_session_id": { "type": "string" },
+        "items_injected": { "type": "integer", "minimum": 0 },
+        "items_available": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "relay.handoff.captured": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_id"],
+      "properties": {
+        "session_id": { "type": "string" },
+        "tasks_in_progress": { "type": "integer", "minimum": 0 },
+        "blocking_questions": { "type": "integer", "minimum": 0 },
+        "files_in_flight": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "relay.handoff.injected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_session_id"],
+      "properties": {
+        "source_session_id": { "type": "string" },
+        "age_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "scribe.capture.complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_path", "operation"],
+      "properties": {
+        "file_path": { "type": "string" },
+        "operation": { "type": "string", "enum": ["write", "edit"] },
+        "intent_summary": { "type": "string" }
+      }
+    },
+    "scribe.distill.complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_id", "captures_processed", "artifacts_produced"],
+      "properties": {
+        "session_id": { "type": "string" },
+        "captures_processed": { "type": "integer", "minimum": 0 },
+        "artifacts_produced": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "oracle.calibration.requested": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trigger"],
+      "properties": {
+        "trigger": {
+          "type": "string",
+          "enum": ["user_prompt", "pre_write", "pre_bash"]
+        },
+        "task_summary": { "type": "string" }
+      }
+    },
+    "oracle.calibration.complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trigger", "confidence_score", "intervened"],
+      "properties": {
+        "trigger": {
+          "type": "string",
+          "enum": ["user_prompt", "pre_write", "pre_bash"]
+        },
+        "confidence_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "intervened": { "type": "boolean" },
+        "misalignment_detected": { "type": "boolean" }
+      }
+    },
+    "cues.matched": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cue_id", "match_type", "trigger_source"],
+      "properties": {
+        "cue_id": { "type": "string" },
+        "match_type": {
+          "type": "string",
+          "enum": ["regex", "vocabulary", "semantic"]
+        },
+        "trigger_source": {
+          "type": "string",
+          "enum": ["prompt", "command", "file_path"]
+        },
+        "cue_name": { "type": "string" }
+      }
+    },
+    "cues.applied": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cue_id"],
+      "properties": {
+        "cue_id": { "type": "string" },
+        "cue_name": { "type": "string" },
+        "guidance_length": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "cartographer.audit.complete": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files_audited", "issues_found"],
+      "properties": {
+        "files_audited": { "type": "integer", "minimum": 0 },
+        "issues_found": { "type": "integer", "minimum": 0 },
+        "trigger": {
+          "type": "string",
+          "enum": ["instructions_loaded", "config_change", "manual"]
+        },
+        "issue_categories": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contradictions": { "type": "integer", "minimum": 0 },
+            "stale_references": { "type": "integer", "minimum": 0 },
+            "orphaned_plugins": { "type": "integer", "minimum": 0 },
+            "dead_tools": { "type": "integer", "minimum": 0 },
+            "duplicates": { "type": "integer", "minimum": 0 },
+            "hierarchy_conflicts": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "cartographer.issue.found": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issue_type", "file_path", "severity"],
+      "properties": {
+        "issue_type": {
+          "type": "string",
+          "enum": [
+            "contradiction",
+            "stale_reference",
+            "orphaned_plugin",
+            "dead_tool",
+            "duplicate",
+            "hierarchy_conflict"
+          ]
+        },
+        "file_path": { "type": "string" },
+        "severity": { "type": "string", "enum": ["error", "warning", "info"] },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}
