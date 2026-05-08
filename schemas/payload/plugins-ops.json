@@ -1,246 +1,257 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://onlooker.community/schemas/payload/plugins-ops.json",
-  "title": "Ops plugin payloads",
-  "description": "Payload schemas for ledger.*, echo.*, counsel.*, onlooker.*, and meridian.* events.",
-  "$defs": {
-    "ledger.budget.warning": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["budget_usd", "spent_usd", "threshold_pct"],
-      "properties": {
-        "budget_usd": { "type": "number", "minimum": 0 },
-        "spent_usd": { "type": "number", "minimum": 0 },
-        "threshold_pct": { "type": "number", "minimum": 0, "maximum": 100 },
-        "remaining_usd": { "type": "number" }
-      }
-    },
-    "ledger.budget.exceeded": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["budget_usd", "spent_usd", "blocked_operation"],
-      "properties": {
-        "budget_usd": { "type": "number", "minimum": 0 },
-        "spent_usd": { "type": "number", "minimum": 0 },
-        "blocked_operation": { "type": "string" }
-      }
-    },
-    "ledger.session.complete": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["total_cost_usd", "budget_usd", "under_budget"],
-      "properties": {
-        "total_cost_usd": { "type": "number", "minimum": 0 },
-        "budget_usd": { "type": "number", "minimum": 0 },
-        "under_budget": { "type": "boolean" },
-        "cost_by_plugin": {
-          "type": "object",
-          "additionalProperties": { "type": "number" }
-        }
-      }
-    },
-    "echo.suite.started": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["suite_id", "test_count"],
-      "properties": {
-        "suite_id": { "type": "string" },
-        "test_count": { "type": "integer", "minimum": 0 },
-        "suite_name": { "type": "string" },
-        "trigger": { "type": "string", "enum": ["config_change", "manual"] },
-        "changed_file": { "type": "string" }
-      }
-    },
-    "echo.suite.complete": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["suite_id", "test_count", "improved", "degraded", "neutral"],
-      "properties": {
-        "suite_id": { "type": "string" },
-        "test_count": { "type": "integer", "minimum": 0 },
-        "improved": { "type": "integer", "minimum": 0 },
-        "degraded": { "type": "integer", "minimum": 0 },
-        "neutral": { "type": "integer", "minimum": 0 },
-        "merge_recommended": { "type": "boolean" },
-        "duration_ms": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "echo.regression.detected": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["suite_id", "test_id", "score_before", "score_after"],
-      "properties": {
-        "suite_id": { "type": "string" },
-        "test_id": { "type": "string" },
-        "score_before": { "type": "number", "minimum": 0, "maximum": 1 },
-        "score_after": { "type": "number", "minimum": 0, "maximum": 1 },
-        "test_name": { "type": "string" },
-        "delta": { "type": "number" }
-      }
-    },
-    "counsel.brief.generated": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["period_start", "period_end", "recommendation_count"],
-      "properties": {
-        "period_start": { "type": "string", "format": "date-time" },
-        "period_end": { "type": "string", "format": "date-time" },
-        "recommendation_count": { "type": "integer", "minimum": 0 },
-        "sources_consulted": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "onlooker_events",
-              "tribunal_verdicts",
-              "echo_regressions",
-              "sentinel_audit",
-              "warden_audit",
-              "oracle_calibrations",
-              "meridian_reliance"
-            ]
-          }
-        }
-      }
-    },
-    "onlooker.session.summary": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["session_id", "duration_ms", "event_count"],
-      "properties": {
-        "session_id": { "type": "string" },
-        "duration_ms": { "type": "integer", "minimum": 0 },
-        "event_count": { "type": "integer", "minimum": 0 },
-        "tool_counts": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "file_reads": { "type": "integer", "minimum": 0 },
-            "file_writes": { "type": "integer", "minimum": 0 },
-            "file_edits": { "type": "integer", "minimum": 0 },
-            "shell_execs": { "type": "integer", "minimum": 0 },
-            "web_fetches": { "type": "integer", "minimum": 0 },
-            "agent_spawns": { "type": "integer", "minimum": 0 }
-          }
-        }
-      }
-    },
-    "meridian.hint.generated": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "hint_id",
-        "case_id",
-        "task_type",
-        "failure_type",
-        "hint_direction"
-      ],
-      "properties": {
-        "hint_id": { "type": "string" },
-        "case_id": { "type": "string" },
-        "task_type": {
-          "type": "string",
-          "enum": ["code", "reasoning", "writing", "general"]
-        },
-        "failure_type": {
-          "type": "string",
-          "enum": [
-            "wrong_approach",
-            "missing_concept",
-            "implementation_error",
-            "misunderstood_task",
-            "out_of_scope"
-          ]
-        },
-        "hint_direction": {
-          "type": "string",
-          "enum": [
-            "reframe",
-            "missing_tool",
-            "intermediate_goal",
-            "alternative_representation",
-            "constraint_reminder"
-          ]
-        },
-        "target_concept": { "type": "string" },
-        "signal_creation": { "type": "number", "minimum": 0, "maximum": 1 },
-        "signal_transfer": { "type": "number", "minimum": 0, "maximum": 1 },
-        "playbook_bullets_injected": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "meridian.hint.delivered": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["hint_id", "case_id", "delivery_mode"],
-      "properties": {
-        "hint_id": { "type": "string" },
-        "case_id": { "type": "string" },
-        "delivery_mode": {
-          "type": "string",
-          "enum": ["append", "comment", "inline", "aside"]
-        }
-      }
-    },
-    "meridian.outcome.recorded": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["hint_id", "case_id", "succeeded", "attempts_after_hint"],
-      "properties": {
-        "hint_id": { "type": "string" },
-        "case_id": { "type": "string" },
-        "succeeded": { "type": "boolean" },
-        "attempts_after_hint": { "type": "integer", "minimum": 0 },
-        "hint_referenced": { "type": "boolean" },
-        "time_to_success_ms": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "meridian.reliance.measured": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["hint_id", "case_id", "score", "assessment", "method"],
-      "properties": {
-        "hint_id": { "type": "string" },
-        "case_id": { "type": "string" },
-        "score": { "type": "number", "minimum": 0, "maximum": 1 },
-        "assessment": { "type": "string", "enum": ["low", "medium", "high"] },
-        "method": { "type": "string", "enum": ["logprob", "judge"] }
-      }
-    },
-    "meridian.lesson.curated": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["bullet_id", "case_id", "category", "task_type", "target_concept"],
-      "properties": {
-        "bullet_id": { "type": "string" },
-        "case_id": { "type": "string" },
-        "category": {
-          "type": "string",
-          "enum": ["failure_pattern", "successful_hint", "task_strategy", "tool_usage"]
-        },
-        "task_type": {
-          "type": "string",
-          "enum": ["code", "reasoning", "writing", "general"]
-        },
-        "target_concept": { "type": "string" },
-        "origin": {
-          "type": "string",
-          "enum": ["agent_failure", "human_session", "manual"]
-        }
-      }
-    },
-    "meridian.playbook.updated": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["scope_id", "operation", "bullet_count_after"],
-      "properties": {
-        "scope_id": { "type": "string" },
-        "operation": {
-          "type": "string",
-          "enum": ["append", "update", "deduplicate", "promote", "retire"]
-        },
-        "bullet_count_after": { "type": "integer", "minimum": 0 },
-        "bullets_removed": { "type": "integer", "minimum": 0 }
-      }
-    }
-  }
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://onlooker.community/schemas/payload/plugins-ops.json",
+	"title": "Ops plugin payloads",
+	"description": "Payload schemas for ledger.*, echo.*, counsel.*, onlooker.*, and meridian.* events.",
+	"$defs": {
+		"ledger.budget.warning": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["budget_usd", "spent_usd", "threshold_pct"],
+			"properties": {
+				"budget_usd": { "type": "number", "minimum": 0 },
+				"spent_usd": { "type": "number", "minimum": 0 },
+				"threshold_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+				"remaining_usd": { "type": "number" }
+			}
+		},
+		"ledger.budget.exceeded": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["budget_usd", "spent_usd", "blocked_operation"],
+			"properties": {
+				"budget_usd": { "type": "number", "minimum": 0 },
+				"spent_usd": { "type": "number", "minimum": 0 },
+				"blocked_operation": { "type": "string" }
+			}
+		},
+		"ledger.session.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["total_cost_usd", "budget_usd", "under_budget"],
+			"properties": {
+				"total_cost_usd": { "type": "number", "minimum": 0 },
+				"budget_usd": { "type": "number", "minimum": 0 },
+				"under_budget": { "type": "boolean" },
+				"cost_by_plugin": {
+					"type": "object",
+					"additionalProperties": { "type": "number" }
+				}
+			}
+		},
+		"echo.suite.started": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["suite_id", "test_count"],
+			"properties": {
+				"suite_id": { "type": "string" },
+				"test_count": { "type": "integer", "minimum": 0 },
+				"suite_name": { "type": "string" },
+				"trigger": { "type": "string", "enum": ["config_change", "manual"] },
+				"changed_file": { "type": "string" }
+			}
+		},
+		"echo.suite.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["suite_id", "test_count", "improved", "degraded", "neutral"],
+			"properties": {
+				"suite_id": { "type": "string" },
+				"test_count": { "type": "integer", "minimum": 0 },
+				"improved": { "type": "integer", "minimum": 0 },
+				"degraded": { "type": "integer", "minimum": 0 },
+				"neutral": { "type": "integer", "minimum": 0 },
+				"merge_recommended": { "type": "boolean" },
+				"duration_ms": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"echo.regression.detected": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["suite_id", "test_id", "score_before", "score_after"],
+			"properties": {
+				"suite_id": { "type": "string" },
+				"test_id": { "type": "string" },
+				"score_before": { "type": "number", "minimum": 0, "maximum": 1 },
+				"score_after": { "type": "number", "minimum": 0, "maximum": 1 },
+				"test_name": { "type": "string" },
+				"delta": { "type": "number" }
+			}
+		},
+		"counsel.brief.generated": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["period_start", "period_end", "recommendation_count"],
+			"properties": {
+				"period_start": { "type": "string", "format": "date-time" },
+				"period_end": { "type": "string", "format": "date-time" },
+				"recommendation_count": { "type": "integer", "minimum": 0 },
+				"sources_consulted": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"enum": [
+							"onlooker_events",
+							"tribunal_verdicts",
+							"echo_regressions",
+							"sentinel_audit",
+							"warden_audit",
+							"oracle_calibrations",
+							"meridian_reliance"
+						]
+					}
+				}
+			}
+		},
+		"onlooker.session.summary": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["session_id", "duration_ms", "event_count"],
+			"properties": {
+				"session_id": { "type": "string" },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"event_count": { "type": "integer", "minimum": 0 },
+				"tool_counts": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"file_reads": { "type": "integer", "minimum": 0 },
+						"file_writes": { "type": "integer", "minimum": 0 },
+						"file_edits": { "type": "integer", "minimum": 0 },
+						"shell_execs": { "type": "integer", "minimum": 0 },
+						"web_fetches": { "type": "integer", "minimum": 0 },
+						"agent_spawns": { "type": "integer", "minimum": 0 }
+					}
+				}
+			}
+		},
+		"meridian.hint.generated": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"hint_id",
+				"case_id",
+				"task_type",
+				"failure_type",
+				"hint_direction"
+			],
+			"properties": {
+				"hint_id": { "type": "string" },
+				"case_id": { "type": "string" },
+				"task_type": {
+					"type": "string",
+					"enum": ["code", "reasoning", "writing", "general"]
+				},
+				"failure_type": {
+					"type": "string",
+					"enum": [
+						"wrong_approach",
+						"missing_concept",
+						"implementation_error",
+						"misunderstood_task",
+						"out_of_scope"
+					]
+				},
+				"hint_direction": {
+					"type": "string",
+					"enum": [
+						"reframe",
+						"missing_tool",
+						"intermediate_goal",
+						"alternative_representation",
+						"constraint_reminder"
+					]
+				},
+				"target_concept": { "type": "string" },
+				"signal_creation": { "type": "number", "minimum": 0, "maximum": 1 },
+				"signal_transfer": { "type": "number", "minimum": 0, "maximum": 1 },
+				"playbook_bullets_injected": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"meridian.hint.delivered": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["hint_id", "case_id", "delivery_mode"],
+			"properties": {
+				"hint_id": { "type": "string" },
+				"case_id": { "type": "string" },
+				"delivery_mode": {
+					"type": "string",
+					"enum": ["append", "comment", "inline", "aside"]
+				}
+			}
+		},
+		"meridian.outcome.recorded": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["hint_id", "case_id", "succeeded", "attempts_after_hint"],
+			"properties": {
+				"hint_id": { "type": "string" },
+				"case_id": { "type": "string" },
+				"succeeded": { "type": "boolean" },
+				"attempts_after_hint": { "type": "integer", "minimum": 0 },
+				"hint_referenced": { "type": "boolean" },
+				"time_to_success_ms": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"meridian.reliance.measured": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["hint_id", "case_id", "score", "assessment", "method"],
+			"properties": {
+				"hint_id": { "type": "string" },
+				"case_id": { "type": "string" },
+				"score": { "type": "number", "minimum": 0, "maximum": 1 },
+				"assessment": { "type": "string", "enum": ["low", "medium", "high"] },
+				"method": { "type": "string", "enum": ["logprob", "judge"] }
+			}
+		},
+		"meridian.lesson.curated": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"bullet_id",
+				"case_id",
+				"category",
+				"task_type",
+				"target_concept"
+			],
+			"properties": {
+				"bullet_id": { "type": "string" },
+				"case_id": { "type": "string" },
+				"category": {
+					"type": "string",
+					"enum": [
+						"failure_pattern",
+						"successful_hint",
+						"task_strategy",
+						"tool_usage"
+					]
+				},
+				"task_type": {
+					"type": "string",
+					"enum": ["code", "reasoning", "writing", "general"]
+				},
+				"target_concept": { "type": "string" },
+				"origin": {
+					"type": "string",
+					"enum": ["agent_failure", "human_session", "manual"]
+				}
+			}
+		},
+		"meridian.playbook.updated": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["scope_id", "operation", "bullet_count_after"],
+			"properties": {
+				"scope_id": { "type": "string" },
+				"operation": {
+					"type": "string",
+					"enum": ["append", "update", "deduplicate", "promote", "retire"]
+				},
+				"bullet_count_after": { "type": "integer", "minimum": 0 },
+				"bullets_removed": { "type": "integer", "minimum": 0 }
+			}
+		}
+	}
 }

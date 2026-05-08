@@ -1,126 +1,142 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://onlooker.community/schemas/payload/plugins-safety.json",
-  "title": "Safety plugin payloads",
-  "description": "Payload schemas for sentinel.*, tribunal.*, and warden.* events.",
-  "$defs": {
-    "sentinel.blocked": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["command", "risk_level", "matched_pattern"],
-      "properties": {
-        "command": { "type": "string" },
-        "risk_level": { "type": "string", "enum": ["critical", "high", "medium"] },
-        "matched_pattern": { "type": "string" },
-        "reason": { "type": "string" }
-      }
-    },
-    "sentinel.allowed": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["command", "risk_level"],
-      "properties": {
-        "command": { "type": "string" },
-        "risk_level": { "type": "string", "enum": ["low", "none"] },
-        "review_required": { "type": "boolean" }
-      }
-    },
-    "sentinel.reviewed": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["command", "decision"],
-      "properties": {
-        "command": { "type": "string" },
-        "decision": { "type": "string", "enum": ["approved", "rejected"] },
-        "review_duration_ms": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "tribunal.verdict": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["task_id", "score", "passed", "judge_type"],
-      "properties": {
-        "task_id": { "type": "string" },
-        "score": { "type": "number", "minimum": 0, "maximum": 1 },
-        "passed": { "type": "boolean" },
-        "judge_type": {
-          "type": "string",
-          "enum": ["standard", "security", "maintainability", "adversarial", "domain", "meta"]
-        },
-        "feedback_summary": { "type": "string" },
-        "file_path": { "type": "string" }
-      }
-    },
-    "tribunal.actor.complete": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["task_id", "success"],
-      "properties": {
-        "task_id": { "type": "string" },
-        "success": { "type": "boolean" },
-        "duration_ms": { "type": "integer", "minimum": 0 },
-        "skepticism_rounds": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "tribunal.meta.complete": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["task_id", "verdict_quality", "bias_detected"],
-      "properties": {
-        "task_id": { "type": "string" },
-        "verdict_quality": { "type": "string", "enum": ["sound", "questionable", "biased"] },
-        "bias_detected": { "type": "boolean" },
-        "override_recommendation": {
-          "type": "string",
-          "enum": ["accept", "reject", "re-evaluate"]
-        }
-      }
-    },
-    "warden.threat.detected": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["source_type", "threat_type", "confidence"],
-      "properties": {
-        "source_type": { "type": "string", "enum": ["web_fetch", "file_read"] },
-        "threat_type": {
-          "type": "string",
-          "enum": [
-            "prompt_injection",
-            "instruction_override",
-            "credential_exfiltration",
-            "command_injection",
-            "social_engineering"
-          ]
-        },
-        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
-        "source_url": { "type": "string" },
-        "source_path": { "type": "string" },
-        "snippet": { "type": "string" }
-      }
-    },
-    "warden.threat.cleared": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["source_type"],
-      "properties": {
-        "source_type": { "type": "string", "enum": ["web_fetch", "file_read"] },
-        "cleared_by": {
-          "type": "string",
-          "enum": ["timeout", "user_override", "subsequent_scan_clean"]
-        }
-      }
-    },
-    "warden.gate.blocked": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["blocked_operation", "threat_source_type"],
-      "properties": {
-        "blocked_operation": {
-          "type": "string",
-          "enum": ["tool.file.write", "tool.file.edit", "tool.shell.exec"]
-        },
-        "threat_source_type": { "type": "string", "enum": ["web_fetch", "file_read"] }
-      }
-    }
-  }
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://onlooker.community/schemas/payload/plugins-safety.json",
+	"title": "Safety plugin payloads",
+	"description": "Payload schemas for sentinel.*, tribunal.*, and warden.* events.",
+	"$defs": {
+		"sentinel.blocked": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["command", "risk_level", "matched_pattern"],
+			"properties": {
+				"command": { "type": "string" },
+				"risk_level": {
+					"type": "string",
+					"enum": ["critical", "high", "medium"]
+				},
+				"matched_pattern": { "type": "string" },
+				"reason": { "type": "string" }
+			}
+		},
+		"sentinel.allowed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["command", "risk_level"],
+			"properties": {
+				"command": { "type": "string" },
+				"risk_level": { "type": "string", "enum": ["low", "none"] },
+				"review_required": { "type": "boolean" }
+			}
+		},
+		"sentinel.reviewed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["command", "decision"],
+			"properties": {
+				"command": { "type": "string" },
+				"decision": { "type": "string", "enum": ["approved", "rejected"] },
+				"review_duration_ms": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"tribunal.verdict": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["task_id", "score", "passed", "judge_type"],
+			"properties": {
+				"task_id": { "type": "string" },
+				"score": { "type": "number", "minimum": 0, "maximum": 1 },
+				"passed": { "type": "boolean" },
+				"judge_type": {
+					"type": "string",
+					"enum": [
+						"standard",
+						"security",
+						"maintainability",
+						"adversarial",
+						"domain",
+						"meta"
+					]
+				},
+				"feedback_summary": { "type": "string" },
+				"file_path": { "type": "string" }
+			}
+		},
+		"tribunal.actor.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["task_id", "success"],
+			"properties": {
+				"task_id": { "type": "string" },
+				"success": { "type": "boolean" },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"skepticism_rounds": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"tribunal.meta.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["task_id", "verdict_quality", "bias_detected"],
+			"properties": {
+				"task_id": { "type": "string" },
+				"verdict_quality": {
+					"type": "string",
+					"enum": ["sound", "questionable", "biased"]
+				},
+				"bias_detected": { "type": "boolean" },
+				"override_recommendation": {
+					"type": "string",
+					"enum": ["accept", "reject", "re-evaluate"]
+				}
+			}
+		},
+		"warden.threat.detected": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["source_type", "threat_type", "confidence"],
+			"properties": {
+				"source_type": { "type": "string", "enum": ["web_fetch", "file_read"] },
+				"threat_type": {
+					"type": "string",
+					"enum": [
+						"prompt_injection",
+						"instruction_override",
+						"credential_exfiltration",
+						"command_injection",
+						"social_engineering"
+					]
+				},
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+				"source_url": { "type": "string" },
+				"source_path": { "type": "string" },
+				"snippet": { "type": "string" }
+			}
+		},
+		"warden.threat.cleared": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["source_type"],
+			"properties": {
+				"source_type": { "type": "string", "enum": ["web_fetch", "file_read"] },
+				"cleared_by": {
+					"type": "string",
+					"enum": ["timeout", "user_override", "subsequent_scan_clean"]
+				}
+			}
+		},
+		"warden.gate.blocked": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["blocked_operation", "threat_source_type"],
+			"properties": {
+				"blocked_operation": {
+					"type": "string",
+					"enum": ["tool.file.write", "tool.file.edit", "tool.shell.exec"]
+				},
+				"threat_source_type": {
+					"type": "string",
+					"enum": ["web_fetch", "file_read"]
+				}
+			}
+		}
+	}
 }

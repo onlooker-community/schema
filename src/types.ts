@@ -1,498 +1,510 @@
 import type { EventType } from "./event-types.js";
 
-export type RuntimeId = "claude-code" | "cursor" | "copilot" | "gemini" | "custom";
+export type RuntimeId =
+	| "claude-code"
+	| "cursor"
+	| "copilot"
+	| "gemini"
+	| "custom";
 
 export interface SessionStartPayload {
-  working_directory: string;
-  git_branch?: string;
-  git_commit?: string;
-  resume_of_session_id?: string;
+	working_directory: string;
+	git_branch?: string;
+	git_commit?: string;
+	resume_of_session_id?: string;
 }
 
 export interface SessionEndPayload {
-  duration_ms: number;
-  turn_count: number;
-  total_cost_usd?: number;
-  total_tokens?: number;
-  end_reason?: "user_exit" | "timeout" | "error" | "task_complete" | "unknown";
+	duration_ms: number;
+	turn_count: number;
+	total_cost_usd?: number;
+	total_tokens?: number;
+	end_reason?: "user_exit" | "timeout" | "error" | "task_complete" | "unknown";
 }
 
 export interface SessionCompactPayload {
-  tokens_before: number;
-  tokens_after: number;
-  compression_ratio?: number;
+	tokens_before: number;
+	tokens_after: number;
+	compression_ratio?: number;
 }
 
 export interface SessionPromptPayload {
-  turn_number: number;
-  input_summary?: string;
-  context_tokens?: number;
+	turn_number: number;
+	input_summary?: string;
+	context_tokens?: number;
 }
 
 export interface ToolFileReadPayload {
-  path: string;
-  lines_read?: number;
-  file_size_bytes?: number;
+	path: string;
+	lines_read?: number;
+	file_size_bytes?: number;
 }
 
 export interface ToolFileWritePayload {
-  path: string;
-  operation: "create" | "overwrite";
-  bytes_written?: number;
-  lines_written?: number;
+	path: string;
+	operation: "create" | "overwrite";
+	bytes_written?: number;
+	lines_written?: number;
 }
 
 export interface ToolFileEditPayload {
-  path: string;
-  lines_changed?: number;
+	path: string;
+	lines_changed?: number;
 }
 
 export interface ToolShellExecPayload {
-  command: string;
-  exit_code?: number;
-  duration_ms?: number;
-  working_directory?: string;
-  blocked?: boolean;
+	command: string;
+	exit_code?: number;
+	duration_ms?: number;
+	working_directory?: string;
+	blocked?: boolean;
 }
 
 export interface ToolWebFetchPayload {
-  url: string;
-  status_code?: number;
-  response_bytes?: number;
-  blocked?: boolean;
+	url: string;
+	status_code?: number;
+	response_bytes?: number;
+	blocked?: boolean;
 }
 
 export interface ToolAgentSpawnPayload {
-  subagent_id: string;
-  agent_name?: string;
-  task_summary?: string;
-  blocked?: boolean;
+	subagent_id: string;
+	agent_name?: string;
+	task_summary?: string;
+	blocked?: boolean;
 }
 
 export interface ToolAgentCompletePayload {
-  subagent_id: string;
-  success: boolean;
-  agent_name?: string;
-  duration_ms?: number;
-  cost_usd?: number;
-  output_summary?: string;
+	subagent_id: string;
+	success: boolean;
+	agent_name?: string;
+	duration_ms?: number;
+	cost_usd?: number;
+	output_summary?: string;
 }
 
 export interface SentinelBlockedPayload {
-  command: string;
-  risk_level: "critical" | "high" | "medium";
-  matched_pattern: string;
-  reason?: string;
+	command: string;
+	risk_level: "critical" | "high" | "medium";
+	matched_pattern: string;
+	reason?: string;
 }
 
 export interface SentinelAllowedPayload {
-  command: string;
-  risk_level: "low" | "none";
-  review_required?: boolean;
+	command: string;
+	risk_level: "low" | "none";
+	review_required?: boolean;
 }
 
 export interface SentinelReviewedPayload {
-  command: string;
-  decision: "approved" | "rejected";
-  review_duration_ms?: number;
+	command: string;
+	decision: "approved" | "rejected";
+	review_duration_ms?: number;
 }
 
 export interface TribunalVerdictPayload {
-  task_id: string;
-  score: number;
-  passed: boolean;
-  judge_type:
-    | "standard"
-    | "security"
-    | "maintainability"
-    | "adversarial"
-    | "domain"
-    | "meta";
-  feedback_summary?: string;
-  file_path?: string;
+	task_id: string;
+	score: number;
+	passed: boolean;
+	judge_type:
+		| "standard"
+		| "security"
+		| "maintainability"
+		| "adversarial"
+		| "domain"
+		| "meta";
+	feedback_summary?: string;
+	file_path?: string;
 }
 
 export interface TribunalActorCompletePayload {
-  task_id: string;
-  success: boolean;
-  duration_ms?: number;
-  skepticism_rounds?: number;
+	task_id: string;
+	success: boolean;
+	duration_ms?: number;
+	skepticism_rounds?: number;
 }
 
 export interface TribunalMetaCompletePayload {
-  task_id: string;
-  verdict_quality: "sound" | "questionable" | "biased";
-  bias_detected: boolean;
-  override_recommendation?: "accept" | "reject" | "re-evaluate";
+	task_id: string;
+	verdict_quality: "sound" | "questionable" | "biased";
+	bias_detected: boolean;
+	override_recommendation?: "accept" | "reject" | "re-evaluate";
 }
 
 export interface WardenThreatDetectedPayload {
-  source_type: "web_fetch" | "file_read";
-  threat_type:
-    | "prompt_injection"
-    | "instruction_override"
-    | "credential_exfiltration"
-    | "command_injection"
-    | "social_engineering";
-  confidence: number;
-  source_url?: string;
-  source_path?: string;
-  snippet?: string;
+	source_type: "web_fetch" | "file_read";
+	threat_type:
+		| "prompt_injection"
+		| "instruction_override"
+		| "credential_exfiltration"
+		| "command_injection"
+		| "social_engineering";
+	confidence: number;
+	source_url?: string;
+	source_path?: string;
+	snippet?: string;
 }
 
 export interface WardenThreatClearedPayload {
-  source_type: "web_fetch" | "file_read";
-  cleared_by?: "timeout" | "user_override" | "subsequent_scan_clean";
+	source_type: "web_fetch" | "file_read";
+	cleared_by?: "timeout" | "user_override" | "subsequent_scan_clean";
 }
 
 export interface WardenGateBlockedPayload {
-  blocked_operation: "tool.file.write" | "tool.file.edit" | "tool.shell.exec";
-  threat_source_type: "web_fetch" | "file_read";
+	blocked_operation: "tool.file.write" | "tool.file.edit" | "tool.shell.exec";
+	threat_source_type: "web_fetch" | "file_read";
 }
 
 export interface OracleCalibrationRequestedPayload {
-  trigger: "user_prompt" | "pre_write" | "pre_bash";
-  task_summary?: string;
+	trigger: "user_prompt" | "pre_write" | "pre_bash";
+	task_summary?: string;
 }
 
 export interface OracleCalibrationCompletePayload {
-  trigger: "user_prompt" | "pre_write" | "pre_bash";
-  confidence_score: number;
-  intervened: boolean;
-  misalignment_detected?: boolean;
+	trigger: "user_prompt" | "pre_write" | "pre_bash";
+	confidence_score: number;
+	intervened: boolean;
+	misalignment_detected?: boolean;
 }
 
 export interface ArchivistExtractCompletePayload {
-  session_id: string;
-  item_count: number;
-  decision_count?: number;
-  dead_end_count?: number;
-  open_question_count?: number;
-  file_count?: number;
-  trigger?: "pre_compact" | "session_end" | "manual";
+	session_id: string;
+	item_count: number;
+	decision_count?: number;
+	dead_end_count?: number;
+	open_question_count?: number;
+	file_count?: number;
+	trigger?: "pre_compact" | "session_end" | "manual";
 }
 
 export interface ArchivistInjectCompletePayload {
-  source_session_id: string;
-  items_injected: number;
-  items_available?: number;
+	source_session_id: string;
+	items_injected: number;
+	items_available?: number;
 }
 
 export interface RelayHandoffCapturedPayload {
-  session_id: string;
-  tasks_in_progress?: number;
-  blocking_questions?: number;
-  files_in_flight?: number;
+	session_id: string;
+	tasks_in_progress?: number;
+	blocking_questions?: number;
+	files_in_flight?: number;
 }
 
 export interface RelayHandoffInjectedPayload {
-  source_session_id: string;
-  age_ms?: number;
+	source_session_id: string;
+	age_ms?: number;
 }
 
 export interface ScribeCaptureCompletePayload {
-  file_path: string;
-  operation: "write" | "edit";
-  intent_summary?: string;
+	file_path: string;
+	operation: "write" | "edit";
+	intent_summary?: string;
 }
 
 export interface ScribeDistillCompletePayload {
-  session_id: string;
-  captures_processed: number;
-  artifacts_produced: number;
+	session_id: string;
+	captures_processed: number;
+	artifacts_produced: number;
 }
 
 export interface CuesMatchedPayload {
-  cue_id: string;
-  match_type: "regex" | "vocabulary" | "semantic";
-  trigger_source: "prompt" | "command" | "file_path";
-  cue_name?: string;
+	cue_id: string;
+	match_type: "regex" | "vocabulary" | "semantic";
+	trigger_source: "prompt" | "command" | "file_path";
+	cue_name?: string;
 }
 
 export interface CuesAppliedPayload {
-  cue_id: string;
-  cue_name?: string;
-  guidance_length?: number;
+	cue_id: string;
+	cue_name?: string;
+	guidance_length?: number;
 }
 
 export interface CartographerIssueCategories {
-  contradictions?: number;
-  stale_references?: number;
-  orphaned_plugins?: number;
-  dead_tools?: number;
-  duplicates?: number;
-  hierarchy_conflicts?: number;
+	contradictions?: number;
+	stale_references?: number;
+	orphaned_plugins?: number;
+	dead_tools?: number;
+	duplicates?: number;
+	hierarchy_conflicts?: number;
 }
 
 export interface CartographerAuditCompletePayload {
-  files_audited: number;
-  issues_found: number;
-  trigger?: "instructions_loaded" | "config_change" | "manual";
-  issue_categories?: CartographerIssueCategories;
+	files_audited: number;
+	issues_found: number;
+	trigger?: "instructions_loaded" | "config_change" | "manual";
+	issue_categories?: CartographerIssueCategories;
 }
 
 export interface CartographerIssueFoundPayload {
-  issue_type:
-    | "contradiction"
-    | "stale_reference"
-    | "orphaned_plugin"
-    | "dead_tool"
-    | "duplicate"
-    | "hierarchy_conflict";
-  file_path: string;
-  severity: "error" | "warning" | "info";
-  description?: string;
+	issue_type:
+		| "contradiction"
+		| "stale_reference"
+		| "orphaned_plugin"
+		| "dead_tool"
+		| "duplicate"
+		| "hierarchy_conflict";
+	file_path: string;
+	severity: "error" | "warning" | "info";
+	description?: string;
 }
 
 export interface LedgerBudgetWarningPayload {
-  budget_usd: number;
-  spent_usd: number;
-  threshold_pct: number;
-  remaining_usd?: number;
+	budget_usd: number;
+	spent_usd: number;
+	threshold_pct: number;
+	remaining_usd?: number;
 }
 
 export interface LedgerBudgetExceededPayload {
-  budget_usd: number;
-  spent_usd: number;
-  blocked_operation: string;
+	budget_usd: number;
+	spent_usd: number;
+	blocked_operation: string;
 }
 
 export interface LedgerSessionCompletePayload {
-  total_cost_usd: number;
-  budget_usd: number;
-  under_budget: boolean;
-  cost_by_plugin?: Record<string, number>;
+	total_cost_usd: number;
+	budget_usd: number;
+	under_budget: boolean;
+	cost_by_plugin?: Record<string, number>;
 }
 
 export interface EchoSuiteStartedPayload {
-  suite_id: string;
-  test_count: number;
-  suite_name?: string;
-  trigger?: "config_change" | "manual";
-  changed_file?: string;
+	suite_id: string;
+	test_count: number;
+	suite_name?: string;
+	trigger?: "config_change" | "manual";
+	changed_file?: string;
 }
 
 export interface EchoSuiteCompletePayload {
-  suite_id: string;
-  test_count: number;
-  improved: number;
-  degraded: number;
-  neutral: number;
-  merge_recommended?: boolean;
-  duration_ms?: number;
+	suite_id: string;
+	test_count: number;
+	improved: number;
+	degraded: number;
+	neutral: number;
+	merge_recommended?: boolean;
+	duration_ms?: number;
 }
 
 export interface EchoRegressionDetectedPayload {
-  suite_id: string;
-  test_id: string;
-  score_before: number;
-  score_after: number;
-  test_name?: string;
-  delta?: number;
+	suite_id: string;
+	test_id: string;
+	score_before: number;
+	score_after: number;
+	test_name?: string;
+	delta?: number;
 }
 
 export type CounselSource =
-  | "onlooker_events"
-  | "tribunal_verdicts"
-  | "echo_regressions"
-  | "sentinel_audit"
-  | "warden_audit"
-  | "oracle_calibrations"
-  | "meridian_reliance";
+	| "onlooker_events"
+	| "tribunal_verdicts"
+	| "echo_regressions"
+	| "sentinel_audit"
+	| "warden_audit"
+	| "oracle_calibrations"
+	| "meridian_reliance";
 
 export interface CounselBriefGeneratedPayload {
-  period_start: string;
-  period_end: string;
-  recommendation_count: number;
-  sources_consulted?: CounselSource[];
+	period_start: string;
+	period_end: string;
+	recommendation_count: number;
+	sources_consulted?: CounselSource[];
 }
 
 export interface OnlookerToolCounts {
-  file_reads?: number;
-  file_writes?: number;
-  file_edits?: number;
-  shell_execs?: number;
-  web_fetches?: number;
-  agent_spawns?: number;
+	file_reads?: number;
+	file_writes?: number;
+	file_edits?: number;
+	shell_execs?: number;
+	web_fetches?: number;
+	agent_spawns?: number;
 }
 
 export interface OnlookerSessionSummaryPayload {
-  session_id: string;
-  duration_ms: number;
-  event_count: number;
-  tool_counts?: OnlookerToolCounts;
+	session_id: string;
+	duration_ms: number;
+	event_count: number;
+	tool_counts?: OnlookerToolCounts;
 }
 
 export type MeridianTaskType = "code" | "reasoning" | "writing" | "general";
 
 export interface MeridianHintGeneratedPayload {
-  hint_id: string;
-  case_id: string;
-  task_type: MeridianTaskType;
-  failure_type:
-    | "wrong_approach"
-    | "missing_concept"
-    | "implementation_error"
-    | "misunderstood_task"
-    | "out_of_scope";
-  hint_direction:
-    | "reframe"
-    | "missing_tool"
-    | "intermediate_goal"
-    | "alternative_representation"
-    | "constraint_reminder";
-  target_concept?: string;
-  signal_creation?: number;
-  signal_transfer?: number;
-  playbook_bullets_injected?: number;
+	hint_id: string;
+	case_id: string;
+	task_type: MeridianTaskType;
+	failure_type:
+		| "wrong_approach"
+		| "missing_concept"
+		| "implementation_error"
+		| "misunderstood_task"
+		| "out_of_scope";
+	hint_direction:
+		| "reframe"
+		| "missing_tool"
+		| "intermediate_goal"
+		| "alternative_representation"
+		| "constraint_reminder";
+	target_concept?: string;
+	signal_creation?: number;
+	signal_transfer?: number;
+	playbook_bullets_injected?: number;
 }
 
 export interface MeridianHintDeliveredPayload {
-  hint_id: string;
-  case_id: string;
-  delivery_mode: "append" | "comment" | "inline" | "aside";
+	hint_id: string;
+	case_id: string;
+	delivery_mode: "append" | "comment" | "inline" | "aside";
 }
 
 export interface MeridianOutcomeRecordedPayload {
-  hint_id: string;
-  case_id: string;
-  succeeded: boolean;
-  attempts_after_hint: number;
-  hint_referenced?: boolean;
-  time_to_success_ms?: number;
+	hint_id: string;
+	case_id: string;
+	succeeded: boolean;
+	attempts_after_hint: number;
+	hint_referenced?: boolean;
+	time_to_success_ms?: number;
 }
 
 export interface MeridianRelianceMeasuredPayload {
-  hint_id: string;
-  case_id: string;
-  score: number;
-  assessment: "low" | "medium" | "high";
-  method: "logprob" | "judge";
+	hint_id: string;
+	case_id: string;
+	score: number;
+	assessment: "low" | "medium" | "high";
+	method: "logprob" | "judge";
 }
 
 export interface MeridianLessonCuratedPayload {
-  bullet_id: string;
-  case_id: string;
-  category: "failure_pattern" | "successful_hint" | "task_strategy" | "tool_usage";
-  task_type: MeridianTaskType;
-  target_concept: string;
-  origin?: "agent_failure" | "human_session" | "manual";
+	bullet_id: string;
+	case_id: string;
+	category:
+		| "failure_pattern"
+		| "successful_hint"
+		| "task_strategy"
+		| "tool_usage";
+	task_type: MeridianTaskType;
+	target_concept: string;
+	origin?: "agent_failure" | "human_session" | "manual";
 }
 
 export interface MeridianPlaybookUpdatedPayload {
-  scope_id: string;
-  operation: "append" | "update" | "deduplicate" | "promote" | "retire";
-  bullet_count_after: number;
-  bullets_removed?: number;
+	scope_id: string;
+	operation: "append" | "update" | "deduplicate" | "promote" | "retire";
+	bullet_count_after: number;
+	bullets_removed?: number;
 }
 
 export type PayloadFor<T extends EventType> = T extends "session.start"
-  ? SessionStartPayload
-  : T extends "session.end"
-    ? SessionEndPayload
-    : T extends "session.compact"
-      ? SessionCompactPayload
-      : T extends "session.prompt"
-        ? SessionPromptPayload
-        : T extends "tool.file.read"
-          ? ToolFileReadPayload
-          : T extends "tool.file.write"
-            ? ToolFileWritePayload
-            : T extends "tool.file.edit"
-              ? ToolFileEditPayload
-              : T extends "tool.shell.exec"
-                ? ToolShellExecPayload
-                : T extends "tool.web.fetch"
-                  ? ToolWebFetchPayload
-                  : T extends "tool.agent.spawn"
-                    ? ToolAgentSpawnPayload
-                    : T extends "tool.agent.complete"
-                      ? ToolAgentCompletePayload
-                      : T extends "sentinel.blocked"
-                        ? SentinelBlockedPayload
-                        : T extends "sentinel.allowed"
-                          ? SentinelAllowedPayload
-                          : T extends "sentinel.reviewed"
-                            ? SentinelReviewedPayload
-                            : T extends "tribunal.verdict"
-                              ? TribunalVerdictPayload
-                              : T extends "tribunal.actor.complete"
-                                ? TribunalActorCompletePayload
-                                : T extends "tribunal.meta.complete"
-                                  ? TribunalMetaCompletePayload
-                                  : T extends "warden.threat.detected"
-                                    ? WardenThreatDetectedPayload
-                                    : T extends "warden.threat.cleared"
-                                      ? WardenThreatClearedPayload
-                                      : T extends "warden.gate.blocked"
-                                        ? WardenGateBlockedPayload
-                                        : T extends "oracle.calibration.requested"
-                                          ? OracleCalibrationRequestedPayload
-                                          : T extends "oracle.calibration.complete"
-                                            ? OracleCalibrationCompletePayload
-                                            : T extends "archivist.extract.complete"
-                                              ? ArchivistExtractCompletePayload
-                                              : T extends "archivist.inject.complete"
-                                                ? ArchivistInjectCompletePayload
-                                                : T extends "relay.handoff.captured"
-                                                  ? RelayHandoffCapturedPayload
-                                                  : T extends "relay.handoff.injected"
-                                                    ? RelayHandoffInjectedPayload
-                                                    : T extends "scribe.capture.complete"
-                                                      ? ScribeCaptureCompletePayload
-                                                      : T extends "scribe.distill.complete"
-                                                        ? ScribeDistillCompletePayload
-                                                        : T extends "cues.matched"
-                                                          ? CuesMatchedPayload
-                                                          : T extends "cues.applied"
-                                                            ? CuesAppliedPayload
-                                                            : T extends "ledger.budget.warning"
-                                                              ? LedgerBudgetWarningPayload
-                                                              : T extends "ledger.budget.exceeded"
-                                                                ? LedgerBudgetExceededPayload
-                                                                : T extends "ledger.session.complete"
-                                                                  ? LedgerSessionCompletePayload
-                                                                  : T extends "echo.suite.started"
-                                                                    ? EchoSuiteStartedPayload
-                                                                    : T extends "echo.suite.complete"
-                                                                      ? EchoSuiteCompletePayload
-                                                                      : T extends "echo.regression.detected"
-                                                                        ? EchoRegressionDetectedPayload
-                                                                        : T extends "cartographer.audit.complete"
-                                                                          ? CartographerAuditCompletePayload
-                                                                          : T extends "cartographer.issue.found"
-                                                                            ? CartographerIssueFoundPayload
-                                                                            : T extends "counsel.brief.generated"
-                                                                              ? CounselBriefGeneratedPayload
-                                                                              : T extends "onlooker.session.summary"
-                                                                                ? OnlookerSessionSummaryPayload
-                                                                                : T extends "meridian.hint.generated"
-                                                                                  ? MeridianHintGeneratedPayload
-                                                                                  : T extends "meridian.hint.delivered"
-                                                                                    ? MeridianHintDeliveredPayload
-                                                                                    : T extends "meridian.outcome.recorded"
-                                                                                      ? MeridianOutcomeRecordedPayload
-                                                                                      : T extends "meridian.reliance.measured"
-                                                                                        ? MeridianRelianceMeasuredPayload
-                                                                                        : T extends "meridian.lesson.curated"
-                                                                                          ? MeridianLessonCuratedPayload
-                                                                                          : T extends "meridian.playbook.updated"
-                                                                                            ? MeridianPlaybookUpdatedPayload
-                                                                                            : Record<string, unknown>;
+	? SessionStartPayload
+	: T extends "session.end"
+		? SessionEndPayload
+		: T extends "session.compact"
+			? SessionCompactPayload
+			: T extends "session.prompt"
+				? SessionPromptPayload
+				: T extends "tool.file.read"
+					? ToolFileReadPayload
+					: T extends "tool.file.write"
+						? ToolFileWritePayload
+						: T extends "tool.file.edit"
+							? ToolFileEditPayload
+							: T extends "tool.shell.exec"
+								? ToolShellExecPayload
+								: T extends "tool.web.fetch"
+									? ToolWebFetchPayload
+									: T extends "tool.agent.spawn"
+										? ToolAgentSpawnPayload
+										: T extends "tool.agent.complete"
+											? ToolAgentCompletePayload
+											: T extends "sentinel.blocked"
+												? SentinelBlockedPayload
+												: T extends "sentinel.allowed"
+													? SentinelAllowedPayload
+													: T extends "sentinel.reviewed"
+														? SentinelReviewedPayload
+														: T extends "tribunal.verdict"
+															? TribunalVerdictPayload
+															: T extends "tribunal.actor.complete"
+																? TribunalActorCompletePayload
+																: T extends "tribunal.meta.complete"
+																	? TribunalMetaCompletePayload
+																	: T extends "warden.threat.detected"
+																		? WardenThreatDetectedPayload
+																		: T extends "warden.threat.cleared"
+																			? WardenThreatClearedPayload
+																			: T extends "warden.gate.blocked"
+																				? WardenGateBlockedPayload
+																				: T extends "oracle.calibration.requested"
+																					? OracleCalibrationRequestedPayload
+																					: T extends "oracle.calibration.complete"
+																						? OracleCalibrationCompletePayload
+																						: T extends "archivist.extract.complete"
+																							? ArchivistExtractCompletePayload
+																							: T extends "archivist.inject.complete"
+																								? ArchivistInjectCompletePayload
+																								: T extends "relay.handoff.captured"
+																									? RelayHandoffCapturedPayload
+																									: T extends "relay.handoff.injected"
+																										? RelayHandoffInjectedPayload
+																										: T extends "scribe.capture.complete"
+																											? ScribeCaptureCompletePayload
+																											: T extends "scribe.distill.complete"
+																												? ScribeDistillCompletePayload
+																												: T extends "cues.matched"
+																													? CuesMatchedPayload
+																													: T extends "cues.applied"
+																														? CuesAppliedPayload
+																														: T extends "ledger.budget.warning"
+																															? LedgerBudgetWarningPayload
+																															: T extends "ledger.budget.exceeded"
+																																? LedgerBudgetExceededPayload
+																																: T extends "ledger.session.complete"
+																																	? LedgerSessionCompletePayload
+																																	: T extends "echo.suite.started"
+																																		? EchoSuiteStartedPayload
+																																		: T extends "echo.suite.complete"
+																																			? EchoSuiteCompletePayload
+																																			: T extends "echo.regression.detected"
+																																				? EchoRegressionDetectedPayload
+																																				: T extends "cartographer.audit.complete"
+																																					? CartographerAuditCompletePayload
+																																					: T extends "cartographer.issue.found"
+																																						? CartographerIssueFoundPayload
+																																						: T extends "counsel.brief.generated"
+																																							? CounselBriefGeneratedPayload
+																																							: T extends "onlooker.session.summary"
+																																								? OnlookerSessionSummaryPayload
+																																								: T extends "meridian.hint.generated"
+																																									? MeridianHintGeneratedPayload
+																																									: T extends "meridian.hint.delivered"
+																																										? MeridianHintDeliveredPayload
+																																										: T extends "meridian.outcome.recorded"
+																																											? MeridianOutcomeRecordedPayload
+																																											: T extends "meridian.reliance.measured"
+																																												? MeridianRelianceMeasuredPayload
+																																												: T extends "meridian.lesson.curated"
+																																													? MeridianLessonCuratedPayload
+																																													: T extends "meridian.playbook.updated"
+																																														? MeridianPlaybookUpdatedPayload
+																																														: Record<
+																																																string,
+																																																unknown
+																																															>;
 
 export interface OnlookerEvent<T extends EventType = EventType> {
-  id: string;
-  schema_version: "1.0";
-  runtime: RuntimeId;
-  adapter_id?: string;
-  plugin: string;
-  machine_id: string;
-  timestamp: string;
-  session_id: string;
-  sequence: number;
-  event_type: T;
-  payload: PayloadFor<T>;
-  cost_usd?: number;
-  token_count?: number;
-  redacted?: boolean;
+	id: string;
+	schema_version: "1.0";
+	runtime: RuntimeId;
+	adapter_id?: string;
+	plugin: string;
+	machine_id: string;
+	timestamp: string;
+	session_id: string;
+	sequence: number;
+	event_type: T;
+	payload: PayloadFor<T>;
+	cost_usd?: number;
+	token_count?: number;
+	redacted?: boolean;
 }
