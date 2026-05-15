@@ -1,0 +1,36 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://onlooker.community/schemas/payload/task.json",
+	"title": "Task payloads",
+	"description": "Payload schemas for the task.* event family.",
+	"$defs": {
+		"task.start": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"task_summary": { "type": "string" }
+			}
+		},
+		"task.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["success"],
+			"properties": {
+				"success": { "type": "boolean", "const": true },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"output_summary": { "type": "string" }
+			}
+		},
+		"task.fail": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["success"],
+			"properties": {
+				"success": { "type": "boolean", "const": false },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"failure_reason": { "type": "string" },
+				"attempts": { "type": "integer", "minimum": 0 }
+			}
+		}
+	}
+}
