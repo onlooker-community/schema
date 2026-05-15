@@ -39,7 +39,7 @@ export interface TaskStartPayload {
 }
 
 export interface TaskCompletePayload {
-	success: boolean;
+	success: true;
 	duration_ms?: number;
 	output_summary?: string;
 }

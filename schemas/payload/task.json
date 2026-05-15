@@ -16,7 +16,7 @@
 			"additionalProperties": false,
 			"required": ["success"],
 			"properties": {
-				"success": { "type": "boolean" },
+				"success": { "type": "boolean", "const": true },
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"output_summary": { "type": "string" }
 			}
