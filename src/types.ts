@@ -34,6 +34,23 @@ export interface SessionPromptPayload {
 	context_tokens?: number;
 }
 
+export interface TaskStartPayload {
+	task_summary?: string;
+}
+
+export interface TaskCompletePayload {
+	success: boolean;
+	duration_ms?: number;
+	output_summary?: string;
+}
+
+export interface TaskFailPayload {
+	success: false;
+	duration_ms?: number;
+	failure_reason?: string;
+	attempts?: number;
+}
+
 export interface ToolFileReadPayload {
 	path: string;
 	lines_read?: number;
@@ -403,94 +420,100 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 			? SessionCompactPayload
 			: T extends "session.prompt"
 				? SessionPromptPayload
-				: T extends "tool.file.read"
-					? ToolFileReadPayload
-					: T extends "tool.file.write"
-						? ToolFileWritePayload
-						: T extends "tool.file.edit"
-							? ToolFileEditPayload
-							: T extends "tool.shell.exec"
-								? ToolShellExecPayload
-								: T extends "tool.web.fetch"
-									? ToolWebFetchPayload
-									: T extends "tool.agent.spawn"
-										? ToolAgentSpawnPayload
-										: T extends "tool.agent.complete"
-											? ToolAgentCompletePayload
-											: T extends "sentinel.blocked"
-												? SentinelBlockedPayload
-												: T extends "sentinel.allowed"
-													? SentinelAllowedPayload
-													: T extends "sentinel.reviewed"
-														? SentinelReviewedPayload
-														: T extends "tribunal.verdict"
-															? TribunalVerdictPayload
-															: T extends "tribunal.actor.complete"
-																? TribunalActorCompletePayload
-																: T extends "tribunal.meta.complete"
-																	? TribunalMetaCompletePayload
-																	: T extends "warden.threat.detected"
-																		? WardenThreatDetectedPayload
-																		: T extends "warden.threat.cleared"
-																			? WardenThreatClearedPayload
-																			: T extends "warden.gate.blocked"
-																				? WardenGateBlockedPayload
-																				: T extends "oracle.calibration.requested"
-																					? OracleCalibrationRequestedPayload
-																					: T extends "oracle.calibration.complete"
-																						? OracleCalibrationCompletePayload
-																						: T extends "archivist.extract.complete"
-																							? ArchivistExtractCompletePayload
-																							: T extends "archivist.inject.complete"
-																								? ArchivistInjectCompletePayload
-																								: T extends "relay.handoff.captured"
-																									? RelayHandoffCapturedPayload
-																									: T extends "relay.handoff.injected"
-																										? RelayHandoffInjectedPayload
-																										: T extends "scribe.capture.complete"
-																											? ScribeCaptureCompletePayload
-																											: T extends "scribe.distill.complete"
-																												? ScribeDistillCompletePayload
-																												: T extends "cues.matched"
-																													? CuesMatchedPayload
-																													: T extends "cues.applied"
-																														? CuesAppliedPayload
-																														: T extends "ledger.budget.warning"
-																															? LedgerBudgetWarningPayload
-																															: T extends "ledger.budget.exceeded"
-																																? LedgerBudgetExceededPayload
-																																: T extends "ledger.session.complete"
-																																	? LedgerSessionCompletePayload
-																																	: T extends "echo.suite.started"
-																																		? EchoSuiteStartedPayload
-																																		: T extends "echo.suite.complete"
-																																			? EchoSuiteCompletePayload
-																																			: T extends "echo.regression.detected"
-																																				? EchoRegressionDetectedPayload
-																																				: T extends "cartographer.audit.complete"
-																																					? CartographerAuditCompletePayload
-																																					: T extends "cartographer.issue.found"
-																																						? CartographerIssueFoundPayload
-																																						: T extends "counsel.brief.generated"
-																																							? CounselBriefGeneratedPayload
-																																							: T extends "onlooker.session.summary"
-																																								? OnlookerSessionSummaryPayload
-																																								: T extends "meridian.hint.generated"
-																																									? MeridianHintGeneratedPayload
-																																									: T extends "meridian.hint.delivered"
-																																										? MeridianHintDeliveredPayload
-																																										: T extends "meridian.outcome.recorded"
-																																											? MeridianOutcomeRecordedPayload
-																																											: T extends "meridian.reliance.measured"
-																																												? MeridianRelianceMeasuredPayload
-																																												: T extends "meridian.lesson.curated"
-																																													? MeridianLessonCuratedPayload
-																																													: T extends "meridian.playbook.updated"
-																																														? MeridianPlaybookUpdatedPayload
-																																														: Record<
-																																																string,
-																																																unknown
-																																															>;
+				: T extends "task.start"
+					? TaskStartPayload
+					: T extends "task.complete"
+						? TaskCompletePayload
+						: T extends "task.fail"
+							? TaskFailPayload
+							: T extends "tool.file.read"
+								? ToolFileReadPayload
+								: T extends "tool.file.write"
+									? ToolFileWritePayload
+									: T extends "tool.file.edit"
+										? ToolFileEditPayload
+										: T extends "tool.shell.exec"
+											? ToolShellExecPayload
+											: T extends "tool.web.fetch"
+												? ToolWebFetchPayload
+												: T extends "tool.agent.spawn"
+													? ToolAgentSpawnPayload
+													: T extends "tool.agent.complete"
+														? ToolAgentCompletePayload
+														: T extends "sentinel.blocked"
+															? SentinelBlockedPayload
+															: T extends "sentinel.allowed"
+																? SentinelAllowedPayload
+																: T extends "sentinel.reviewed"
+																	? SentinelReviewedPayload
+																	: T extends "tribunal.verdict"
+																		? TribunalVerdictPayload
+																		: T extends "tribunal.actor.complete"
+																			? TribunalActorCompletePayload
+																			: T extends "tribunal.meta.complete"
+																				? TribunalMetaCompletePayload
+																				: T extends "warden.threat.detected"
+																					? WardenThreatDetectedPayload
+																					: T extends "warden.threat.cleared"
+																						? WardenThreatClearedPayload
+																						: T extends "warden.gate.blocked"
+																							? WardenGateBlockedPayload
+																							: T extends "oracle.calibration.requested"
+																								? OracleCalibrationRequestedPayload
+																								: T extends "oracle.calibration.complete"
+																									? OracleCalibrationCompletePayload
+																									: T extends "archivist.extract.complete"
+																										? ArchivistExtractCompletePayload
+																										: T extends "archivist.inject.complete"
+																											? ArchivistInjectCompletePayload
+																											: T extends "relay.handoff.captured"
+																												? RelayHandoffCapturedPayload
+																												: T extends "relay.handoff.injected"
+																													? RelayHandoffInjectedPayload
+																													: T extends "scribe.capture.complete"
+																														? ScribeCaptureCompletePayload
+																														: T extends "scribe.distill.complete"
+																															? ScribeDistillCompletePayload
+																															: T extends "cues.matched"
+																																? CuesMatchedPayload
+																																: T extends "cues.applied"
+																																	? CuesAppliedPayload
+																																	: T extends "ledger.budget.warning"
+																																		? LedgerBudgetWarningPayload
+																																		: T extends "ledger.budget.exceeded"
+																																			? LedgerBudgetExceededPayload
+																																			: T extends "ledger.session.complete"
+																																				? LedgerSessionCompletePayload
+																																				: T extends "echo.suite.started"
+																																					? EchoSuiteStartedPayload
+																																					: T extends "echo.suite.complete"
+																																						? EchoSuiteCompletePayload
+																																						: T extends "echo.regression.detected"
+																																							? EchoRegressionDetectedPayload
+																																							: T extends "cartographer.audit.complete"
+																																								? CartographerAuditCompletePayload
+																																								: T extends "cartographer.issue.found"
+																																									? CartographerIssueFoundPayload
+																																									: T extends "counsel.brief.generated"
+																																										? CounselBriefGeneratedPayload
+																																										: T extends "onlooker.session.summary"
+																																											? OnlookerSessionSummaryPayload
+																																											: T extends "meridian.hint.generated"
+																																												? MeridianHintGeneratedPayload
+																																												: T extends "meridian.hint.delivered"
+																																													? MeridianHintDeliveredPayload
+																																													: T extends "meridian.outcome.recorded"
+																																														? MeridianOutcomeRecordedPayload
+																																														: T extends "meridian.reliance.measured"
+																																															? MeridianRelianceMeasuredPayload
+																																															: T extends "meridian.lesson.curated"
+																																																? MeridianLessonCuratedPayload
+																																																: T extends "meridian.playbook.updated"
+																																																	? MeridianPlaybookUpdatedPayload
+																																																	: Record<
+																																																			string,
+																																																			unknown
+																																																		>;
 
 export interface OnlookerEvent<T extends EventType = EventType> {
 	id: string;
