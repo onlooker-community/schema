@@ -4,6 +4,19 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/onlooker-community/schema/compare/v1.0.0...v1.1.0) (2026-05-15)
+
+
+### Features
+
+* add payload schemas for task.* event types ([e9e6ad2](https://github.com/onlooker-community/schema/commit/e9e6ad21bd13b089fa3a91f9fc5af6585305389c))
+* **schema:** add payload schemas for task.* events (ONL-15) ([2560fcb](https://github.com/onlooker-community/schema/commit/2560fcbfbfb04de550bcca1c42eb31ae1e849a89))
+
+
+### Bug Fixes
+
+* **schema:** pin task.complete success to const true ([eaaf946](https://github.com/onlooker-community/schema/commit/eaaf946c2491b217fafc2ebfd14bc692854ac1b4))
+
 ## 1.0.0 (2026-05-08)
 
 
