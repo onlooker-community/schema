@@ -17,7 +17,8 @@
 		"schemas"
 	],
 	"scripts": {
-		"build": "tsc -p tsconfig.build.json",
+		"build": "tsc -p tsconfig.build.json && npm run generate-types",
+		"generate-types": "node scripts/generate-types.js",
 		"ci": "npx @biomejs/biome ci",
 		"lint": "npx @biomejs/biome lint",
 		"lint:fix": "npx @biomejs/biome lint --fix",
@@ -37,6 +38,7 @@
 		"@biomejs/biome": "2.4.14",
 		"@types/node": "^20.0.0",
 		"@vitest/coverage-v8": "^1.6.1",
+		"json-schema-to-typescript": "^15.0.4",
 		"typescript": "^5.0.0",
 		"vitest": "^1.0.0"
 	}
