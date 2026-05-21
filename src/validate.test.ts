@@ -343,7 +343,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 49 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(49);
+	it("has exactly 50 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(50);
 	});
 });
