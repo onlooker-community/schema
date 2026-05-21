@@ -1,0 +1,27 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://schema.onlooker.dev/schemas/payload/skill.json",
+	"title": "Skill payloads",
+	"description": "Payload schemas for skill.* events.",
+	"$defs": {
+		"skill.invoked": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["skill_name", "invocation_source"],
+			"properties": {
+				"skill_name": { "type": "string" },
+				"invocation_source": {
+					"type": "string",
+					"enum": ["slash_command", "tool"]
+				},
+				"command_args": { "type": "string" },
+				"command_source": { "type": "string" },
+				"expansion_type": {
+					"type": "string",
+					"enum": ["slash_command", "mcp_prompt"]
+				},
+				"turn_number": { "type": "integer", "minimum": 1 }
+			}
+		}
+	}
+}

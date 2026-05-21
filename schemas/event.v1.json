@@ -67,6 +67,7 @@
 				"session.end",
 				"session.compact",
 				"session.prompt",
+				"skill.invoked",
 				"task.start",
 				"task.complete",
 				"task.fail",

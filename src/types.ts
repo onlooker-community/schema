@@ -34,6 +34,15 @@ export interface SessionPromptPayload {
 	context_tokens?: number;
 }
 
+export interface SkillInvokedPayload {
+	skill_name: string;
+	invocation_source: "slash_command" | "tool";
+	command_args?: string;
+	command_source?: string;
+	expansion_type?: "slash_command" | "mcp_prompt";
+	turn_number?: number;
+}
+
 export interface TaskStartPayload {
 	task_summary?: string;
 }
@@ -420,7 +429,9 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 			? SessionCompactPayload
 			: T extends "session.prompt"
 				? SessionPromptPayload
-				: T extends "task.start"
+				: T extends "skill.invoked"
+					? SkillInvokedPayload
+					: T extends "task.start"
 					? TaskStartPayload
 					: T extends "task.complete"
 						? TaskCompletePayload

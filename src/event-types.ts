@@ -3,6 +3,8 @@ export const SESSION_END = "session.end" as const;
 export const SESSION_COMPACT = "session.compact" as const;
 export const SESSION_PROMPT = "session.prompt" as const;
 
+export const SKILL_INVOKED = "skill.invoked" as const;
+
 export const TASK_START = "task.start" as const;
 export const TASK_COMPLETE = "task.complete" as const;
 export const TASK_FAIL = "task.fail" as const;
@@ -72,6 +74,7 @@ export const ALL_EVENT_TYPES = [
 	SESSION_END,
 	SESSION_COMPACT,
 	SESSION_PROMPT,
+	SKILL_INVOKED,
 	TASK_START,
 	TASK_COMPLETE,
 	TASK_FAIL,
