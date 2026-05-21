@@ -146,7 +146,7 @@ Deploy (requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/)
 npm run deploy:schemas
 ```
 
-CI deploys on every push to `main` via `.github/workflows/deploy-schemas.yml`. Set repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, then attach the custom domain `schema.onlooker.dev` to the `onlooker-schemas` Worker in the Cloudflare dashboard.
+CI deploys when a GitHub release is published (after a successful `v*.*.*` tag release and npm publish) via `.github/workflows/deploy-schemas.yml`. Set repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, then attach the custom domain `schema.onlooker.dev` to the `onlooker-schemas` Worker in the Cloudflare dashboard.
 
 ## Development
 
