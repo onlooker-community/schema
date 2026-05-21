@@ -128,6 +128,26 @@ node -p "require.resolve('@onlooker-community/schema/schemas/event.v1.json')"
 - Removing an event type, making an optional field required, tightening an enum, or changing `additionalProperties` is a **major** release and bumps `schema_version`.
 - Payload schemas for `task.start`, `task.complete`, and `task.fail` are intentionally minimal in `1.0.0` and will be filled in during the `1.x` line.
 
+## Hosted JSON Schema URLs
+
+Each schema file declares a canonical `$id` under `https://schema.onlooker.dev/schemas/…` (for example `https://schema.onlooker.dev/schemas/event.v1.json`). Those paths are served as static assets from a Cloudflare Worker.
+
+Local preview:
+
+```bash
+npm run prepare:assets
+npx wrangler dev
+# e.g. http://localhost:8787/schemas/event.v1.json
+```
+
+Deploy (requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) login or API token):
+
+```bash
+npm run deploy:schemas
+```
+
+CI deploys on every push to `main` via `.github/workflows/deploy-schemas.yml`. Set repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, then attach the custom domain `schema.onlooker.dev` to the `onlooker-schemas` Worker in the Cloudflare dashboard.
+
 ## Development
 
 ```bash

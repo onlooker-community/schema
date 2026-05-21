@@ -1,0 +1,4 @@
+# JSON Schema files are fetched cross-origin by validators and tooling.
+/schemas/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600, must-revalidate

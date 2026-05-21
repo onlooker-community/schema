@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://onlooker.community/schemas/payload/session.json",
+	"$id": "https://schema.onlooker.dev/schemas/payload/session.json",
 	"title": "Session payloads",
 	"description": "Payload schemas for the session.* event family.",
 	"$defs": {

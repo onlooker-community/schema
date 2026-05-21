@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://onlooker.community/schemas/payload/plugins-ops.json",
+	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-ops.json",
 	"title": "Ops plugin payloads",
 	"description": "Payload schemas for ledger.*, echo.*, counsel.*, onlooker.*, and meridian.* events.",
 	"$defs": {

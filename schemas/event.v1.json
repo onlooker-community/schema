@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://onlooker.community/schemas/event.v1.json",
+	"$id": "https://schema.onlooker.dev/schemas/event.v1.json",
 	"title": "OnlookerEvent",
 	"description": "Canonical event envelope for the Onlooker ecosystem.",
 	"type": "object",

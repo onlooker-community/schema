@@ -1,0 +1,11 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "onlooker-schemas",
+	"compatibility_date": "2026-05-21",
+	"routes": [
+		{ "pattern": "schema.onlooker.dev/*", "zone_name": "onlooker.dev" }
+	],
+	"assets": {
+		"directory": "./public"
+	}
+}

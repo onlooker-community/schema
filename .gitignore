@@ -1,6 +1,9 @@
 node_modules/
 dist/
+public/schemas/
 *.log
 .DS_Store
 .vitest-cache/
 coverage/
+
+.wrangler/

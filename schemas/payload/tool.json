@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://onlooker.community/schemas/payload/tool.json",
+	"$id": "https://schema.onlooker.dev/schemas/payload/tool.json",
 	"title": "Tool payloads",
 	"description": "Payload schemas for the tool.* event family.",
 	"$defs": {

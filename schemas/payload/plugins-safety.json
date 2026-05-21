@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://onlooker.community/schemas/payload/plugins-safety.json",
+	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-safety.json",
 	"title": "Safety plugin payloads",
 	"description": "Payload schemas for sentinel.*, tribunal.*, and warden.* events.",
 	"$defs": {

@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://onlooker.community/schemas/payload/task.json",
+	"$id": "https://schema.onlooker.dev/schemas/payload/task.json",
 	"title": "Task payloads",
 	"description": "Payload schemas for the task.* event family.",
 	"$defs": {

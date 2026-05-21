@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "https://onlooker.community/schemas/payload/plugins-memory.json",
+	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-memory.json",
 	"title": "Memory plugin payloads",
 	"description": "Payload schemas for archivist.*, relay.*, scribe.*, oracle.*, cues.*, and cartographer.* events.",
 	"$defs": {
