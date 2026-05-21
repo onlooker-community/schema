@@ -5,6 +5,9 @@
 	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+  "repository": {
+    "url": "https://github.com/onlooker-community/schema"
+  },
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
