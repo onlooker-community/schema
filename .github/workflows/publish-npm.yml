@@ -100,6 +100,9 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     needs: [validate, test]
     environment: npm-publish
     steps:
@@ -111,6 +114,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: npm
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - run: npm ci
       - run: npm run build
 
@@ -120,9 +126,6 @@ jobs:
             --tag ${{ needs.validate.outputs.npm_tag }} \
             --access public \
             --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
