@@ -4,6 +4,18 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0](https://github.com/onlooker-community/schema/compare/v1.2.0...v1.3.0) (2026-05-21)
+
+
+### Features
+
+* **schema:** add Cloudflare Worker deployment and static asset preparation ([9a8b652](https://github.com/onlooker-community/schema/commit/9a8b6528e2a77fd256688470f9ed62458145357b))
+
+
+### Bug Fixes
+
+* **ci:** update deployment trigger to release events in GitHub Actions ([5c998e8](https://github.com/onlooker-community/schema/commit/5c998e8e39ebe5eaf748596aa9c74764815ebdd7))
+
 ## [1.2.0](https://github.com/onlooker-community/schema/compare/v1.1.0...v1.2.0) (2026-05-16)
 
 
