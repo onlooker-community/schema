@@ -7,11 +7,48 @@
 		"tool.file.read": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["path"],
+			"required": ["path", "read_mode"],
 			"properties": {
 				"path": { "type": "string" },
-				"lines_read": { "type": "integer", "minimum": 0 },
-				"file_size_bytes": { "type": "integer", "minimum": 0 }
+				"read_mode": {
+					"type": "string",
+					"enum": ["full", "partial"],
+					"description": "Whether the Read tool used line offset/limit (partial) or read the whole file (full)."
+				},
+				"offset": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Line offset from tool_input when present (partial reads)."
+				},
+				"limit": {
+					"type": "integer",
+					"minimum": 1,
+					"description": "Line limit from tool_input when present (partial reads)."
+				},
+				"lines_read": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Lines returned in tool_response content."
+				},
+				"file_size_bytes": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Bytes of content returned in tool_response."
+				},
+				"file_bytes_on_disk": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "File size on disk when path is readable at hook time."
+				},
+				"file_lines_on_disk": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Total line count on disk when measured (omitted for very large files)."
+				},
+				"large_file_full_read": {
+					"type": "boolean",
+					"description": "True when read_mode is full and on-disk file exceeds the large-file threshold."
+				}
 			}
 		},
 		"tool.file.write": {

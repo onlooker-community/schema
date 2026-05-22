@@ -62,8 +62,14 @@ export interface TaskFailPayload {
 
 export interface ToolFileReadPayload {
 	path: string;
+	read_mode: "full" | "partial";
+	offset?: number;
+	limit?: number;
 	lines_read?: number;
 	file_size_bytes?: number;
+	file_bytes_on_disk?: number;
+	file_lines_on_disk?: number;
+	large_file_full_read?: boolean;
 }
 
 export interface ToolFileWritePayload {
