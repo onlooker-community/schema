@@ -4,6 +4,17 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0](https://github.com/onlooker-community/schema/compare/v1.4.1...v2.0.0) (2026-05-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **events:** cues.matched and cues.applied event types are renamed to prompt_rule.matched and prompt_rule.applied. Payload field names also change (cue_id -> rule_id, cue_name -> rule_name, guidance_length -> guidance_chars). Consumers emitting cues.* must update to the new names; the experimental marketplace cues plugin is already being replaced.
+
+### Features
+
+* **events:** rename cues.* to prompt_rule.* :nail_care: ([#16](https://github.com/onlooker-community/schema/issues/16)) ([d234f32](https://github.com/onlooker-community/schema/commit/d234f32a5778c0766bbe3afdb322a12673d7347b))
+
 ## [1.4.1](https://github.com/onlooker-community/schema/compare/v1.4.0...v1.4.1) (2026-05-22)
 
 
