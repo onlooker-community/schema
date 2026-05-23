@@ -43,8 +43,8 @@ export const RELAY_HANDOFF_INJECTED = "relay.handoff.injected" as const;
 export const SCRIBE_CAPTURE_COMPLETE = "scribe.capture.complete" as const;
 export const SCRIBE_DISTILL_COMPLETE = "scribe.distill.complete" as const;
 
-export const CUES_MATCHED = "cues.matched" as const;
-export const CUES_APPLIED = "cues.applied" as const;
+export const PROMPT_RULE_MATCHED = "prompt_rule.matched" as const;
+export const PROMPT_RULE_APPLIED = "prompt_rule.applied" as const;
 
 export const LEDGER_BUDGET_WARNING = "ledger.budget.warning" as const;
 export const LEDGER_BUDGET_EXCEEDED = "ledger.budget.exceeded" as const;
@@ -102,8 +102,8 @@ export const ALL_EVENT_TYPES = [
 	RELAY_HANDOFF_INJECTED,
 	SCRIBE_CAPTURE_COMPLETE,
 	SCRIBE_DISTILL_COMPLETE,
-	CUES_MATCHED,
-	CUES_APPLIED,
+	PROMPT_RULE_MATCHED,
+	PROMPT_RULE_APPLIED,
 	LEDGER_BUDGET_WARNING,
 	LEDGER_BUDGET_EXCEEDED,
 	LEDGER_SESSION_COMPLETE,

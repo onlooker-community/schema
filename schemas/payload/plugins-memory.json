@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-memory.json",
 	"title": "Memory plugin payloads",
-	"description": "Payload schemas for archivist.*, relay.*, scribe.*, oracle.*, cues.*, and cartographer.* events.",
+	"description": "Payload schemas for archivist.*, relay.*, scribe.*, oracle.*, prompt_rule.*, and cartographer.* events.",
 	"$defs": {
 		"archivist.extract.complete": {
 			"type": "object",
@@ -97,12 +97,12 @@
 				"misalignment_detected": { "type": "boolean" }
 			}
 		},
-		"cues.matched": {
+		"prompt_rule.matched": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["cue_id", "match_type", "trigger_source"],
+			"required": ["rule_id", "match_type", "trigger_source"],
 			"properties": {
-				"cue_id": { "type": "string" },
+				"rule_id": { "type": "string" },
 				"match_type": {
 					"type": "string",
 					"enum": ["regex", "vocabulary", "semantic"]
@@ -111,17 +111,17 @@
 					"type": "string",
 					"enum": ["prompt", "command", "file_path"]
 				},
-				"cue_name": { "type": "string" }
+				"rule_name": { "type": "string" }
 			}
 		},
-		"cues.applied": {
+		"prompt_rule.applied": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["cue_id"],
+			"required": ["rule_id"],
 			"properties": {
-				"cue_id": { "type": "string" },
-				"cue_name": { "type": "string" },
-				"guidance_length": { "type": "integer", "minimum": 0 }
+				"rule_id": { "type": "string" },
+				"rule_name": { "type": "string" },
+				"guidance_chars": { "type": "integer", "minimum": 0 }
 			}
 		},
 		"cartographer.audit.complete": {

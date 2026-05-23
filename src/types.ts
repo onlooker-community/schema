@@ -239,17 +239,17 @@ export interface ScribeDistillCompletePayload {
 	artifacts_produced: number;
 }
 
-export interface CuesMatchedPayload {
-	cue_id: string;
+export interface PromptRuleMatchedPayload {
+	rule_id: string;
 	match_type: "regex" | "vocabulary" | "semantic";
 	trigger_source: "prompt" | "command" | "file_path";
-	cue_name?: string;
+	rule_name?: string;
 }
 
-export interface CuesAppliedPayload {
-	cue_id: string;
-	cue_name?: string;
-	guidance_length?: number;
+export interface PromptRuleAppliedPayload {
+	rule_id: string;
+	rule_name?: string;
+	guidance_chars?: number;
 }
 
 export interface CartographerIssueCategories {
@@ -491,10 +491,10 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 																															? ScribeCaptureCompletePayload
 																															: T extends "scribe.distill.complete"
 																																? ScribeDistillCompletePayload
-																																: T extends "cues.matched"
-																																	? CuesMatchedPayload
-																																	: T extends "cues.applied"
-																																		? CuesAppliedPayload
+																																: T extends "prompt_rule.matched"
+																																	? PromptRuleMatchedPayload
+																																	: T extends "prompt_rule.applied"
+																																		? PromptRuleAppliedPayload
 																																		: T extends "ledger.budget.warning"
 																																			? LedgerBudgetWarningPayload
 																																			: T extends "ledger.budget.exceeded"
