@@ -47,7 +47,10 @@
 				"suite_id": { "type": "string" },
 				"test_count": { "type": "integer", "minimum": 0 },
 				"suite_name": { "type": "string" },
-				"trigger": { "type": "string", "enum": ["config_change", "manual", "file_change"] },
+				"trigger": {
+					"type": "string",
+					"enum": ["config_change", "manual", "file_change"]
+				},
 				"changed_file": { "type": "string" }
 			}
 		},
