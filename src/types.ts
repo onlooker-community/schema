@@ -287,7 +287,7 @@ export interface TribunalDissentRecordedPayload {
 	iteration_id: string;
 	disagreement_score: number;
 	judges: TribunalDissentingJudge[];
-	resolution?: "meta_override" | "majority" | "re_evaluate" | "escalate";
+	resolution?: "meta_override" | "majority" | "re-evaluate" | "escalate";
 }
 
 export interface TribunalGatePassedPayload {

@@ -15,15 +15,30 @@ const addFormats: FormatsPlugin =
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_PATH = resolve(HERE, "..", "schemas", "event.v1.json");
+const PAYLOAD_SCHEMA_PATH = resolve(
+	HERE,
+	"..",
+	"schemas",
+	"payload",
+	"plugins-safety.json",
+);
 
 const envelopeSchema: AnySchema = JSON.parse(
 	readFileSync(SCHEMA_PATH, "utf8"),
 ) as AnySchema;
+const payloadSchemas = JSON.parse(readFileSync(PAYLOAD_SCHEMA_PATH, "utf8")) as {
+	$defs?: Record<string, AnySchema>;
+};
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 
 const validateEnvelope: ValidateFunction = ajv.compile(envelopeSchema);
+
+const payloadValidators = new Map<string, ValidateFunction>();
+for (const [eventType, schema] of Object.entries(payloadSchemas.$defs ?? {})) {
+	payloadValidators.set(eventType, ajv.compile(schema));
+}
 
 export interface ValidationErrorDetail {
 	path: string;
@@ -54,10 +69,18 @@ function formatErrors(
 
 export function validate(raw: unknown): ValidationResult {
 	const ok = validateEnvelope(raw);
-	if (ok) {
-		return { valid: true, event: raw as OnlookerEvent };
+	if (!ok) {
+		return { valid: false, errors: formatErrors(validateEnvelope.errors) };
 	}
-	return { valid: false, errors: formatErrors(validateEnvelope.errors) };
+	const event = raw as OnlookerEvent;
+	const validatePayload = payloadValidators.get(event.event_type);
+	if (validatePayload) {
+		const payloadOk = validatePayload(event.payload);
+		if (!payloadOk) {
+			return { valid: false, errors: formatErrors(validatePayload.errors) };
+		}
+	}
+	return { valid: true, event };
 }
 
 export function validateOrThrow(raw: unknown): OnlookerEvent {

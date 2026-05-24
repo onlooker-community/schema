@@ -321,7 +321,7 @@
 				},
 				"resolution": {
 					"type": "string",
-					"enum": ["meta_override", "majority", "re_evaluate", "escalate"]
+					"enum": ["meta_override", "majority", "re-evaluate", "escalate"]
 				}
 			}
 		},
