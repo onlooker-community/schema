@@ -68,8 +68,14 @@
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"baseline_score": { "type": "number", "minimum": 0, "maximum": 1 },
 				"score_after": { "type": "number", "minimum": 0, "maximum": 1 },
-				"drift": { "type": "number" },
-				"drift_threshold": { "type": "number" }
+				"drift": { "type": "number", "minimum": -1, "maximum": 1 },
+				"drift_threshold": { "type": "number", "minimum": 0, "maximum": 1 }
+			},
+			"dependentRequired": {
+				"drift": ["baseline_score", "score_after", "drift_threshold"],
+				"baseline_score": ["score_after", "drift", "drift_threshold"],
+				"score_after": ["baseline_score", "drift", "drift_threshold"],
+				"drift_threshold": ["baseline_score", "score_after", "drift"]
 			}
 		},
 		"echo.regression.detected": {

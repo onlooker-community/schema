@@ -458,7 +458,14 @@ export interface EchoSuiteStartedPayload {
 	changed_file?: string;
 }
 
-export interface EchoSuiteCompletePayload {
+type EchoSuiteDrift = {
+	baseline_score: number;
+	score_after: number;
+	drift: number;
+	drift_threshold: number;
+};
+
+export type EchoSuiteCompletePayload = {
 	suite_id: string;
 	test_count: number;
 	improved: number;
@@ -466,11 +473,10 @@ export interface EchoSuiteCompletePayload {
 	neutral: number;
 	merge_recommended?: boolean;
 	duration_ms?: number;
-	baseline_score?: number;
-	score_after?: number;
-	drift?: number;
-	drift_threshold?: number;
-}
+} & (
+	| EchoSuiteDrift
+	| { baseline_score?: never; score_after?: never; drift?: never; drift_threshold?: never }
+);
 
 export interface EchoRegressionDetectedPayload {
 	suite_id: string;
