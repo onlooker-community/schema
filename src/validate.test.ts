@@ -8,6 +8,19 @@ import {
 	MERIDIAN_HINT_GENERATED,
 	SENTINEL_BLOCKED,
 	SESSION_START,
+	TRIBUNAL_ACTOR_COMPLETE,
+	TRIBUNAL_ACTOR_START,
+	TRIBUNAL_CONSENSUS_REACHED,
+	TRIBUNAL_DISSENT_RECORDED,
+	TRIBUNAL_GATE_BLOCKED,
+	TRIBUNAL_GATE_PASSED,
+	TRIBUNAL_ITERATION_START,
+	TRIBUNAL_JUDGE_START,
+	TRIBUNAL_JURY_EMPANELED,
+	TRIBUNAL_META_COMPLETE,
+	TRIBUNAL_META_START,
+	TRIBUNAL_SESSION_COMPLETE,
+	TRIBUNAL_SESSION_START,
 	TRIBUNAL_VERDICT,
 } from "./event-types.js";
 import type { OnlookerEvent } from "./types.js";
@@ -279,6 +292,191 @@ describe("createEvent", () => {
 	});
 });
 
+describe("tribunal full-loop events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const TASK_ID = "task-trib-1";
+	const ITERATION_ID = "iter-aaaa-0001";
+
+	function tribunal<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "tribunal",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a complete tribunal loop end-to-end", () => {
+		const events = [
+			tribunal(TRIBUNAL_SESSION_START, {
+				task_id: TASK_ID,
+				judge_types: ["standard", "security", "adversarial"],
+				gate_policy: "majority",
+				score_threshold: 0.8,
+				max_iterations: 3,
+				actor_model_id: "claude-opus-4-7",
+				judge_model_ids: ["claude-sonnet-4-6", "claude-sonnet-4-6"],
+				meta_model_id: "claude-opus-4-7",
+			}),
+			tribunal(TRIBUNAL_ITERATION_START, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				iteration_number: 0,
+				trigger: "initial",
+			}),
+			tribunal(TRIBUNAL_ACTOR_START, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				iteration_number: 0,
+				actor_model_id: "claude-opus-4-7",
+			}),
+			tribunal(TRIBUNAL_ACTOR_COMPLETE, {
+				task_id: TASK_ID,
+				success: true,
+				duration_ms: 4200,
+				iteration_id: ITERATION_ID,
+				iteration_number: 0,
+				artifact_kind: "patch",
+				actor_model_id: "claude-opus-4-7",
+			}),
+			tribunal(TRIBUNAL_JURY_EMPANELED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				panel_size: 2,
+				judges: [
+					{
+						judge_id: "j-1",
+						judge_type: "security",
+						model_id: "claude-sonnet-4-6",
+					},
+					{
+						judge_id: "j-2",
+						judge_type: "adversarial",
+						model_id: "claude-sonnet-4-6",
+					},
+				],
+			}),
+			tribunal(TRIBUNAL_JUDGE_START, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				judge_id: "j-1",
+				judge_type: "security",
+				judge_model_id: "claude-sonnet-4-6",
+			}),
+			tribunal(TRIBUNAL_VERDICT, {
+				task_id: TASK_ID,
+				score: 0.85,
+				passed: true,
+				judge_type: "security",
+				iteration_id: ITERATION_ID,
+				judge_id: "j-1",
+				judge_model_id: "claude-sonnet-4-6",
+				criteria_evaluated: ["input_validation", "secrets_handling"],
+				strengths_count: 3,
+				weaknesses_count: 1,
+				confidence: 0.9,
+			}),
+			tribunal(TRIBUNAL_CONSENSUS_REACHED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				aggregated_score: 0.83,
+				passed: true,
+				aggregation_method: "mean",
+				judges: [
+					{ judge_id: "j-1", score: 0.85 },
+					{ judge_id: "j-2", score: 0.81 },
+				],
+			}),
+			tribunal(TRIBUNAL_META_START, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				meta_model_id: "claude-opus-4-7",
+				verdicts_reviewed: 2,
+			}),
+			tribunal(TRIBUNAL_META_COMPLETE, {
+				task_id: TASK_ID,
+				verdict_quality: "sound",
+				bias_detected: false,
+				override_recommendation: "accept",
+				iteration_id: ITERATION_ID,
+				bias_types: [],
+				confidence: 0.88,
+				meta_model_id: "claude-opus-4-7",
+			}),
+			tribunal(TRIBUNAL_GATE_PASSED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				final_score: 0.83,
+				iteration_number: 0,
+				judges_consulted: 2,
+			}),
+			tribunal(TRIBUNAL_SESSION_COMPLETE, {
+				task_id: TASK_ID,
+				outcome: "accepted",
+				final_score: 0.83,
+				iterations_used: 1,
+				total_cost_usd: 0.42,
+				total_duration_ms: 12345,
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates dissent + gate.blocked + bias_detected paths", () => {
+		const dissent = tribunal(TRIBUNAL_DISSENT_RECORDED, {
+			task_id: TASK_ID,
+			iteration_id: ITERATION_ID,
+			disagreement_score: 0.6,
+			judges: [
+				{ judge_id: "j-1", score: 0.9, passed: true },
+				{ judge_id: "j-2", score: 0.3, passed: false },
+			],
+			resolution: "meta_override",
+		});
+		expect(validate(dissent).valid).toBe(true);
+
+		const blocked = tribunal(TRIBUNAL_GATE_BLOCKED, {
+			task_id: TASK_ID,
+			iteration_id: ITERATION_ID,
+			reason: "dissent_unresolved",
+			final_score: 0.5,
+			iteration_number: 1,
+			will_retry: true,
+			retry_iteration_number: 2,
+		});
+		expect(validate(blocked).valid).toBe(true);
+
+		const biased = tribunal(TRIBUNAL_META_COMPLETE, {
+			task_id: TASK_ID,
+			verdict_quality: "biased",
+			bias_detected: true,
+			bias_types: ["self_enhancement", "verbosity"],
+			override_recommendation: "re-evaluate",
+			iteration_id: ITERATION_ID,
+			confidence: 0.71,
+		});
+		expect(validate(biased).valid).toBe(true);
+	});
+});
+
 describe("isEventOfType", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -343,7 +541,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 50 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(50);
+	it("has exactly 61 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(61);
 	});
 });
