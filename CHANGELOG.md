@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0](https://github.com/onlooker-community/schema/compare/v2.0.0...v2.1.0) (2026-05-24)
+
+
+### Features
+
+* **events:** expand tribunal namespace for multi-agent quality gates :thinking: ([#18](https://github.com/onlooker-community/schema/issues/18)) ([c588829](https://github.com/onlooker-community/schema/commit/c58882906ad22bac4db781f5cfe081efb85a4019))
+
 ## [2.0.0](https://github.com/onlooker-community/schema/compare/v1.4.1...v2.0.0) (2026-05-23)
 
 
