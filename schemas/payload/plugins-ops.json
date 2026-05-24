@@ -47,7 +47,10 @@
 				"suite_id": { "type": "string" },
 				"test_count": { "type": "integer", "minimum": 0 },
 				"suite_name": { "type": "string" },
-				"trigger": { "type": "string", "enum": ["config_change", "manual"] },
+				"trigger": {
+					"type": "string",
+					"enum": ["config_change", "manual", "file_change"]
+				},
 				"changed_file": { "type": "string" }
 			}
 		},
@@ -62,7 +65,17 @@
 				"degraded": { "type": "integer", "minimum": 0 },
 				"neutral": { "type": "integer", "minimum": 0 },
 				"merge_recommended": { "type": "boolean" },
-				"duration_ms": { "type": "integer", "minimum": 0 }
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"baseline_score": { "type": "number", "minimum": 0, "maximum": 1 },
+				"score_after": { "type": "number", "minimum": 0, "maximum": 1 },
+				"drift": { "type": "number", "minimum": -1, "maximum": 1 },
+				"drift_threshold": { "type": "number", "minimum": 0, "maximum": 1 }
+			},
+			"dependentRequired": {
+				"drift": ["baseline_score", "score_after", "drift_threshold"],
+				"baseline_score": ["score_after", "drift", "drift_threshold"],
+				"score_after": ["baseline_score", "drift", "drift_threshold"],
+				"drift_threshold": ["baseline_score", "score_after", "drift"]
 			}
 		},
 		"echo.regression.detected": {
@@ -75,7 +88,22 @@
 				"score_before": { "type": "number", "minimum": 0, "maximum": 1 },
 				"score_after": { "type": "number", "minimum": 0, "maximum": 1 },
 				"test_name": { "type": "string" },
-				"delta": { "type": "number" }
+				"delta": { "type": "number" },
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+			}
+		},
+		"echo.improvement.detected": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["suite_id", "test_id", "score_before", "score_after"],
+			"properties": {
+				"suite_id": { "type": "string" },
+				"test_id": { "type": "string" },
+				"score_before": { "type": "number", "minimum": 0, "maximum": 1 },
+				"score_after": { "type": "number", "minimum": 0, "maximum": 1 },
+				"test_name": { "type": "string" },
+				"delta": { "type": "number" },
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 }
 			}
 		},
 		"counsel.brief.generated": {

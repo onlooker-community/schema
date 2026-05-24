@@ -454,11 +454,18 @@ export interface EchoSuiteStartedPayload {
 	suite_id: string;
 	test_count: number;
 	suite_name?: string;
-	trigger?: "config_change" | "manual";
+	trigger?: "config_change" | "manual" | "file_change";
 	changed_file?: string;
 }
 
-export interface EchoSuiteCompletePayload {
+type EchoSuiteDrift = {
+	baseline_score: number;
+	score_after: number;
+	drift: number;
+	drift_threshold: number;
+};
+
+export type EchoSuiteCompletePayload = {
 	suite_id: string;
 	test_count: number;
 	improved: number;
@@ -466,7 +473,15 @@ export interface EchoSuiteCompletePayload {
 	neutral: number;
 	merge_recommended?: boolean;
 	duration_ms?: number;
-}
+} & (
+	| EchoSuiteDrift
+	| {
+			baseline_score?: never;
+			score_after?: never;
+			drift?: never;
+			drift_threshold?: never;
+	  }
+);
 
 export interface EchoRegressionDetectedPayload {
 	suite_id: string;
@@ -475,6 +490,17 @@ export interface EchoRegressionDetectedPayload {
 	score_after: number;
 	test_name?: string;
 	delta?: number;
+	confidence?: number;
+}
+
+export interface EchoImprovementDetectedPayload {
+	suite_id: string;
+	test_id: string;
+	score_before: number;
+	score_after: number;
+	test_name?: string;
+	delta?: number;
+	confidence?: number;
 }
 
 export type CounselSource =
@@ -678,30 +704,32 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 																																																		? EchoSuiteCompletePayload
 																																																		: T extends "echo.regression.detected"
 																																																			? EchoRegressionDetectedPayload
-																																																			: T extends "cartographer.audit.complete"
-																																																				? CartographerAuditCompletePayload
-																																																				: T extends "cartographer.issue.found"
-																																																					? CartographerIssueFoundPayload
-																																																					: T extends "counsel.brief.generated"
-																																																						? CounselBriefGeneratedPayload
-																																																						: T extends "onlooker.session.summary"
-																																																							? OnlookerSessionSummaryPayload
-																																																							: T extends "meridian.hint.generated"
-																																																								? MeridianHintGeneratedPayload
-																																																								: T extends "meridian.hint.delivered"
-																																																									? MeridianHintDeliveredPayload
-																																																									: T extends "meridian.outcome.recorded"
-																																																										? MeridianOutcomeRecordedPayload
-																																																										: T extends "meridian.reliance.measured"
-																																																											? MeridianRelianceMeasuredPayload
-																																																											: T extends "meridian.lesson.curated"
-																																																												? MeridianLessonCuratedPayload
-																																																												: T extends "meridian.playbook.updated"
-																																																													? MeridianPlaybookUpdatedPayload
-																																																													: Record<
-																																																															string,
-																																																															unknown
-																																																														>;
+																																																			: T extends "echo.improvement.detected"
+																																																				? EchoImprovementDetectedPayload
+																																																				: T extends "cartographer.audit.complete"
+																																																					? CartographerAuditCompletePayload
+																																																					: T extends "cartographer.issue.found"
+																																																						? CartographerIssueFoundPayload
+																																																						: T extends "counsel.brief.generated"
+																																																							? CounselBriefGeneratedPayload
+																																																							: T extends "onlooker.session.summary"
+																																																								? OnlookerSessionSummaryPayload
+																																																								: T extends "meridian.hint.generated"
+																																																									? MeridianHintGeneratedPayload
+																																																									: T extends "meridian.hint.delivered"
+																																																										? MeridianHintDeliveredPayload
+																																																										: T extends "meridian.outcome.recorded"
+																																																											? MeridianOutcomeRecordedPayload
+																																																											: T extends "meridian.reliance.measured"
+																																																												? MeridianRelianceMeasuredPayload
+																																																												: T extends "meridian.lesson.curated"
+																																																													? MeridianLessonCuratedPayload
+																																																													: T extends "meridian.playbook.updated"
+																																																														? MeridianPlaybookUpdatedPayload
+																																																														: Record<
+																																																																string,
+																																																																unknown
+																																																															>;
 
 export interface OnlookerEvent<T extends EventType = EventType> {
 	id: string;

@@ -64,6 +64,7 @@ export const LEDGER_SESSION_COMPLETE = "ledger.session.complete" as const;
 export const ECHO_SUITE_STARTED = "echo.suite.started" as const;
 export const ECHO_SUITE_COMPLETE = "echo.suite.complete" as const;
 export const ECHO_REGRESSION_DETECTED = "echo.regression.detected" as const;
+export const ECHO_IMPROVEMENT_DETECTED = "echo.improvement.detected" as const;
 
 export const CARTOGRAPHER_AUDIT_COMPLETE =
 	"cartographer.audit.complete" as const;
@@ -132,6 +133,7 @@ export const ALL_EVENT_TYPES = [
 	ECHO_SUITE_STARTED,
 	ECHO_SUITE_COMPLETE,
 	ECHO_REGRESSION_DETECTED,
+	ECHO_IMPROVEMENT_DETECTED,
 	CARTOGRAPHER_AUDIT_COMPLETE,
 	CARTOGRAPHER_ISSUE_FOUND,
 	COUNSEL_BRIEF_GENERATED,
