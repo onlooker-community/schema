@@ -114,6 +114,7 @@
 				"echo.suite.started",
 				"echo.suite.complete",
 				"echo.regression.detected",
+				"echo.improvement.detected",
 				"cartographer.audit.complete",
 				"cartographer.issue.found",
 				"counsel.brief.generated",

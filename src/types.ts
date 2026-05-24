@@ -454,7 +454,7 @@ export interface EchoSuiteStartedPayload {
 	suite_id: string;
 	test_count: number;
 	suite_name?: string;
-	trigger?: "config_change" | "manual";
+	trigger?: "config_change" | "manual" | "file_change";
 	changed_file?: string;
 }
 
@@ -466,6 +466,10 @@ export interface EchoSuiteCompletePayload {
 	neutral: number;
 	merge_recommended?: boolean;
 	duration_ms?: number;
+	baseline_score?: number;
+	score_after?: number;
+	drift?: number;
+	drift_threshold?: number;
 }
 
 export interface EchoRegressionDetectedPayload {
@@ -475,6 +479,17 @@ export interface EchoRegressionDetectedPayload {
 	score_after: number;
 	test_name?: string;
 	delta?: number;
+	confidence?: number;
+}
+
+export interface EchoImprovementDetectedPayload {
+	suite_id: string;
+	test_id: string;
+	score_before: number;
+	score_after: number;
+	test_name?: string;
+	delta?: number;
+	confidence?: number;
 }
 
 export type CounselSource =
@@ -678,7 +693,9 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 																																																		? EchoSuiteCompletePayload
 																																																		: T extends "echo.regression.detected"
 																																																			? EchoRegressionDetectedPayload
-																																																			: T extends "cartographer.audit.complete"
+																																																			: T extends "echo.improvement.detected"
+																																																				? EchoImprovementDetectedPayload
+																																																				: T extends "cartographer.audit.complete"
 																																																				? CartographerAuditCompletePayload
 																																																				: T extends "cartographer.issue.found"
 																																																					? CartographerIssueFoundPayload
