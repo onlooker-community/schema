@@ -26,7 +26,9 @@ const PAYLOAD_SCHEMA_PATH = resolve(
 const envelopeSchema: AnySchema = JSON.parse(
 	readFileSync(SCHEMA_PATH, "utf8"),
 ) as AnySchema;
-const payloadSchemas = JSON.parse(readFileSync(PAYLOAD_SCHEMA_PATH, "utf8")) as {
+const payloadSchemas = JSON.parse(
+	readFileSync(PAYLOAD_SCHEMA_PATH, "utf8"),
+) as {
 	$defs?: Record<string, AnySchema>;
 };
 
