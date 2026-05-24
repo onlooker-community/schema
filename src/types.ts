@@ -475,7 +475,12 @@ export type EchoSuiteCompletePayload = {
 	duration_ms?: number;
 } & (
 	| EchoSuiteDrift
-	| { baseline_score?: never; score_after?: never; drift?: never; drift_threshold?: never }
+	| {
+			baseline_score?: never;
+			score_after?: never;
+			drift?: never;
+			drift_threshold?: never;
+	  }
 );
 
 export interface EchoRegressionDetectedPayload {
