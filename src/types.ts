@@ -134,19 +134,66 @@ export interface SentinelReviewedPayload {
 	review_duration_ms?: number;
 }
 
-export interface TribunalVerdictPayload {
+export type TribunalJudgeType =
+	| "standard"
+	| "security"
+	| "maintainability"
+	| "adversarial"
+	| "domain"
+	| "meta";
+
+export type TribunalGatePolicy =
+	| "strict"
+	| "majority"
+	| "unanimous"
+	| "meta_override";
+
+export type TribunalBiasType =
+	| "position"
+	| "verbosity"
+	| "self_enhancement"
+	| "sycophancy"
+	| "refusal"
+	| "length";
+
+export type TribunalAggregationMethod =
+	| "mean"
+	| "median"
+	| "min"
+	| "weighted_mean";
+
+export interface TribunalSessionStartPayload {
 	task_id: string;
-	score: number;
-	passed: boolean;
-	judge_type:
-		| "standard"
-		| "security"
-		| "maintainability"
-		| "adversarial"
-		| "domain"
-		| "meta";
-	feedback_summary?: string;
-	file_path?: string;
+	judge_types?: TribunalJudgeType[];
+	gate_policy?: TribunalGatePolicy;
+	score_threshold?: number;
+	max_iterations?: number;
+	actor_model_id?: string;
+	judge_model_ids?: string[];
+	meta_model_id?: string;
+}
+
+export interface TribunalSessionCompletePayload {
+	task_id: string;
+	outcome: "accepted" | "rejected" | "exhausted_iterations" | "aborted";
+	final_score?: number;
+	iterations_used?: number;
+	total_cost_usd?: number;
+	total_duration_ms?: number;
+}
+
+export interface TribunalIterationStartPayload {
+	task_id: string;
+	iteration_id: string;
+	iteration_number: number;
+	trigger?: "initial" | "gate_blocked" | "appeal";
+}
+
+export interface TribunalActorStartPayload {
+	task_id: string;
+	iteration_id: string;
+	iteration_number?: number;
+	actor_model_id?: string;
 }
 
 export interface TribunalActorCompletePayload {
@@ -154,6 +201,41 @@ export interface TribunalActorCompletePayload {
 	success: boolean;
 	duration_ms?: number;
 	skepticism_rounds?: number;
+	iteration_id?: string;
+	iteration_number?: number;
+	artifact_kind?: "file" | "patch" | "message" | "command";
+	actor_model_id?: string;
+}
+
+export interface TribunalJudgeStartPayload {
+	task_id: string;
+	iteration_id: string;
+	judge_id: string;
+	judge_type: TribunalJudgeType;
+	judge_model_id?: string;
+}
+
+export interface TribunalVerdictPayload {
+	task_id: string;
+	score: number;
+	passed: boolean;
+	judge_type: TribunalJudgeType;
+	feedback_summary?: string;
+	file_path?: string;
+	iteration_id?: string;
+	judge_id?: string;
+	judge_model_id?: string;
+	criteria_evaluated?: string[];
+	strengths_count?: number;
+	weaknesses_count?: number;
+	confidence?: number;
+}
+
+export interface TribunalMetaStartPayload {
+	task_id: string;
+	iteration_id: string;
+	meta_model_id?: string;
+	verdicts_reviewed?: number;
 }
 
 export interface TribunalMetaCompletePayload {
@@ -161,6 +243,73 @@ export interface TribunalMetaCompletePayload {
 	verdict_quality: "sound" | "questionable" | "biased";
 	bias_detected: boolean;
 	override_recommendation?: "accept" | "reject" | "re-evaluate";
+	iteration_id?: string;
+	bias_types?: TribunalBiasType[];
+	confidence?: number;
+	meta_model_id?: string;
+}
+
+export interface TribunalJurorRef {
+	judge_id: string;
+	judge_type: TribunalJudgeType;
+	model_id?: string;
+}
+
+export interface TribunalJuryEmpaneledPayload {
+	task_id: string;
+	iteration_id: string;
+	judges: TribunalJurorRef[];
+	panel_size?: number;
+}
+
+export interface TribunalJudgeScore {
+	judge_id: string;
+	score: number;
+}
+
+export interface TribunalConsensusReachedPayload {
+	task_id: string;
+	iteration_id: string;
+	aggregated_score: number;
+	passed: boolean;
+	aggregation_method: TribunalAggregationMethod;
+	judges: TribunalJudgeScore[];
+}
+
+export interface TribunalDissentingJudge {
+	judge_id: string;
+	score: number;
+	passed: boolean;
+}
+
+export interface TribunalDissentRecordedPayload {
+	task_id: string;
+	iteration_id: string;
+	disagreement_score: number;
+	judges: TribunalDissentingJudge[];
+	resolution?: "meta_override" | "majority" | "re-evaluate" | "escalate";
+}
+
+export interface TribunalGatePassedPayload {
+	task_id: string;
+	iteration_id: string;
+	final_score: number;
+	iteration_number?: number;
+	judges_consulted?: number;
+}
+
+export interface TribunalGateBlockedPayload {
+	task_id: string;
+	iteration_id: string;
+	reason:
+		| "low_score"
+		| "meta_override"
+		| "bias_detected"
+		| "dissent_unresolved";
+	final_score?: number;
+	iteration_number?: number;
+	will_retry?: boolean;
+	retry_iteration_number?: number;
 }
 
 export interface WardenThreatDetectedPayload {
@@ -463,74 +612,96 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 																	? SentinelAllowedPayload
 																	: T extends "sentinel.reviewed"
 																		? SentinelReviewedPayload
-																		: T extends "tribunal.verdict"
-																			? TribunalVerdictPayload
-																			: T extends "tribunal.actor.complete"
-																				? TribunalActorCompletePayload
-																				: T extends "tribunal.meta.complete"
-																					? TribunalMetaCompletePayload
-																					: T extends "warden.threat.detected"
-																						? WardenThreatDetectedPayload
-																						: T extends "warden.threat.cleared"
-																							? WardenThreatClearedPayload
-																							: T extends "warden.gate.blocked"
-																								? WardenGateBlockedPayload
-																								: T extends "oracle.calibration.requested"
-																									? OracleCalibrationRequestedPayload
-																									: T extends "oracle.calibration.complete"
-																										? OracleCalibrationCompletePayload
-																										: T extends "archivist.extract.complete"
-																											? ArchivistExtractCompletePayload
-																											: T extends "archivist.inject.complete"
-																												? ArchivistInjectCompletePayload
-																												: T extends "relay.handoff.captured"
-																													? RelayHandoffCapturedPayload
-																													: T extends "relay.handoff.injected"
-																														? RelayHandoffInjectedPayload
-																														: T extends "scribe.capture.complete"
-																															? ScribeCaptureCompletePayload
-																															: T extends "scribe.distill.complete"
-																																? ScribeDistillCompletePayload
-																																: T extends "prompt_rule.matched"
-																																	? PromptRuleMatchedPayload
-																																	: T extends "prompt_rule.applied"
-																																		? PromptRuleAppliedPayload
-																																		: T extends "ledger.budget.warning"
-																																			? LedgerBudgetWarningPayload
-																																			: T extends "ledger.budget.exceeded"
-																																				? LedgerBudgetExceededPayload
-																																				: T extends "ledger.session.complete"
-																																					? LedgerSessionCompletePayload
-																																					: T extends "echo.suite.started"
-																																						? EchoSuiteStartedPayload
-																																						: T extends "echo.suite.complete"
-																																							? EchoSuiteCompletePayload
-																																							: T extends "echo.regression.detected"
-																																								? EchoRegressionDetectedPayload
-																																								: T extends "cartographer.audit.complete"
-																																									? CartographerAuditCompletePayload
-																																									: T extends "cartographer.issue.found"
-																																										? CartographerIssueFoundPayload
-																																										: T extends "counsel.brief.generated"
-																																											? CounselBriefGeneratedPayload
-																																											: T extends "onlooker.session.summary"
-																																												? OnlookerSessionSummaryPayload
-																																												: T extends "meridian.hint.generated"
-																																													? MeridianHintGeneratedPayload
-																																													: T extends "meridian.hint.delivered"
-																																														? MeridianHintDeliveredPayload
-																																														: T extends "meridian.outcome.recorded"
-																																															? MeridianOutcomeRecordedPayload
-																																															: T extends "meridian.reliance.measured"
-																																																? MeridianRelianceMeasuredPayload
-																																																: T extends "meridian.lesson.curated"
-																																																	? MeridianLessonCuratedPayload
-																																																	: T extends "meridian.playbook.updated"
-																																																		? MeridianPlaybookUpdatedPayload
-																																																		: Record<
-																																																				string,
-																																																				unknown
-																																																			>;
+																		: T extends "tribunal.session.start"
+																			? TribunalSessionStartPayload
+																			: T extends "tribunal.session.complete"
+																				? TribunalSessionCompletePayload
+																				: T extends "tribunal.iteration.start"
+																					? TribunalIterationStartPayload
+																					: T extends "tribunal.actor.start"
+																						? TribunalActorStartPayload
+																						: T extends "tribunal.actor.complete"
+																							? TribunalActorCompletePayload
+																							: T extends "tribunal.judge.start"
+																								? TribunalJudgeStartPayload
+																								: T extends "tribunal.verdict"
+																									? TribunalVerdictPayload
+																									: T extends "tribunal.meta.start"
+																										? TribunalMetaStartPayload
+																										: T extends "tribunal.meta.complete"
+																											? TribunalMetaCompletePayload
+																											: T extends "tribunal.jury.empaneled"
+																												? TribunalJuryEmpaneledPayload
+																												: T extends "tribunal.consensus.reached"
+																													? TribunalConsensusReachedPayload
+																													: T extends "tribunal.dissent.recorded"
+																														? TribunalDissentRecordedPayload
+																														: T extends "tribunal.gate.passed"
+																															? TribunalGatePassedPayload
+																															: T extends "tribunal.gate.blocked"
+																																? TribunalGateBlockedPayload
+																																: T extends "warden.threat.detected"
+																																	? WardenThreatDetectedPayload
+																																	: T extends "warden.threat.cleared"
+																																		? WardenThreatClearedPayload
+																																		: T extends "warden.gate.blocked"
+																																			? WardenGateBlockedPayload
+																																			: T extends "oracle.calibration.requested"
+																																				? OracleCalibrationRequestedPayload
+																																				: T extends "oracle.calibration.complete"
+																																					? OracleCalibrationCompletePayload
+																																					: T extends "archivist.extract.complete"
+																																						? ArchivistExtractCompletePayload
+																																						: T extends "archivist.inject.complete"
+																																							? ArchivistInjectCompletePayload
+																																							: T extends "relay.handoff.captured"
+																																								? RelayHandoffCapturedPayload
+																																								: T extends "relay.handoff.injected"
+																																									? RelayHandoffInjectedPayload
+																																									: T extends "scribe.capture.complete"
+																																										? ScribeCaptureCompletePayload
+																																										: T extends "scribe.distill.complete"
+																																											? ScribeDistillCompletePayload
+																																											: T extends "prompt_rule.matched"
+																																												? PromptRuleMatchedPayload
+																																												: T extends "prompt_rule.applied"
+																																													? PromptRuleAppliedPayload
+																																													: T extends "ledger.budget.warning"
+																																														? LedgerBudgetWarningPayload
+																																														: T extends "ledger.budget.exceeded"
+																																															? LedgerBudgetExceededPayload
+																																															: T extends "ledger.session.complete"
+																																																? LedgerSessionCompletePayload
+																																																: T extends "echo.suite.started"
+																																																	? EchoSuiteStartedPayload
+																																																	: T extends "echo.suite.complete"
+																																																		? EchoSuiteCompletePayload
+																																																		: T extends "echo.regression.detected"
+																																																			? EchoRegressionDetectedPayload
+																																																			: T extends "cartographer.audit.complete"
+																																																				? CartographerAuditCompletePayload
+																																																				: T extends "cartographer.issue.found"
+																																																					? CartographerIssueFoundPayload
+																																																					: T extends "counsel.brief.generated"
+																																																						? CounselBriefGeneratedPayload
+																																																						: T extends "onlooker.session.summary"
+																																																							? OnlookerSessionSummaryPayload
+																																																							: T extends "meridian.hint.generated"
+																																																								? MeridianHintGeneratedPayload
+																																																								: T extends "meridian.hint.delivered"
+																																																									? MeridianHintDeliveredPayload
+																																																									: T extends "meridian.outcome.recorded"
+																																																										? MeridianOutcomeRecordedPayload
+																																																										: T extends "meridian.reliance.measured"
+																																																											? MeridianRelianceMeasuredPayload
+																																																											: T extends "meridian.lesson.curated"
+																																																												? MeridianLessonCuratedPayload
+																																																												: T extends "meridian.playbook.updated"
+																																																													? MeridianPlaybookUpdatedPayload
+																																																													: Record<
+																																																															string,
+																																																															unknown
+																																																														>;
 
 export interface OnlookerEvent<T extends EventType = EventType> {
 	id: string;

@@ -73,7 +73,7 @@ interface OnlookerEvent<T extends EventType = EventType> {
 | `task`         | `start`, `complete`, `fail`                                                                                             |
 | `tool`         | `file.read`, `file.write`, `file.edit`, `shell.exec`, `web.fetch`, `agent.spawn`, `agent.complete`                      |
 | `sentinel`     | `blocked`, `allowed`, `reviewed`                                                                                        |
-| `tribunal`     | `verdict`, `actor.complete`, `meta.complete`                                                                            |
+| `tribunal`     | `session.start`, `session.complete`, `iteration.start`, `actor.start`, `actor.complete`, `judge.start`, `verdict`, `meta.start`, `meta.complete`, `jury.empaneled`, `consensus.reached`, `dissent.recorded`, `gate.passed`, `gate.blocked` |
 | `warden`       | `threat.detected`, `threat.cleared`, `gate.blocked`                                                                     |
 | `oracle`       | `calibration.requested`, `calibration.complete`                                                                         |
 | `archivist`    | `extract.complete`, `inject.complete`                                                                                   |

@@ -21,9 +21,20 @@ export const SENTINEL_BLOCKED = "sentinel.blocked" as const;
 export const SENTINEL_ALLOWED = "sentinel.allowed" as const;
 export const SENTINEL_REVIEWED = "sentinel.reviewed" as const;
 
-export const TRIBUNAL_VERDICT = "tribunal.verdict" as const;
+export const TRIBUNAL_SESSION_START = "tribunal.session.start" as const;
+export const TRIBUNAL_SESSION_COMPLETE = "tribunal.session.complete" as const;
+export const TRIBUNAL_ITERATION_START = "tribunal.iteration.start" as const;
+export const TRIBUNAL_ACTOR_START = "tribunal.actor.start" as const;
 export const TRIBUNAL_ACTOR_COMPLETE = "tribunal.actor.complete" as const;
+export const TRIBUNAL_JUDGE_START = "tribunal.judge.start" as const;
+export const TRIBUNAL_VERDICT = "tribunal.verdict" as const;
+export const TRIBUNAL_META_START = "tribunal.meta.start" as const;
 export const TRIBUNAL_META_COMPLETE = "tribunal.meta.complete" as const;
+export const TRIBUNAL_JURY_EMPANELED = "tribunal.jury.empaneled" as const;
+export const TRIBUNAL_CONSENSUS_REACHED = "tribunal.consensus.reached" as const;
+export const TRIBUNAL_DISSENT_RECORDED = "tribunal.dissent.recorded" as const;
+export const TRIBUNAL_GATE_PASSED = "tribunal.gate.passed" as const;
+export const TRIBUNAL_GATE_BLOCKED = "tribunal.gate.blocked" as const;
 
 export const WARDEN_THREAT_DETECTED = "warden.threat.detected" as const;
 export const WARDEN_THREAT_CLEARED = "warden.threat.cleared" as const;
@@ -88,9 +99,20 @@ export const ALL_EVENT_TYPES = [
 	SENTINEL_BLOCKED,
 	SENTINEL_ALLOWED,
 	SENTINEL_REVIEWED,
-	TRIBUNAL_VERDICT,
+	TRIBUNAL_SESSION_START,
+	TRIBUNAL_SESSION_COMPLETE,
+	TRIBUNAL_ITERATION_START,
+	TRIBUNAL_ACTOR_START,
 	TRIBUNAL_ACTOR_COMPLETE,
+	TRIBUNAL_JUDGE_START,
+	TRIBUNAL_VERDICT,
+	TRIBUNAL_META_START,
 	TRIBUNAL_META_COMPLETE,
+	TRIBUNAL_JURY_EMPANELED,
+	TRIBUNAL_CONSENSUS_REACHED,
+	TRIBUNAL_DISSENT_RECORDED,
+	TRIBUNAL_GATE_PASSED,
+	TRIBUNAL_GATE_BLOCKED,
 	WARDEN_THREAT_DETECTED,
 	WARDEN_THREAT_CLEARED,
 	WARDEN_GATE_BLOCKED,
