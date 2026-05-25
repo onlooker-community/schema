@@ -33,7 +33,14 @@
 		"archivist.compact.complete": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["project_key", "session_id", "decisions_extracted", "dead_ends_extracted", "open_questions_extracted", "duration_ms"],
+			"required": [
+				"project_key",
+				"session_id",
+				"decisions_extracted",
+				"dead_ends_extracted",
+				"open_questions_extracted",
+				"duration_ms"
+			],
 			"properties": {
 				"project_key": { "type": "string" },
 				"session_id": { "type": "string" },
@@ -55,7 +62,12 @@
 		"archivist.inject.complete": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["project_key", "session_id", "items_injected", "chars_injected"],
+			"required": [
+				"project_key",
+				"session_id",
+				"items_injected",
+				"chars_injected"
+			],
 			"properties": {
 				"project_key": { "type": "string" },
 				"session_id": { "type": "string" },
