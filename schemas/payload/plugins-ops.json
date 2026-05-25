@@ -4,6 +4,37 @@
 	"title": "Ops plugin payloads",
 	"description": "Payload schemas for governor.*, echo.*, counsel.*, onlooker.*, and meridian.* events.",
 	"$defs": {
+		"governor.gate.checked": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"session_id",
+				"agent_id",
+				"agent_type",
+				"decision",
+				"estimated_tokens",
+				"tokens_available",
+				"estimation_method",
+				"safety_margin"
+			],
+			"properties": {
+				"session_id": { "type": "string" },
+				"agent_id": { "type": "string" },
+				"agent_type": { "type": "string" },
+				"decision": { "type": "string", "enum": ["allow", "block"] },
+				"reason": {
+					"type": "string",
+					"enum": ["budget_exceeded", "ceiling_exceeded", "lock_timeout"]
+				},
+				"estimated_tokens": { "type": "integer", "minimum": 0 },
+				"tokens_available": { "type": "integer", "minimum": 0 },
+				"estimation_method": {
+					"type": "string",
+					"enum": ["tiktoken", "char_ratio", "tier_table"]
+				},
+				"safety_margin": { "type": "number", "minimum": 1 }
+			}
+		},
 		"governor.budget.warning": {
 			"type": "object",
 			"additionalProperties": false,

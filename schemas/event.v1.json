@@ -111,6 +111,7 @@
 				"scribe.distill.complete",
 				"prompt_rule.matched",
 				"prompt_rule.applied",
+				"governor.gate.checked",
 				"governor.budget.warning",
 				"governor.budget.exceeded",
 				"governor.session.complete",

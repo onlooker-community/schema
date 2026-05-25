@@ -60,6 +60,7 @@ export const SCRIBE_DISTILL_COMPLETE = "scribe.distill.complete" as const;
 export const PROMPT_RULE_MATCHED = "prompt_rule.matched" as const;
 export const PROMPT_RULE_APPLIED = "prompt_rule.applied" as const;
 
+export const GOVERNOR_GATE_CHECKED = "governor.gate.checked" as const;
 export const GOVERNOR_BUDGET_WARNING = "governor.budget.warning" as const;
 export const GOVERNOR_BUDGET_EXCEEDED = "governor.budget.exceeded" as const;
 export const GOVERNOR_SESSION_COMPLETE = "governor.session.complete" as const;
@@ -133,6 +134,7 @@ export const ALL_EVENT_TYPES = [
 	SCRIBE_DISTILL_COMPLETE,
 	PROMPT_RULE_MATCHED,
 	PROMPT_RULE_APPLIED,
+	GOVERNOR_GATE_CHECKED,
 	GOVERNOR_BUDGET_WARNING,
 	GOVERNOR_BUDGET_EXCEEDED,
 	GOVERNOR_SESSION_COMPLETE,
