@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AnySchema, ErrorObject, ValidateFunction } from "ajv";
 import { Ajv2020 } from "ajv/dist/2020.js";
@@ -15,22 +15,11 @@ const addFormats: FormatsPlugin =
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_PATH = resolve(HERE, "..", "schemas", "event.v1.json");
-const PAYLOAD_SCHEMA_PATH = resolve(
-	HERE,
-	"..",
-	"schemas",
-	"payload",
-	"plugins-safety.json",
-);
+const PAYLOAD_DIR = resolve(HERE, "..", "schemas", "payload");
 
 const envelopeSchema: AnySchema = JSON.parse(
 	readFileSync(SCHEMA_PATH, "utf8"),
 ) as AnySchema;
-const payloadSchemas = JSON.parse(
-	readFileSync(PAYLOAD_SCHEMA_PATH, "utf8"),
-) as {
-	$defs?: Record<string, AnySchema>;
-};
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
@@ -38,8 +27,16 @@ addFormats(ajv);
 const validateEnvelope: ValidateFunction = ajv.compile(envelopeSchema);
 
 const payloadValidators = new Map<string, ValidateFunction>();
-for (const [eventType, schema] of Object.entries(payloadSchemas.$defs ?? {})) {
-	payloadValidators.set(eventType, ajv.compile(schema));
+for (const filename of readdirSync(PAYLOAD_DIR)) {
+	if (!filename.endsWith(".json")) continue;
+	const file = JSON.parse(
+		readFileSync(join(PAYLOAD_DIR, filename), "utf8"),
+	) as {
+		$defs?: Record<string, AnySchema>;
+	};
+	for (const [eventType, schema] of Object.entries(file.$defs ?? {})) {
+		payloadValidators.set(eventType, ajv.compile(schema));
+	}
 }
 
 export interface ValidationErrorDetail {

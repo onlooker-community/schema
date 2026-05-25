@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-memory.json",
 	"title": "Memory plugin payloads",
-	"description": "Payload schemas for archivist.*, relay.*, scribe.*, oracle.*, prompt_rule.*, and cartographer.* events.",
+	"description": "Payload schemas for archivist.*, relay.*, scribe.*, oracle.*, prompt_rule.*, and cartographer.* events. Archivist events cover compact (PreCompact hook) and inject (SessionStart hook) lifecycles.",
 	"$defs": {
 		"archivist.extract.complete": {
 			"type": "object",
@@ -21,14 +21,58 @@
 				}
 			}
 		},
+		"archivist.compact.started": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["project_key", "session_id"],
+			"properties": {
+				"project_key": { "type": "string" },
+				"session_id": { "type": "string" }
+			}
+		},
+		"archivist.compact.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"project_key",
+				"session_id",
+				"decisions_extracted",
+				"dead_ends_extracted",
+				"open_questions_extracted",
+				"duration_ms"
+			],
+			"properties": {
+				"project_key": { "type": "string" },
+				"session_id": { "type": "string" },
+				"decisions_extracted": { "type": "integer", "minimum": 0 },
+				"dead_ends_extracted": { "type": "integer", "minimum": 0 },
+				"open_questions_extracted": { "type": "integer", "minimum": 0 },
+				"duration_ms": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"archivist.inject.started": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["project_key", "session_id"],
+			"properties": {
+				"project_key": { "type": "string" },
+				"session_id": { "type": "string" }
+			}
+		},
 		"archivist.inject.complete": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["source_session_id", "items_injected"],
+			"required": [
+				"project_key",
+				"session_id",
+				"items_injected",
+				"chars_injected"
+			],
 			"properties": {
-				"source_session_id": { "type": "string" },
+				"project_key": { "type": "string" },
+				"session_id": { "type": "string" },
 				"items_injected": { "type": "integer", "minimum": 0 },
-				"items_available": { "type": "integer", "minimum": 0 }
+				"chars_injected": { "type": "integer", "minimum": 0 }
 			}
 		},
 		"relay.handoff.captured": {

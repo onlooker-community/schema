@@ -33,7 +33,16 @@
 		"validate-schemas": "node scripts/validate-schemas.js",
 		"prepare:assets": "node scripts/prepare-static-assets.js",
 		"deploy:schemas": "npm run validate-schemas && npm run prepare:assets && wrangler deploy",
-		"prepublishOnly": "npm run build && npm run validate-schemas && npm test"
+		"prepublishOnly": "npm run build && npm run validate-schemas && npm test",
+		"prepare": "npx simple-git-hooks"
+	},
+	"simple-git-hooks": {
+		"pre-commit": "npx lint-staged"
+	},
+	"lint-staged": {
+		"*.{ts,js,json,jsonc}": [
+			"npx @biomejs/biome check --write --no-errors-on-unmatched"
+		]
 	},
 	"dependencies": {
 		"ajv": "^8.17.1",
@@ -44,6 +53,8 @@
 		"@types/node": "^20.0.0",
 		"@vitest/coverage-v8": "^1.6.1",
 		"json-schema-to-typescript": "^15.0.4",
+		"lint-staged": "^17.0.5",
+		"simple-git-hooks": "^2.13.1",
 		"typescript": "^5.0.0",
 		"vitest": "^1.0.0",
 		"wrangler": "^4.14.0"
