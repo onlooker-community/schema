@@ -450,24 +450,49 @@ export interface CartographerIssueFoundPayload {
 	description?: string;
 }
 
+export type GovernorDimension =
+	| "cost_usd"
+	| "tokens"
+	| "api_calls"
+	| "wall_clock_seconds";
+
 export interface GovernorBudgetWarningPayload {
 	budget_usd: number;
 	spent_usd: number;
 	threshold_pct: number;
+	session_id: string;
+	dimension: GovernorDimension;
 	remaining_usd?: number;
+	tokens_budget?: number;
+	tokens_spent?: number;
+	api_calls_budget?: number;
+	api_calls_spent?: number;
 }
 
 export interface GovernorBudgetExceededPayload {
 	budget_usd: number;
 	spent_usd: number;
 	blocked_operation: string;
+	session_id: string;
+	agent_id: string;
+	dimension: GovernorDimension;
+	estimated_call_cost: number;
+	ceiling_type: "session" | "global" | "per_call";
 }
 
 export interface GovernorSessionCompletePayload {
 	total_cost_usd: number;
 	budget_usd: number;
 	under_budget: boolean;
+	session_id: string;
+	total_tokens: number;
+	total_api_calls: number;
+	duration_ms: number;
+	calls_blocked: number;
+	calls_warned: number;
+	ledger_poisoned: boolean;
 	cost_by_plugin?: Record<string, number>;
+	estimation_accuracy_pct?: number;
 }
 
 export interface EchoSuiteStartedPayload {

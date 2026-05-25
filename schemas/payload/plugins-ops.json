@@ -7,28 +7,74 @@
 		"governor.budget.warning": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["budget_usd", "spent_usd", "threshold_pct"],
+			"required": [
+				"budget_usd",
+				"spent_usd",
+				"threshold_pct",
+				"session_id",
+				"dimension"
+			],
 			"properties": {
 				"budget_usd": { "type": "number", "minimum": 0 },
 				"spent_usd": { "type": "number", "minimum": 0 },
 				"threshold_pct": { "type": "number", "minimum": 0, "maximum": 100 },
-				"remaining_usd": { "type": "number" }
+				"remaining_usd": { "type": "number" },
+				"session_id": { "type": "string" },
+				"dimension": {
+					"type": "string",
+					"enum": ["cost_usd", "tokens", "api_calls", "wall_clock_seconds"]
+				},
+				"tokens_budget": { "type": "integer", "minimum": 0 },
+				"tokens_spent": { "type": "integer", "minimum": 0 },
+				"api_calls_budget": { "type": "integer", "minimum": 0 },
+				"api_calls_spent": { "type": "integer", "minimum": 0 }
 			}
 		},
 		"governor.budget.exceeded": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["budget_usd", "spent_usd", "blocked_operation"],
+			"required": [
+				"budget_usd",
+				"spent_usd",
+				"blocked_operation",
+				"session_id",
+				"agent_id",
+				"dimension",
+				"estimated_call_cost",
+				"ceiling_type"
+			],
 			"properties": {
 				"budget_usd": { "type": "number", "minimum": 0 },
 				"spent_usd": { "type": "number", "minimum": 0 },
-				"blocked_operation": { "type": "string" }
+				"blocked_operation": { "type": "string" },
+				"session_id": { "type": "string" },
+				"agent_id": { "type": "string" },
+				"dimension": {
+					"type": "string",
+					"enum": ["cost_usd", "tokens", "api_calls", "wall_clock_seconds"]
+				},
+				"estimated_call_cost": { "type": "number", "minimum": 0 },
+				"ceiling_type": {
+					"type": "string",
+					"enum": ["session", "global", "per_call"]
+				}
 			}
 		},
 		"governor.session.complete": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["total_cost_usd", "budget_usd", "under_budget"],
+			"required": [
+				"total_cost_usd",
+				"budget_usd",
+				"under_budget",
+				"session_id",
+				"total_tokens",
+				"total_api_calls",
+				"duration_ms",
+				"calls_blocked",
+				"calls_warned",
+				"ledger_poisoned"
+			],
 			"properties": {
 				"total_cost_usd": { "type": "number", "minimum": 0 },
 				"budget_usd": { "type": "number", "minimum": 0 },
@@ -36,7 +82,15 @@
 				"cost_by_plugin": {
 					"type": "object",
 					"additionalProperties": { "type": "number" }
-				}
+				},
+				"session_id": { "type": "string" },
+				"total_tokens": { "type": "integer", "minimum": 0 },
+				"total_api_calls": { "type": "integer", "minimum": 0 },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"calls_blocked": { "type": "integer", "minimum": 0 },
+				"calls_warned": { "type": "integer", "minimum": 0 },
+				"ledger_poisoned": { "type": "boolean" },
+				"estimation_accuracy_pct": { "type": "number" }
 			}
 		},
 		"echo.suite.started": {
