@@ -60,9 +60,9 @@ export const SCRIBE_DISTILL_COMPLETE = "scribe.distill.complete" as const;
 export const PROMPT_RULE_MATCHED = "prompt_rule.matched" as const;
 export const PROMPT_RULE_APPLIED = "prompt_rule.applied" as const;
 
-export const LEDGER_BUDGET_WARNING = "ledger.budget.warning" as const;
-export const LEDGER_BUDGET_EXCEEDED = "ledger.budget.exceeded" as const;
-export const LEDGER_SESSION_COMPLETE = "ledger.session.complete" as const;
+export const GOVERNOR_BUDGET_WARNING = "governor.budget.warning" as const;
+export const GOVERNOR_BUDGET_EXCEEDED = "governor.budget.exceeded" as const;
+export const GOVERNOR_SESSION_COMPLETE = "governor.session.complete" as const;
 
 export const ECHO_SUITE_STARTED = "echo.suite.started" as const;
 export const ECHO_SUITE_COMPLETE = "echo.suite.complete" as const;
@@ -133,9 +133,9 @@ export const ALL_EVENT_TYPES = [
 	SCRIBE_DISTILL_COMPLETE,
 	PROMPT_RULE_MATCHED,
 	PROMPT_RULE_APPLIED,
-	LEDGER_BUDGET_WARNING,
-	LEDGER_BUDGET_EXCEEDED,
-	LEDGER_SESSION_COMPLETE,
+	GOVERNOR_BUDGET_WARNING,
+	GOVERNOR_BUDGET_EXCEEDED,
+	GOVERNOR_SESSION_COMPLETE,
 	ECHO_SUITE_STARTED,
 	ECHO_SUITE_COMPLETE,
 	ECHO_REGRESSION_DETECTED,

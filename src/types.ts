@@ -450,20 +450,20 @@ export interface CartographerIssueFoundPayload {
 	description?: string;
 }
 
-export interface LedgerBudgetWarningPayload {
+export interface GovernorBudgetWarningPayload {
 	budget_usd: number;
 	spent_usd: number;
 	threshold_pct: number;
 	remaining_usd?: number;
 }
 
-export interface LedgerBudgetExceededPayload {
+export interface GovernorBudgetExceededPayload {
 	budget_usd: number;
 	spent_usd: number;
 	blocked_operation: string;
 }
 
-export interface LedgerSessionCompletePayload {
+export interface GovernorSessionCompletePayload {
 	total_cost_usd: number;
 	budget_usd: number;
 	under_budget: boolean;
@@ -718,12 +718,12 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 																																															? PromptRuleMatchedPayload
 																																															: T extends "prompt_rule.applied"
 																																																? PromptRuleAppliedPayload
-																																																: T extends "ledger.budget.warning"
-																																																	? LedgerBudgetWarningPayload
-																																																	: T extends "ledger.budget.exceeded"
-																																																		? LedgerBudgetExceededPayload
-																																																		: T extends "ledger.session.complete"
-																																																			? LedgerSessionCompletePayload
+																																																: T extends "governor.budget.warning"
+																																																	? GovernorBudgetWarningPayload
+																																																	: T extends "governor.budget.exceeded"
+																																																		? GovernorBudgetExceededPayload
+																																																		: T extends "governor.session.complete"
+																																																			? GovernorSessionCompletePayload
 																																																			: T extends "echo.suite.started"
 																																																				? EchoSuiteStartedPayload
 																																																				: T extends "echo.suite.complete"
