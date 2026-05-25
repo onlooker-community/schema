@@ -112,6 +112,8 @@
 				"prompt_rule.matched",
 				"prompt_rule.applied",
 				"governor.gate.checked",
+				"governor.call.recorded",
+				"governor.ledger.write_failed",
 				"governor.budget.warning",
 				"governor.budget.exceeded",
 				"governor.session.complete",

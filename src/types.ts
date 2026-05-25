@@ -464,6 +464,28 @@ export interface GovernorGateCheckedPayload {
 	reason?: "budget_exceeded" | "ceiling_exceeded" | "lock_timeout";
 }
 
+export interface GovernorCallRecordedPayload {
+	session_id: string;
+	agent_id: string;
+	agent_type: string;
+	estimated_tokens: number;
+	cost_usd_estimated: number;
+	duration_ms: number;
+	tokens_returned_to_pool: number;
+	actual_tokens?: number;
+	estimation_error_pct?: number;
+	cost_usd_actual?: number;
+}
+
+export interface GovernorLedgerWriteFailedPayload {
+	session_id: string;
+	agent_id: string;
+	error: string;
+	retry_count: number;
+	ledger_poisoned: boolean;
+	unrecorded_tokens: number;
+}
+
 export type GovernorDimension =
 	| "cost_usd"
 	| "tokens"
@@ -759,44 +781,48 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 																																																? PromptRuleAppliedPayload
 																																																: T extends "governor.gate.checked"
 																																																	? GovernorGateCheckedPayload
-																																																	: T extends "governor.budget.warning"
-																																																		? GovernorBudgetWarningPayload
-																																																		: T extends "governor.budget.exceeded"
-																																																			? GovernorBudgetExceededPayload
-																																																			: T extends "governor.session.complete"
-																																																				? GovernorSessionCompletePayload
-																																																				: T extends "echo.suite.started"
-																																																					? EchoSuiteStartedPayload
-																																																					: T extends "echo.suite.complete"
-																																																						? EchoSuiteCompletePayload
-																																																						: T extends "echo.regression.detected"
-																																																							? EchoRegressionDetectedPayload
-																																																							: T extends "echo.improvement.detected"
-																																																								? EchoImprovementDetectedPayload
-																																																								: T extends "cartographer.audit.complete"
-																																																									? CartographerAuditCompletePayload
-																																																									: T extends "cartographer.issue.found"
-																																																										? CartographerIssueFoundPayload
-																																																										: T extends "counsel.brief.generated"
-																																																											? CounselBriefGeneratedPayload
-																																																											: T extends "onlooker.session.summary"
-																																																												? OnlookerSessionSummaryPayload
-																																																												: T extends "meridian.hint.generated"
-																																																													? MeridianHintGeneratedPayload
-																																																													: T extends "meridian.hint.delivered"
-																																																														? MeridianHintDeliveredPayload
-																																																														: T extends "meridian.outcome.recorded"
-																																																															? MeridianOutcomeRecordedPayload
-																																																															: T extends "meridian.reliance.measured"
-																																																																? MeridianRelianceMeasuredPayload
-																																																																: T extends "meridian.lesson.curated"
-																																																																	? MeridianLessonCuratedPayload
-																																																																	: T extends "meridian.playbook.updated"
-																																																																		? MeridianPlaybookUpdatedPayload
-																																																																		: Record<
-																																																																				string,
-																																																																				unknown
-																																																																			>;
+																																																	: T extends "governor.call.recorded"
+																																																		? GovernorCallRecordedPayload
+																																																		: T extends "governor.ledger.write_failed"
+																																																			? GovernorLedgerWriteFailedPayload
+																																																			: T extends "governor.budget.warning"
+																																																				? GovernorBudgetWarningPayload
+																																																				: T extends "governor.budget.exceeded"
+																																																					? GovernorBudgetExceededPayload
+																																																					: T extends "governor.session.complete"
+																																																						? GovernorSessionCompletePayload
+																																																						: T extends "echo.suite.started"
+																																																							? EchoSuiteStartedPayload
+																																																							: T extends "echo.suite.complete"
+																																																								? EchoSuiteCompletePayload
+																																																								: T extends "echo.regression.detected"
+																																																									? EchoRegressionDetectedPayload
+																																																									: T extends "echo.improvement.detected"
+																																																										? EchoImprovementDetectedPayload
+																																																										: T extends "cartographer.audit.complete"
+																																																											? CartographerAuditCompletePayload
+																																																											: T extends "cartographer.issue.found"
+																																																												? CartographerIssueFoundPayload
+																																																												: T extends "counsel.brief.generated"
+																																																													? CounselBriefGeneratedPayload
+																																																													: T extends "onlooker.session.summary"
+																																																														? OnlookerSessionSummaryPayload
+																																																														: T extends "meridian.hint.generated"
+																																																															? MeridianHintGeneratedPayload
+																																																															: T extends "meridian.hint.delivered"
+																																																																? MeridianHintDeliveredPayload
+																																																																: T extends "meridian.outcome.recorded"
+																																																																	? MeridianOutcomeRecordedPayload
+																																																																	: T extends "meridian.reliance.measured"
+																																																																		? MeridianRelianceMeasuredPayload
+																																																																		: T extends "meridian.lesson.curated"
+																																																																			? MeridianLessonCuratedPayload
+																																																																			: T extends "meridian.playbook.updated"
+																																																																				? MeridianPlaybookUpdatedPayload
+																																																																				: Record<
+																																																																						string,
+																																																																						unknown
+																																																																					>;
 
 export interface OnlookerEvent<T extends EventType = EventType> {
 	id: string;

@@ -35,6 +35,51 @@
 				"safety_margin": { "type": "number", "minimum": 1 }
 			}
 		},
+		"governor.call.recorded": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"session_id",
+				"agent_id",
+				"agent_type",
+				"estimated_tokens",
+				"cost_usd_estimated",
+				"duration_ms",
+				"tokens_returned_to_pool"
+			],
+			"properties": {
+				"session_id": { "type": "string" },
+				"agent_id": { "type": "string" },
+				"agent_type": { "type": "string" },
+				"estimated_tokens": { "type": "integer", "minimum": 0 },
+				"actual_tokens": { "type": "integer", "minimum": 0 },
+				"estimation_error_pct": { "type": "number" },
+				"cost_usd_estimated": { "type": "number", "minimum": 0 },
+				"cost_usd_actual": { "type": "number", "minimum": 0 },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"tokens_returned_to_pool": { "type": "integer" }
+			}
+		},
+		"governor.ledger.write_failed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"session_id",
+				"agent_id",
+				"error",
+				"retry_count",
+				"ledger_poisoned",
+				"unrecorded_tokens"
+			],
+			"properties": {
+				"session_id": { "type": "string" },
+				"agent_id": { "type": "string" },
+				"error": { "type": "string" },
+				"retry_count": { "type": "integer", "minimum": 0 },
+				"ledger_poisoned": { "type": "boolean" },
+				"unrecorded_tokens": { "type": "integer", "minimum": 0 }
+			}
+		},
 		"governor.budget.warning": {
 			"type": "object",
 			"additionalProperties": false,
