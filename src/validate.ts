@@ -29,7 +29,9 @@ const validateEnvelope: ValidateFunction = ajv.compile(envelopeSchema);
 const payloadValidators = new Map<string, ValidateFunction>();
 for (const filename of readdirSync(PAYLOAD_DIR)) {
 	if (!filename.endsWith(".json")) continue;
-	const file = JSON.parse(readFileSync(join(PAYLOAD_DIR, filename), "utf8")) as {
+	const file = JSON.parse(
+		readFileSync(join(PAYLOAD_DIR, filename), "utf8"),
+	) as {
 		$defs?: Record<string, AnySchema>;
 	};
 	for (const [eventType, schema] of Object.entries(file.$defs ?? {})) {
