@@ -114,6 +114,8 @@
 				"governor.gate.checked",
 				"governor.call.recorded",
 				"governor.ledger.write_failed",
+				"governor.child.allocated",
+				"governor.child.returned",
 				"governor.budget.warning",
 				"governor.budget.exceeded",
 				"governor.session.complete",

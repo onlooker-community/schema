@@ -80,6 +80,53 @@
 				"unrecorded_tokens": { "type": "integer", "minimum": 0 }
 			}
 		},
+		"governor.child.allocated": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"session_id",
+				"parent_agent_id",
+				"child_agent_id",
+				"child_agent_type",
+				"tokens_allocated",
+				"cost_usd_allocated",
+				"tokens_remaining_after_allocation",
+				"conservation_check_passed"
+			],
+			"properties": {
+				"session_id": { "type": "string" },
+				"parent_agent_id": { "type": "string" },
+				"child_agent_id": { "type": "string" },
+				"child_agent_type": { "type": "string" },
+				"tokens_allocated": { "type": "integer", "minimum": 0 },
+				"cost_usd_allocated": { "type": "number", "minimum": 0 },
+				"tokens_remaining_after_allocation": {
+					"type": "integer",
+					"minimum": 0
+				},
+				"conservation_check_passed": { "type": "boolean" }
+			}
+		},
+		"governor.child.returned": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"session_id",
+				"parent_agent_id",
+				"child_agent_id",
+				"tokens_allocated",
+				"tokens_consumed",
+				"tokens_returned"
+			],
+			"properties": {
+				"session_id": { "type": "string" },
+				"parent_agent_id": { "type": "string" },
+				"child_agent_id": { "type": "string" },
+				"tokens_allocated": { "type": "integer", "minimum": 0 },
+				"tokens_consumed": { "type": "integer", "minimum": 0 },
+				"tokens_returned": { "type": "integer" }
+			}
+		},
 		"governor.budget.warning": {
 			"type": "object",
 			"additionalProperties": false,

@@ -64,6 +64,8 @@ export const GOVERNOR_GATE_CHECKED = "governor.gate.checked" as const;
 export const GOVERNOR_CALL_RECORDED = "governor.call.recorded" as const;
 export const GOVERNOR_LEDGER_WRITE_FAILED =
 	"governor.ledger.write_failed" as const;
+export const GOVERNOR_CHILD_ALLOCATED = "governor.child.allocated" as const;
+export const GOVERNOR_CHILD_RETURNED = "governor.child.returned" as const;
 export const GOVERNOR_BUDGET_WARNING = "governor.budget.warning" as const;
 export const GOVERNOR_BUDGET_EXCEEDED = "governor.budget.exceeded" as const;
 export const GOVERNOR_SESSION_COMPLETE = "governor.session.complete" as const;
@@ -140,6 +142,8 @@ export const ALL_EVENT_TYPES = [
 	GOVERNOR_GATE_CHECKED,
 	GOVERNOR_CALL_RECORDED,
 	GOVERNOR_LEDGER_WRITE_FAILED,
+	GOVERNOR_CHILD_ALLOCATED,
+	GOVERNOR_CHILD_RETURNED,
 	GOVERNOR_BUDGET_WARNING,
 	GOVERNOR_BUDGET_EXCEEDED,
 	GOVERNOR_SESSION_COMPLETE,
