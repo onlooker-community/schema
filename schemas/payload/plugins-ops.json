@@ -216,6 +216,16 @@
 				"estimation_accuracy_pct": { "type": "number" }
 			}
 		},
+		"governor.lock.stale_cleared": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lock_path", "lock_age_seconds", "pid_verified_dead"],
+			"properties": {
+				"lock_path": { "type": "string" },
+				"lock_age_seconds": { "type": "number", "minimum": 0 },
+				"pid_verified_dead": { "type": "boolean" }
+			}
+		},
 		"echo.suite.started": {
 			"type": "object",
 			"additionalProperties": false,

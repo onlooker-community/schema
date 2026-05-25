@@ -69,6 +69,8 @@ export const GOVERNOR_CHILD_RETURNED = "governor.child.returned" as const;
 export const GOVERNOR_BUDGET_WARNING = "governor.budget.warning" as const;
 export const GOVERNOR_BUDGET_EXCEEDED = "governor.budget.exceeded" as const;
 export const GOVERNOR_SESSION_COMPLETE = "governor.session.complete" as const;
+export const GOVERNOR_LOCK_STALE_CLEARED =
+	"governor.lock.stale_cleared" as const;
 
 export const ECHO_SUITE_STARTED = "echo.suite.started" as const;
 export const ECHO_SUITE_COMPLETE = "echo.suite.complete" as const;
@@ -147,6 +149,7 @@ export const ALL_EVENT_TYPES = [
 	GOVERNOR_BUDGET_WARNING,
 	GOVERNOR_BUDGET_EXCEEDED,
 	GOVERNOR_SESSION_COMPLETE,
+	GOVERNOR_LOCK_STALE_CLEARED,
 	ECHO_SUITE_STARTED,
 	ECHO_SUITE_COMPLETE,
 	ECHO_REGRESSION_DETECTED,

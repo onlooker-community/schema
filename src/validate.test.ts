@@ -8,6 +8,15 @@ import {
 	ARCHIVIST_INJECT_COMPLETE,
 	ARCHIVIST_INJECT_STARTED,
 	type EventType,
+	GOVERNOR_BUDGET_EXCEEDED,
+	GOVERNOR_BUDGET_WARNING,
+	GOVERNOR_CALL_RECORDED,
+	GOVERNOR_CHILD_ALLOCATED,
+	GOVERNOR_CHILD_RETURNED,
+	GOVERNOR_GATE_CHECKED,
+	GOVERNOR_LEDGER_WRITE_FAILED,
+	GOVERNOR_LOCK_STALE_CLEARED,
+	GOVERNOR_SESSION_COMPLETE,
 	isEventType,
 	MERIDIAN_HINT_GENERATED,
 	SENTINEL_BLOCKED,
@@ -550,6 +559,149 @@ describe("archivist lifecycle events", () => {
 	});
 });
 
+describe("governor lifecycle events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const SID = "session-gov-1";
+	const PARENT = "agent-orchestrator";
+	const CHILD = "agent-actor-1";
+
+	function gov<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "governor",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a full enforcement lifecycle end-to-end", () => {
+		const events = [
+			gov(GOVERNOR_LOCK_STALE_CLEARED, {
+				lock_path: "/tmp/governor.lock",
+				lock_age_seconds: 45.2,
+				pid_verified_dead: true,
+			}),
+			gov(GOVERNOR_GATE_CHECKED, {
+				session_id: SID,
+				agent_id: PARENT,
+				agent_type: "actor",
+				decision: "allow",
+				estimated_tokens: 8000,
+				tokens_available: 50000,
+				estimation_method: "tiktoken",
+				safety_margin: 1.3,
+			}),
+			gov(GOVERNOR_CHILD_ALLOCATED, {
+				session_id: SID,
+				parent_agent_id: PARENT,
+				child_agent_id: CHILD,
+				child_agent_type: "judge",
+				tokens_allocated: 10000,
+				cost_usd_allocated: 0.05,
+				tokens_remaining_after_allocation: 40000,
+				conservation_check_passed: true,
+			}),
+			gov(GOVERNOR_CALL_RECORDED, {
+				session_id: SID,
+				agent_id: CHILD,
+				agent_type: "judge",
+				estimated_tokens: 8000,
+				actual_tokens: 7200,
+				estimation_error_pct: -10,
+				cost_usd_estimated: 0.04,
+				cost_usd_actual: 0.036,
+				duration_ms: 1800,
+				tokens_returned_to_pool: 800,
+			}),
+			gov(GOVERNOR_CHILD_RETURNED, {
+				session_id: SID,
+				parent_agent_id: PARENT,
+				child_agent_id: CHILD,
+				tokens_allocated: 10000,
+				tokens_consumed: 7200,
+				tokens_returned: 2800,
+			}),
+			gov(GOVERNOR_BUDGET_WARNING, {
+				session_id: SID,
+				budget_usd: 1.0,
+				spent_usd: 0.8,
+				threshold_pct: 80,
+				dimension: "cost_usd",
+				remaining_usd: 0.2,
+			}),
+			gov(GOVERNOR_BUDGET_EXCEEDED, {
+				session_id: SID,
+				agent_id: PARENT,
+				budget_usd: 1.0,
+				spent_usd: 1.02,
+				blocked_operation: "tool.agent.spawn",
+				dimension: "cost_usd",
+				estimated_call_cost: 0.05,
+				ceiling_type: "session",
+			}),
+			gov(GOVERNOR_SESSION_COMPLETE, {
+				session_id: SID,
+				total_cost_usd: 1.02,
+				budget_usd: 1.0,
+				under_budget: false,
+				total_tokens: 42000,
+				total_api_calls: 12,
+				duration_ms: 34000,
+				calls_blocked: 1,
+				calls_warned: 2,
+				ledger_poisoned: false,
+				estimation_accuracy_pct: 94.5,
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates ledger.write_failed poisoned path", () => {
+		const event = gov(GOVERNOR_LEDGER_WRITE_FAILED, {
+			session_id: SID,
+			agent_id: CHILD,
+			error: "SQLITE_BUSY: database is locked",
+			retry_count: 3,
+			ledger_poisoned: true,
+			unrecorded_tokens: 7200,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates gate.checked block decision", () => {
+		const event = gov(GOVERNOR_GATE_CHECKED, {
+			session_id: SID,
+			agent_id: PARENT,
+			agent_type: "actor",
+			decision: "block",
+			reason: "budget_exceeded",
+			estimated_tokens: 15000,
+			tokens_available: 5000,
+			estimation_method: "char_ratio",
+			safety_margin: 1.3,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+});
+
 describe("isEventOfType", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -614,7 +766,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 70 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(70);
+	it("has exactly 71 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(71);
 	});
 });

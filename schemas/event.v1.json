@@ -119,6 +119,7 @@
 				"governor.budget.warning",
 				"governor.budget.exceeded",
 				"governor.session.complete",
+				"governor.lock.stale_cleared",
 				"echo.suite.started",
 				"echo.suite.complete",
 				"echo.regression.detected",
