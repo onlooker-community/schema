@@ -2,9 +2,9 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-ops.json",
 	"title": "Ops plugin payloads",
-	"description": "Payload schemas for ledger.*, echo.*, counsel.*, onlooker.*, and meridian.* events.",
+	"description": "Payload schemas for governor.*, echo.*, counsel.*, onlooker.*, and meridian.* events.",
 	"$defs": {
-		"ledger.budget.warning": {
+		"governor.budget.warning": {
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["budget_usd", "spent_usd", "threshold_pct"],
@@ -15,7 +15,7 @@
 				"remaining_usd": { "type": "number" }
 			}
 		},
-		"ledger.budget.exceeded": {
+		"governor.budget.exceeded": {
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["budget_usd", "spent_usd", "blocked_operation"],
@@ -25,7 +25,7 @@
 				"blocked_operation": { "type": "string" }
 			}
 		},
-		"ledger.session.complete": {
+		"governor.session.complete": {
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["total_cost_usd", "budget_usd", "under_budget"],
