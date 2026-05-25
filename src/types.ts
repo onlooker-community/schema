@@ -471,7 +471,7 @@ export interface GovernorCallRecordedPayload {
 	estimated_tokens: number;
 	cost_usd_estimated: number;
 	duration_ms: number;
-	tokens_returned_to_pool: number;
+	tokens_returned_to_pool?: number;
 	actual_tokens?: number;
 	estimation_error_pct?: number;
 	cost_usd_actual?: number;

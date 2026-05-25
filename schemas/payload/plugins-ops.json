@@ -44,8 +44,7 @@
 				"agent_type",
 				"estimated_tokens",
 				"cost_usd_estimated",
-				"duration_ms",
-				"tokens_returned_to_pool"
+				"duration_ms"
 			],
 			"properties": {
 				"session_id": { "type": "string" },
@@ -57,7 +56,12 @@
 				"cost_usd_estimated": { "type": "number", "minimum": 0 },
 				"cost_usd_actual": { "type": "number", "minimum": 0 },
 				"duration_ms": { "type": "integer", "minimum": 0 },
-				"tokens_returned_to_pool": { "type": "integer" }
+				"tokens_returned_to_pool": { "type": "integer", "minimum": 0 }
+			},
+			"dependentRequired": {
+				"actual_tokens": ["tokens_returned_to_pool"],
+				"estimation_error_pct": ["actual_tokens"],
+				"cost_usd_actual": ["actual_tokens"]
 			}
 		},
 		"governor.ledger.write_failed": {
@@ -124,7 +128,7 @@
 				"child_agent_id": { "type": "string" },
 				"tokens_allocated": { "type": "integer", "minimum": 0 },
 				"tokens_consumed": { "type": "integer", "minimum": 0 },
-				"tokens_returned": { "type": "integer" }
+				"tokens_returned": { "type": "integer", "minimum": 0 }
 			}
 		},
 		"governor.budget.warning": {
