@@ -46,6 +46,9 @@ export const ORACLE_CALIBRATION_COMPLETE =
 	"oracle.calibration.complete" as const;
 
 export const ARCHIVIST_EXTRACT_COMPLETE = "archivist.extract.complete" as const;
+export const ARCHIVIST_COMPACT_STARTED = "archivist.compact.started" as const;
+export const ARCHIVIST_COMPACT_COMPLETE = "archivist.compact.complete" as const;
+export const ARCHIVIST_INJECT_STARTED = "archivist.inject.started" as const;
 export const ARCHIVIST_INJECT_COMPLETE = "archivist.inject.complete" as const;
 
 export const RELAY_HANDOFF_CAPTURED = "relay.handoff.captured" as const;
@@ -120,6 +123,9 @@ export const ALL_EVENT_TYPES = [
 	ORACLE_CALIBRATION_REQUESTED,
 	ORACLE_CALIBRATION_COMPLETE,
 	ARCHIVIST_EXTRACT_COMPLETE,
+	ARCHIVIST_COMPACT_STARTED,
+	ARCHIVIST_COMPACT_COMPLETE,
+	ARCHIVIST_INJECT_STARTED,
 	ARCHIVIST_INJECT_COMPLETE,
 	RELAY_HANDOFF_CAPTURED,
 	RELAY_HANDOFF_INJECTED,

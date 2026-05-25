@@ -358,10 +358,30 @@ export interface ArchivistExtractCompletePayload {
 	trigger?: "pre_compact" | "session_end" | "manual";
 }
 
+export interface ArchivistCompactStartedPayload {
+	project_key: string;
+	session_id: string;
+}
+
+export interface ArchivistCompactCompletePayload {
+	project_key: string;
+	session_id: string;
+	decisions_extracted: number;
+	dead_ends_extracted: number;
+	open_questions_extracted: number;
+	duration_ms: number;
+}
+
+export interface ArchivistInjectStartedPayload {
+	project_key: string;
+	session_id: string;
+}
+
 export interface ArchivistInjectCompletePayload {
-	source_session_id: string;
+	project_key: string;
+	session_id: string;
 	items_injected: number;
-	items_available?: number;
+	chars_injected: number;
 }
 
 export interface RelayHandoffCapturedPayload {
@@ -678,9 +698,15 @@ export type PayloadFor<T extends EventType> = T extends "session.start"
 																																					? OracleCalibrationCompletePayload
 																																					: T extends "archivist.extract.complete"
 																																						? ArchivistExtractCompletePayload
-																																						: T extends "archivist.inject.complete"
-																																							? ArchivistInjectCompletePayload
-																																							: T extends "relay.handoff.captured"
+																																						: T extends "archivist.compact.started"
+																																							? ArchivistCompactStartedPayload
+																																							: T extends "archivist.compact.complete"
+																																								? ArchivistCompactCompletePayload
+																																								: T extends "archivist.inject.started"
+																																									? ArchivistInjectStartedPayload
+																																									: T extends "archivist.inject.complete"
+																																										? ArchivistInjectCompletePayload
+																																										: T extends "relay.handoff.captured"
 																																								? RelayHandoffCapturedPayload
 																																								: T extends "relay.handoff.injected"
 																																									? RelayHandoffInjectedPayload

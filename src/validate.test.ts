@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import {
 	ALL_EVENT_TYPES,
+	ARCHIVIST_COMPACT_COMPLETE,
+	ARCHIVIST_COMPACT_STARTED,
+	ARCHIVIST_INJECT_COMPLETE,
+	ARCHIVIST_INJECT_STARTED,
 	type EventType,
 	isEventType,
 	MERIDIAN_HINT_GENERATED,
@@ -477,6 +481,75 @@ describe("tribunal full-loop events", () => {
 	});
 });
 
+describe("archivist lifecycle events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	it("validates compact and inject lifecycle round-trip", () => {
+		const PROJECT_KEY = "my-project";
+		const SID = "session-archivist-1";
+
+		const events = [
+			createEvent({
+				runtime: "claude-code",
+				plugin: "archivist",
+				machine_id: MACHINE_ID,
+				session_id: SESSION_ID,
+				event_type: ARCHIVIST_COMPACT_STARTED,
+				payload: { project_key: PROJECT_KEY, session_id: SID },
+			}),
+			createEvent({
+				runtime: "claude-code",
+				plugin: "archivist",
+				machine_id: MACHINE_ID,
+				session_id: SESSION_ID,
+				event_type: ARCHIVIST_COMPACT_COMPLETE,
+				payload: {
+					project_key: PROJECT_KEY,
+					session_id: SID,
+					decisions_extracted: 3,
+					dead_ends_extracted: 1,
+					open_questions_extracted: 2,
+					duration_ms: 420,
+				},
+			}),
+			createEvent({
+				runtime: "claude-code",
+				plugin: "archivist",
+				machine_id: MACHINE_ID,
+				session_id: SESSION_ID,
+				event_type: ARCHIVIST_INJECT_STARTED,
+				payload: { project_key: PROJECT_KEY, session_id: SID },
+			}),
+			createEvent({
+				runtime: "claude-code",
+				plugin: "archivist",
+				machine_id: MACHINE_ID,
+				session_id: SESSION_ID,
+				event_type: ARCHIVIST_INJECT_COMPLETE,
+				payload: {
+					project_key: PROJECT_KEY,
+					session_id: SID,
+					items_injected: 6,
+					chars_injected: 1024,
+				},
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+});
+
 describe("isEventOfType", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -541,7 +614,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 62 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(62);
+	it("has exactly 65 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(65);
 	});
 });

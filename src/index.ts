@@ -1,8 +1,11 @@
 export type { EventType } from "./event-types.js";
 export {
 	ALL_EVENT_TYPES,
+	ARCHIVIST_COMPACT_COMPLETE,
+	ARCHIVIST_COMPACT_STARTED,
 	ARCHIVIST_EXTRACT_COMPLETE,
 	ARCHIVIST_INJECT_COMPLETE,
+	ARCHIVIST_INJECT_STARTED,
 	CARTOGRAPHER_AUDIT_COMPLETE,
 	CARTOGRAPHER_ISSUE_FOUND,
 	COUNSEL_BRIEF_GENERATED,
@@ -67,8 +70,11 @@ export {
 } from "./event-types.js";
 
 export type {
+	ArchivistCompactCompletePayload,
+	ArchivistCompactStartedPayload,
 	ArchivistExtractCompletePayload,
 	ArchivistInjectCompletePayload,
+	ArchivistInjectStartedPayload,
 	CartographerAuditCompletePayload,
 	CartographerIssueCategories,
 	CartographerIssueFoundPayload,
