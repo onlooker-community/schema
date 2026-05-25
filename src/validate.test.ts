@@ -576,7 +576,7 @@ describe("governor lifecycle events", () => {
 			runtime: "claude-code",
 			plugin: "governor",
 			machine_id: MACHINE_ID,
-			session_id: SESSION_ID,
+			session_id: SID,
 			event_type,
 			payload,
 		});
@@ -674,7 +674,7 @@ describe("governor lifecycle events", () => {
 		}
 	});
 
-	it("validates ledger.write_failed poisoned path", () => {
+	it("validates governor.ledger.write_failed poisoned path", () => {
 		const event = gov(GOVERNOR_LEDGER_WRITE_FAILED, {
 			session_id: SID,
 			agent_id: CHILD,
@@ -697,6 +697,18 @@ describe("governor lifecycle events", () => {
 			tokens_available: 5000,
 			estimation_method: "char_ratio",
 			safety_margin: 1.3,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates governor.call.recorded estimates-only (no actuals)", () => {
+		const event = gov(GOVERNOR_CALL_RECORDED, {
+			session_id: SID,
+			agent_id: CHILD,
+			agent_type: "judge",
+			estimated_tokens: 8000,
+			cost_usd_estimated: 0.04,
+			duration_ms: 1800,
 		});
 		expect(validate(event).valid).toBe(true);
 	});
