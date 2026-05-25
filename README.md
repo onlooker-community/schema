@@ -81,7 +81,7 @@ interface OnlookerEvent<T extends EventType = EventType> {
 | `scribe`       | `capture.complete`, `distill.complete`                                                                                  |
 | `prompt_rule`  | `matched`, `applied`                                                                                                    |
 | `cartographer` | `audit.complete`, `issue.found`                                                                                         |
-| `ledger`       | `budget.warning`, `budget.exceeded`, `session.complete`                                                                 |
+| `governor`     | `budget.warning`, `budget.exceeded`, `session.complete`                                                                 |
 | `echo`         | `suite.started`, `suite.complete`, `regression.detected`                                                                |
 | `counsel`      | `brief.generated`                                                                                                       |
 | `onlooker`     | `session.summary`                                                                                                       |
