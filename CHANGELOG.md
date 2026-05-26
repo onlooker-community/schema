@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0](https://github.com/onlooker-community/schema/compare/v2.3.0...v2.4.0) (2026-05-26)
+
+
+### Features
+
+* **governor:** full event schema for resource governance and budget enforcement :rocket: ([#27](https://github.com/onlooker-community/schema/issues/27)) ([d8f2ade](https://github.com/onlooker-community/schema/commit/d8f2ade194509647e3c03cde77fad407452acc52))
+
 ## [2.3.0](https://github.com/onlooker-community/schema/compare/v2.2.0...v2.3.0) (2026-05-25)
 
 
