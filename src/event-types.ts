@@ -60,9 +60,17 @@ export const SCRIBE_DISTILL_COMPLETE = "scribe.distill.complete" as const;
 export const PROMPT_RULE_MATCHED = "prompt_rule.matched" as const;
 export const PROMPT_RULE_APPLIED = "prompt_rule.applied" as const;
 
+export const GOVERNOR_GATE_CHECKED = "governor.gate.checked" as const;
+export const GOVERNOR_CALL_RECORDED = "governor.call.recorded" as const;
+export const GOVERNOR_LEDGER_WRITE_FAILED =
+	"governor.ledger.write_failed" as const;
+export const GOVERNOR_CHILD_ALLOCATED = "governor.child.allocated" as const;
+export const GOVERNOR_CHILD_RETURNED = "governor.child.returned" as const;
 export const GOVERNOR_BUDGET_WARNING = "governor.budget.warning" as const;
 export const GOVERNOR_BUDGET_EXCEEDED = "governor.budget.exceeded" as const;
 export const GOVERNOR_SESSION_COMPLETE = "governor.session.complete" as const;
+export const GOVERNOR_LOCK_STALE_CLEARED =
+	"governor.lock.stale_cleared" as const;
 
 export const ECHO_SUITE_STARTED = "echo.suite.started" as const;
 export const ECHO_SUITE_COMPLETE = "echo.suite.complete" as const;
@@ -133,9 +141,15 @@ export const ALL_EVENT_TYPES = [
 	SCRIBE_DISTILL_COMPLETE,
 	PROMPT_RULE_MATCHED,
 	PROMPT_RULE_APPLIED,
+	GOVERNOR_GATE_CHECKED,
+	GOVERNOR_CALL_RECORDED,
+	GOVERNOR_LEDGER_WRITE_FAILED,
+	GOVERNOR_CHILD_ALLOCATED,
+	GOVERNOR_CHILD_RETURNED,
 	GOVERNOR_BUDGET_WARNING,
 	GOVERNOR_BUDGET_EXCEEDED,
 	GOVERNOR_SESSION_COMPLETE,
+	GOVERNOR_LOCK_STALE_CLEARED,
 	ECHO_SUITE_STARTED,
 	ECHO_SUITE_COMPLETE,
 	ECHO_REGRESSION_DETECTED,
