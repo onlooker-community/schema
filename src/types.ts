@@ -464,18 +464,29 @@ export interface GovernorGateCheckedPayload {
 	reason?: "budget_exceeded" | "ceiling_exceeded" | "lock_timeout";
 }
 
-export interface GovernorCallRecordedPayload {
+type GovernorCallActuals = {
+	actual_tokens: number;
+	tokens_returned_to_pool: number;
+	estimation_error_pct?: number;
+	cost_usd_actual?: number;
+};
+
+export type GovernorCallRecordedPayload = {
 	session_id: string;
 	agent_id: string;
 	agent_type: string;
 	estimated_tokens: number;
 	cost_usd_estimated: number;
 	duration_ms: number;
-	tokens_returned_to_pool?: number;
-	actual_tokens?: number;
-	estimation_error_pct?: number;
-	cost_usd_actual?: number;
-}
+} & (
+	| GovernorCallActuals
+	| {
+			actual_tokens?: never;
+			tokens_returned_to_pool?: never;
+			estimation_error_pct?: never;
+			cost_usd_actual?: never;
+	  }
+);
 
 export interface GovernorLedgerWriteFailedPayload {
 	session_id: string;

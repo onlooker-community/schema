@@ -712,6 +712,22 @@ describe("governor lifecycle events", () => {
 		});
 		expect(validate(event).valid).toBe(true);
 	});
+
+	it("validates governor.call.recorded with negative tokens_returned_to_pool (underestimate)", () => {
+		const event = gov(GOVERNOR_CALL_RECORDED, {
+			session_id: SID,
+			agent_id: CHILD,
+			agent_type: "judge",
+			estimated_tokens: 8000,
+			actual_tokens: 9500,
+			estimation_error_pct: 18.75,
+			cost_usd_estimated: 0.04,
+			cost_usd_actual: 0.0475,
+			duration_ms: 2100,
+			tokens_returned_to_pool: -1500,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
 });
 
 describe("isEventOfType", () => {
