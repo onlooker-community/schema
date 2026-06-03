@@ -173,6 +173,7 @@ export type {
 	LibrarianScanStartedPayload,
 	LibrarianTombstoneCreatedPayload,
 	MemoryRecalledPayload,
+	MemoryType,
 	MeridianHintDeliveredPayload,
 	MeridianHintGeneratedPayload,
 	MeridianLessonCuratedPayload,

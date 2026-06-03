@@ -720,14 +720,25 @@ export interface MeridianPlaybookUpdatedPayload {
 	bullets_removed?: number;
 }
 
+/**
+ * The four classifications used by the typed auto-memory store. Shared between
+ * the substrate-level memory.recalled event and librarian's classifier output.
+ */
+export type MemoryType = "user" | "feedback" | "project" | "reference";
+
 export interface MemoryRecalledPayload {
 	project_key: string;
 	memory_file: string;
-	memory_type: "user" | "feedback" | "project" | "reference";
+	memory_type: MemoryType;
 	recall_position?: number;
 }
 
-export type LibrarianMemoryType = "user" | "feedback" | "project" | "reference";
+/**
+ * Alias kept for ergonomics: librarian.candidate.proposed events are
+ * conceptually "classify this artifact into a MemoryType", so naming the
+ * alias librarian-side reads better at the call site.
+ */
+export type LibrarianMemoryType = MemoryType;
 
 export type LibrarianConflictState =
 	| "none"
@@ -1065,6 +1076,28 @@ export interface PayloadMap {
 export type PayloadFor<T extends EventType> = T extends keyof PayloadMap
 	? PayloadMap[T]
 	: Record<string, unknown>;
+
+/**
+ * Compile-time exhaustiveness check: PayloadMap must declare an entry for
+ * every EventType.
+ *
+ * If a new EventType is added in event-types.ts without a corresponding
+ * PayloadMap entry above, `_PayloadMapMissingEntries` resolves to a union of
+ * the missing event_type strings, which fails the `extends never` constraint
+ * on `_AssertNoMissingPayloadEntries` below. TypeScript reports:
+ *
+ *     Type '"some.missing.event"' does not satisfy the constraint 'never'.
+ *
+ * pointing at the `_PayloadMapExhaustivenessCheck` line.
+ *
+ * Without this guard, `PayloadFor` would silently fall back to
+ * `Record<string, unknown>` for any forgotten EventType, weakening payload
+ * typing without warning.
+ */
+type _PayloadMapMissingEntries = Exclude<EventType, keyof PayloadMap>;
+type _AssertNoMissingPayloadEntries<_M extends never> = never;
+type _PayloadMapExhaustivenessCheck =
+	_AssertNoMissingPayloadEntries<_PayloadMapMissingEntries>;
 
 export interface OnlookerEvent<T extends EventType = EventType> {
 	id: string;
