@@ -167,7 +167,11 @@
 				"historian.retrieval.surfaced",
 				"historian.prune.complete",
 				"historian.purge.complete",
-				"historian.config.warning"
+				"historian.config.warning",
+				"assayer.audit.started",
+				"assayer.claim.contradicted",
+				"assayer.claim.unverified",
+				"assayer.audit.complete"
 			]
 		},
 		"payload": {

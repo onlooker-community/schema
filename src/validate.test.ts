@@ -7,6 +7,10 @@ import {
 	ARCHIVIST_COMPACT_STARTED,
 	ARCHIVIST_INJECT_COMPLETE,
 	ARCHIVIST_INJECT_STARTED,
+	ASSAYER_AUDIT_COMPLETE,
+	ASSAYER_AUDIT_STARTED,
+	ASSAYER_CLAIM_CONTRADICTED,
+	ASSAYER_CLAIM_UNVERIFIED,
 	CURATOR_FINDING_CONTRADICTION,
 	CURATOR_FINDING_DATE_DECAYED,
 	CURATOR_FINDING_PATH_BROKEN,
@@ -1062,6 +1066,99 @@ describe("memory.recalled substrate event", () => {
 	});
 });
 
+describe("assayer lifecycle events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const SID = "session-assayer-1";
+	const AUDIT = "01J000000000000000000ASSAY";
+
+	function assay<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "assayer",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a full audit lifecycle end-to-end", () => {
+		const events = [
+			assay(ASSAYER_AUDIT_STARTED, {
+				audit_id: AUDIT,
+				claim_count: 3,
+				trigger: "stop",
+				command_count: 5,
+			}),
+			assay(ASSAYER_CLAIM_CONTRADICTED, {
+				audit_id: AUDIT,
+				claim: "I ran the tests and they all pass.",
+				claim_type: "tests_pass",
+				evidence_command: "npm test",
+				result_excerpt: "Tests: 1 failed, 32 passed",
+				exit_code: 1,
+				confidence: 0.9,
+			}),
+			assay(ASSAYER_CLAIM_UNVERIFIED, {
+				audit_id: AUDIT,
+				claim: "The deploy is healthy.",
+				claim_type: "generic",
+				reason: "no_matching_command",
+			}),
+			assay(ASSAYER_AUDIT_COMPLETE, {
+				audit_id: AUDIT,
+				claim_count: 3,
+				corroborated: 1,
+				contradicted: 1,
+				unverified: 1,
+				verdict: "contradictions_found",
+				duration_ms: 4200,
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("rejects assayer.claim.contradicted missing evidence_command", () => {
+		const event = assay(ASSAYER_CLAIM_CONTRADICTED, {
+			audit_id: AUDIT,
+			claim: "Build is green.",
+			claim_type: "build_succeeds",
+			evidence_command: "npm run build",
+		}) as unknown as Record<string, unknown>;
+		delete (event.payload as Record<string, unknown>).evidence_command;
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates a clean audit with no contradictions", () => {
+		const event = assay(ASSAYER_AUDIT_COMPLETE, {
+			audit_id: AUDIT,
+			claim_count: 2,
+			corroborated: 2,
+			contradicted: 0,
+			unverified: 0,
+			verdict: "clean",
+			duration_ms: 1500,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+});
+
 describe("isEventOfType", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -1126,7 +1223,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 105 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(105);
+	it("has exactly 109 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(109);
 	});
 });
