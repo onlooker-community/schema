@@ -92,6 +92,65 @@ export const MERIDIAN_RELIANCE_MEASURED = "meridian.reliance.measured" as const;
 export const MERIDIAN_LESSON_CURATED = "meridian.lesson.curated" as const;
 export const MERIDIAN_PLAYBOOK_UPDATED = "meridian.playbook.updated" as const;
 
+export const MEMORY_RECALLED = "memory.recalled" as const;
+
+export const LIBRARIAN_SCAN_STARTED = "librarian.scan.started" as const;
+export const LIBRARIAN_SCAN_COMPLETE = "librarian.scan.complete" as const;
+export const LIBRARIAN_CANDIDATE_PROPOSED =
+	"librarian.candidate.proposed" as const;
+export const LIBRARIAN_CANDIDATE_DROPPED =
+	"librarian.candidate.dropped" as const;
+export const LIBRARIAN_PROPOSAL_ACCEPTED =
+	"librarian.proposal.accepted" as const;
+export const LIBRARIAN_PROPOSAL_REJECTED =
+	"librarian.proposal.rejected" as const;
+export const LIBRARIAN_PROPOSAL_MERGED = "librarian.proposal.merged" as const;
+export const LIBRARIAN_PROPOSAL_SUPERSEDED =
+	"librarian.proposal.superseded" as const;
+export const LIBRARIAN_TOMBSTONE_CREATED =
+	"librarian.tombstone.created" as const;
+
+export const CURATOR_SCAN_STARTED = "curator.scan.started" as const;
+export const CURATOR_SCAN_COMPLETE = "curator.scan.complete" as const;
+export const CURATOR_FINDING_DATE_DECAYED =
+	"curator.finding.date_decayed" as const;
+export const CURATOR_FINDING_PATH_BROKEN =
+	"curator.finding.path_broken" as const;
+export const CURATOR_FINDING_SYMBOL_MISSING =
+	"curator.finding.symbol_missing" as const;
+export const CURATOR_FINDING_URL_UNCHECKED =
+	"curator.finding.url_unchecked" as const;
+export const CURATOR_FINDING_UNUSED_LOW_SIGNAL =
+	"curator.finding.unused_low_signal" as const;
+export const CURATOR_FINDING_CONTRADICTION =
+	"curator.finding.contradiction" as const;
+export const CURATOR_FINDING_REDUNDANT_PAIR =
+	"curator.finding.redundant_pair" as const;
+export const CURATOR_FINDING_BROKEN_INDEX =
+	"curator.finding.broken_index" as const;
+export const CURATOR_FINDING_ORPHANED_MEMORY =
+	"curator.finding.orphaned_memory" as const;
+export const CURATOR_FINDING_ACKNOWLEDGED =
+	"curator.finding.acknowledged" as const;
+export const CURATOR_FINDING_RESOLVED = "curator.finding.resolved" as const;
+
+export const HISTORIAN_INDEXING_STARTED = "historian.indexing.started" as const;
+export const HISTORIAN_INDEXING_COMPLETE =
+	"historian.indexing.complete" as const;
+export const HISTORIAN_CHUNK_SANITIZED = "historian.chunk.sanitized" as const;
+export const HISTORIAN_CHUNK_DROPPED = "historian.chunk.dropped" as const;
+export const HISTORIAN_EMBEDDER_UNAVAILABLE =
+	"historian.embedder.unavailable" as const;
+export const HISTORIAN_RETRIEVAL_STARTED =
+	"historian.retrieval.started" as const;
+export const HISTORIAN_RETRIEVAL_COMPLETE =
+	"historian.retrieval.complete" as const;
+export const HISTORIAN_RETRIEVAL_SURFACED =
+	"historian.retrieval.surfaced" as const;
+export const HISTORIAN_PRUNE_COMPLETE = "historian.prune.complete" as const;
+export const HISTORIAN_PURGE_COMPLETE = "historian.purge.complete" as const;
+export const HISTORIAN_CONFIG_WARNING = "historian.config.warning" as const;
+
 export const ALL_EVENT_TYPES = [
 	SESSION_START,
 	SESSION_END,
@@ -164,6 +223,40 @@ export const ALL_EVENT_TYPES = [
 	MERIDIAN_RELIANCE_MEASURED,
 	MERIDIAN_LESSON_CURATED,
 	MERIDIAN_PLAYBOOK_UPDATED,
+	MEMORY_RECALLED,
+	LIBRARIAN_SCAN_STARTED,
+	LIBRARIAN_SCAN_COMPLETE,
+	LIBRARIAN_CANDIDATE_PROPOSED,
+	LIBRARIAN_CANDIDATE_DROPPED,
+	LIBRARIAN_PROPOSAL_ACCEPTED,
+	LIBRARIAN_PROPOSAL_REJECTED,
+	LIBRARIAN_PROPOSAL_MERGED,
+	LIBRARIAN_PROPOSAL_SUPERSEDED,
+	LIBRARIAN_TOMBSTONE_CREATED,
+	CURATOR_SCAN_STARTED,
+	CURATOR_SCAN_COMPLETE,
+	CURATOR_FINDING_DATE_DECAYED,
+	CURATOR_FINDING_PATH_BROKEN,
+	CURATOR_FINDING_SYMBOL_MISSING,
+	CURATOR_FINDING_URL_UNCHECKED,
+	CURATOR_FINDING_UNUSED_LOW_SIGNAL,
+	CURATOR_FINDING_CONTRADICTION,
+	CURATOR_FINDING_REDUNDANT_PAIR,
+	CURATOR_FINDING_BROKEN_INDEX,
+	CURATOR_FINDING_ORPHANED_MEMORY,
+	CURATOR_FINDING_ACKNOWLEDGED,
+	CURATOR_FINDING_RESOLVED,
+	HISTORIAN_INDEXING_STARTED,
+	HISTORIAN_INDEXING_COMPLETE,
+	HISTORIAN_CHUNK_SANITIZED,
+	HISTORIAN_CHUNK_DROPPED,
+	HISTORIAN_EMBEDDER_UNAVAILABLE,
+	HISTORIAN_RETRIEVAL_STARTED,
+	HISTORIAN_RETRIEVAL_COMPLETE,
+	HISTORIAN_RETRIEVAL_SURFACED,
+	HISTORIAN_PRUNE_COMPLETE,
+	HISTORIAN_PURGE_COMPLETE,
+	HISTORIAN_CONFIG_WARNING,
 ] as const;
 
 export type EventType = (typeof ALL_EVENT_TYPES)[number];

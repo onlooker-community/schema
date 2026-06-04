@@ -720,152 +720,384 @@ export interface MeridianPlaybookUpdatedPayload {
 	bullets_removed?: number;
 }
 
-export type PayloadFor<T extends EventType> = T extends "session.start"
-	? SessionStartPayload
-	: T extends "session.end"
-		? SessionEndPayload
-		: T extends "session.compact"
-			? SessionCompactPayload
-			: T extends "session.prompt"
-				? SessionPromptPayload
-				: T extends "skill.invoked"
-					? SkillInvokedPayload
-					: T extends "task.start"
-						? TaskStartPayload
-						: T extends "task.complete"
-							? TaskCompletePayload
-							: T extends "task.fail"
-								? TaskFailPayload
-								: T extends "tool.file.read"
-									? ToolFileReadPayload
-									: T extends "tool.file.write"
-										? ToolFileWritePayload
-										: T extends "tool.file.edit"
-											? ToolFileEditPayload
-											: T extends "tool.shell.exec"
-												? ToolShellExecPayload
-												: T extends "tool.web.fetch"
-													? ToolWebFetchPayload
-													: T extends "tool.agent.spawn"
-														? ToolAgentSpawnPayload
-														: T extends "tool.agent.complete"
-															? ToolAgentCompletePayload
-															: T extends "sentinel.blocked"
-																? SentinelBlockedPayload
-																: T extends "sentinel.allowed"
-																	? SentinelAllowedPayload
-																	: T extends "sentinel.reviewed"
-																		? SentinelReviewedPayload
-																		: T extends "tribunal.session.start"
-																			? TribunalSessionStartPayload
-																			: T extends "tribunal.session.complete"
-																				? TribunalSessionCompletePayload
-																				: T extends "tribunal.iteration.start"
-																					? TribunalIterationStartPayload
-																					: T extends "tribunal.actor.start"
-																						? TribunalActorStartPayload
-																						: T extends "tribunal.actor.complete"
-																							? TribunalActorCompletePayload
-																							: T extends "tribunal.judge.start"
-																								? TribunalJudgeStartPayload
-																								: T extends "tribunal.verdict"
-																									? TribunalVerdictPayload
-																									: T extends "tribunal.meta.start"
-																										? TribunalMetaStartPayload
-																										: T extends "tribunal.meta.complete"
-																											? TribunalMetaCompletePayload
-																											: T extends "tribunal.jury.empaneled"
-																												? TribunalJuryEmpaneledPayload
-																												: T extends "tribunal.consensus.reached"
-																													? TribunalConsensusReachedPayload
-																													: T extends "tribunal.dissent.recorded"
-																														? TribunalDissentRecordedPayload
-																														: T extends "tribunal.gate.passed"
-																															? TribunalGatePassedPayload
-																															: T extends "tribunal.gate.blocked"
-																																? TribunalGateBlockedPayload
-																																: T extends "warden.threat.detected"
-																																	? WardenThreatDetectedPayload
-																																	: T extends "warden.threat.cleared"
-																																		? WardenThreatClearedPayload
-																																		: T extends "warden.gate.blocked"
-																																			? WardenGateBlockedPayload
-																																			: T extends "oracle.calibration.requested"
-																																				? OracleCalibrationRequestedPayload
-																																				: T extends "oracle.calibration.complete"
-																																					? OracleCalibrationCompletePayload
-																																					: T extends "archivist.extract.complete"
-																																						? ArchivistExtractCompletePayload
-																																						: T extends "archivist.compact.started"
-																																							? ArchivistCompactStartedPayload
-																																							: T extends "archivist.compact.complete"
-																																								? ArchivistCompactCompletePayload
-																																								: T extends "archivist.inject.started"
-																																									? ArchivistInjectStartedPayload
-																																									: T extends "archivist.inject.complete"
-																																										? ArchivistInjectCompletePayload
-																																										: T extends "relay.handoff.captured"
-																																											? RelayHandoffCapturedPayload
-																																											: T extends "relay.handoff.injected"
-																																												? RelayHandoffInjectedPayload
-																																												: T extends "scribe.capture.complete"
-																																													? ScribeCaptureCompletePayload
-																																													: T extends "scribe.distill.complete"
-																																														? ScribeDistillCompletePayload
-																																														: T extends "prompt_rule.matched"
-																																															? PromptRuleMatchedPayload
-																																															: T extends "prompt_rule.applied"
-																																																? PromptRuleAppliedPayload
-																																																: T extends "governor.gate.checked"
-																																																	? GovernorGateCheckedPayload
-																																																	: T extends "governor.call.recorded"
-																																																		? GovernorCallRecordedPayload
-																																																		: T extends "governor.ledger.write_failed"
-																																																			? GovernorLedgerWriteFailedPayload
-																																																			: T extends "governor.child.allocated"
-																																																				? GovernorChildAllocatedPayload
-																																																				: T extends "governor.child.returned"
-																																																					? GovernorChildReturnedPayload
-																																																					: T extends "governor.budget.warning"
-																																																						? GovernorBudgetWarningPayload
-																																																						: T extends "governor.budget.exceeded"
-																																																							? GovernorBudgetExceededPayload
-																																																							: T extends "governor.lock.stale_cleared"
-																																																								? GovernorLockStaleClearedPayload
-																																																								: T extends "governor.session.complete"
-																																																									? GovernorSessionCompletePayload
-																																																									: T extends "echo.suite.started"
-																																																										? EchoSuiteStartedPayload
-																																																										: T extends "echo.suite.complete"
-																																																											? EchoSuiteCompletePayload
-																																																											: T extends "echo.regression.detected"
-																																																												? EchoRegressionDetectedPayload
-																																																												: T extends "echo.improvement.detected"
-																																																													? EchoImprovementDetectedPayload
-																																																													: T extends "cartographer.audit.complete"
-																																																														? CartographerAuditCompletePayload
-																																																														: T extends "cartographer.issue.found"
-																																																															? CartographerIssueFoundPayload
-																																																															: T extends "counsel.brief.generated"
-																																																																? CounselBriefGeneratedPayload
-																																																																: T extends "onlooker.session.summary"
-																																																																	? OnlookerSessionSummaryPayload
-																																																																	: T extends "meridian.hint.generated"
-																																																																		? MeridianHintGeneratedPayload
-																																																																		: T extends "meridian.hint.delivered"
-																																																																			? MeridianHintDeliveredPayload
-																																																																			: T extends "meridian.outcome.recorded"
-																																																																				? MeridianOutcomeRecordedPayload
-																																																																				: T extends "meridian.reliance.measured"
-																																																																					? MeridianRelianceMeasuredPayload
-																																																																					: T extends "meridian.lesson.curated"
-																																																																						? MeridianLessonCuratedPayload
-																																																																						: T extends "meridian.playbook.updated"
-																																																																							? MeridianPlaybookUpdatedPayload
-																																																																							: Record<
-																																																																									string,
-																																																																									unknown
-																																																																								>;
+/**
+ * The four classifications used by the typed auto-memory store. Shared between
+ * the substrate-level memory.recalled event and librarian's classifier output.
+ */
+export type MemoryType = "user" | "feedback" | "project" | "reference";
+
+export interface MemoryRecalledPayload {
+	project_key: string;
+	memory_file: string;
+	memory_type: MemoryType;
+	recall_position?: number;
+}
+
+/**
+ * Alias kept for ergonomics: librarian.candidate.proposed events are
+ * conceptually "classify this artifact into a MemoryType", so naming the
+ * alias librarian-side reads better at the call site.
+ */
+export type LibrarianMemoryType = MemoryType;
+
+export type LibrarianConflictState =
+	| "none"
+	| "duplicate"
+	| "merge_candidate"
+	| "conflict_candidate";
+
+export interface LibrarianScanStartedPayload {
+	trigger: "session_end" | "manual" | "bootstrap";
+	last_scan_at?: string;
+	artifact_count_in_window?: number;
+}
+
+export interface LibrarianScanCompletePayload {
+	outcome: "ok" | "empty" | "skipped";
+	skip_reason?: "archivist_not_present" | "memory_path_unresolved" | "disabled";
+	candidates_proposed?: number;
+	candidates_dropped?: number;
+	duration_ms: number;
+	artifact_count_in_window?: number;
+}
+
+export interface LibrarianCandidateProposedPayload {
+	proposal_id: string;
+	memory_type: LibrarianMemoryType;
+	classifier_confidence: number;
+	conflict_state: LibrarianConflictState;
+	source_artifact_ids?: string[];
+}
+
+export interface LibrarianCandidateDroppedPayload {
+	reason:
+		| "duplicate"
+		| "low_confidence"
+		| "classified_null"
+		| "filter_marker_missing"
+		| "filter_repetition_missing"
+		| "detail_too_short";
+	source_artifact_id?: string;
+}
+
+export interface LibrarianProposalAcceptedPayload {
+	proposal_id: string;
+	final_filename: string;
+	accepted_via: "manual" | "auto";
+}
+
+export interface LibrarianProposalRejectedPayload {
+	proposal_id: string;
+	reason?: string;
+}
+
+export interface LibrarianProposalMergedPayload {
+	proposal_id: string;
+	merged_into_filename: string;
+}
+
+export interface LibrarianProposalSupersededPayload {
+	proposal_id: string;
+	superseded_filename: string;
+}
+
+export interface LibrarianTombstoneCreatedPayload {
+	body_hash: string;
+	original_filename?: string;
+}
+
+export type CuratorScanMode = "cheap" | "llm" | "manual";
+
+export interface CuratorScanStartedPayload {
+	mode: CuratorScanMode;
+}
+
+export interface CuratorScanCompletePayload {
+	mode: CuratorScanMode;
+	outcome: "ok" | "skipped";
+	skip_reason?:
+		| "over_budget"
+		| "llm_interval_not_elapsed"
+		| "disabled"
+		| "recent_session_skip";
+	findings_new: number;
+	findings_resolved: number;
+	duration_ms: number;
+	pairs_evaluated?: number;
+}
+
+export interface CuratorFindingDateDecayedPayload {
+	finding_id: string;
+	memory_file: string;
+	matched_phrase: string;
+	days_past: number;
+}
+
+export interface CuratorFindingPathBrokenPayload {
+	finding_id: string;
+	memory_file: string;
+	broken_path: string;
+}
+
+export interface CuratorFindingSymbolMissingPayload {
+	finding_id: string;
+	memory_file: string;
+	symbol: string;
+}
+
+export interface CuratorFindingUrlUncheckedPayload {
+	finding_id: string;
+	memory_file: string;
+	url_host: string;
+}
+
+export interface CuratorFindingUnusedLowSignalPayload {
+	finding_id: string;
+	memory_file: string;
+	window_days: number;
+}
+
+export interface CuratorFindingContradictionPayload {
+	finding_id: string;
+	memory_a: string;
+	memory_b: string;
+	rationale: string;
+}
+
+export interface CuratorFindingRedundantPairPayload {
+	finding_id: string;
+	memory_a: string;
+	memory_b: string;
+	rationale: string;
+}
+
+export interface CuratorFindingBrokenIndexPayload {
+	finding_id: string;
+	referenced_file: string;
+}
+
+export interface CuratorFindingOrphanedMemoryPayload {
+	finding_id: string;
+	memory_file: string;
+}
+
+export interface CuratorFindingAcknowledgedPayload {
+	finding_id: string;
+}
+
+export interface CuratorFindingResolvedPayload {
+	finding_id: string;
+	action: "prune" | "edit" | "reclassify" | "defer";
+}
+
+export type HistorianEmbedderBackend = "ollama" | "fastembed" | "remote";
+
+export interface HistorianIndexingStartedPayload {
+	session_id: string;
+	transcript_chars: number;
+}
+
+export interface HistorianIndexingCompletePayload {
+	outcome: "ok" | "skipped";
+	skip_reason?:
+		| "too_short"
+		| "embedder_unavailable"
+		| "disabled"
+		| "transcript_unavailable";
+	chunks_indexed?: number;
+	chunks_dropped?: number;
+	duration_ms: number;
+}
+
+export interface HistorianChunkSanitizedPayload {
+	chunk_id: string;
+	redaction_count: number;
+}
+
+export interface HistorianChunkDroppedPayload {
+	reason: "skip_marker" | "never_index_path";
+}
+
+export interface HistorianEmbedderUnavailablePayload {
+	backend: HistorianEmbedderBackend;
+	error_summary?: string;
+}
+
+export interface HistorianRetrievalStartedPayload {
+	prompt_chars: number;
+}
+
+export interface HistorianRetrievalCompletePayload {
+	outcome: "surfaced" | "empty" | "skipped";
+	skip_reason?:
+		| "cooldown"
+		| "budget"
+		| "short_prompt"
+		| "disabled"
+		| "embedder_unavailable";
+	top_similarity?: number;
+	candidates_above_floor?: number;
+	duration_ms?: number;
+}
+
+export interface HistorianRetrievalSurfacedPayload {
+	chunk_id: string;
+	similarity: number;
+	age_days: number;
+	source_session_id?: string;
+}
+
+export interface HistorianPruneCompletePayload {
+	chunks_pruned: number;
+	chunks_remaining: number;
+}
+
+export interface HistorianPurgeCompletePayload {
+	scope: "session" | "date_range" | "all";
+	chunks_purged: number;
+}
+
+export interface HistorianConfigWarningPayload {
+	warning:
+		| "remote_egress_not_allowed"
+		| "model_mismatch"
+		| "embedder_path_changed";
+	detail?: string;
+}
+
+export interface PayloadMap {
+	"session.start": SessionStartPayload;
+	"session.end": SessionEndPayload;
+	"session.compact": SessionCompactPayload;
+	"session.prompt": SessionPromptPayload;
+	"skill.invoked": SkillInvokedPayload;
+	"task.start": TaskStartPayload;
+	"task.complete": TaskCompletePayload;
+	"task.fail": TaskFailPayload;
+	"tool.file.read": ToolFileReadPayload;
+	"tool.file.write": ToolFileWritePayload;
+	"tool.file.edit": ToolFileEditPayload;
+	"tool.shell.exec": ToolShellExecPayload;
+	"tool.web.fetch": ToolWebFetchPayload;
+	"tool.agent.spawn": ToolAgentSpawnPayload;
+	"tool.agent.complete": ToolAgentCompletePayload;
+	"sentinel.blocked": SentinelBlockedPayload;
+	"sentinel.allowed": SentinelAllowedPayload;
+	"sentinel.reviewed": SentinelReviewedPayload;
+	"tribunal.session.start": TribunalSessionStartPayload;
+	"tribunal.session.complete": TribunalSessionCompletePayload;
+	"tribunal.iteration.start": TribunalIterationStartPayload;
+	"tribunal.actor.start": TribunalActorStartPayload;
+	"tribunal.actor.complete": TribunalActorCompletePayload;
+	"tribunal.judge.start": TribunalJudgeStartPayload;
+	"tribunal.verdict": TribunalVerdictPayload;
+	"tribunal.meta.start": TribunalMetaStartPayload;
+	"tribunal.meta.complete": TribunalMetaCompletePayload;
+	"tribunal.jury.empaneled": TribunalJuryEmpaneledPayload;
+	"tribunal.consensus.reached": TribunalConsensusReachedPayload;
+	"tribunal.dissent.recorded": TribunalDissentRecordedPayload;
+	"tribunal.gate.passed": TribunalGatePassedPayload;
+	"tribunal.gate.blocked": TribunalGateBlockedPayload;
+	"warden.threat.detected": WardenThreatDetectedPayload;
+	"warden.threat.cleared": WardenThreatClearedPayload;
+	"warden.gate.blocked": WardenGateBlockedPayload;
+	"oracle.calibration.requested": OracleCalibrationRequestedPayload;
+	"oracle.calibration.complete": OracleCalibrationCompletePayload;
+	"archivist.extract.complete": ArchivistExtractCompletePayload;
+	"archivist.compact.started": ArchivistCompactStartedPayload;
+	"archivist.compact.complete": ArchivistCompactCompletePayload;
+	"archivist.inject.started": ArchivistInjectStartedPayload;
+	"archivist.inject.complete": ArchivistInjectCompletePayload;
+	"relay.handoff.captured": RelayHandoffCapturedPayload;
+	"relay.handoff.injected": RelayHandoffInjectedPayload;
+	"scribe.capture.complete": ScribeCaptureCompletePayload;
+	"scribe.distill.complete": ScribeDistillCompletePayload;
+	"prompt_rule.matched": PromptRuleMatchedPayload;
+	"prompt_rule.applied": PromptRuleAppliedPayload;
+	"governor.gate.checked": GovernorGateCheckedPayload;
+	"governor.call.recorded": GovernorCallRecordedPayload;
+	"governor.ledger.write_failed": GovernorLedgerWriteFailedPayload;
+	"governor.child.allocated": GovernorChildAllocatedPayload;
+	"governor.child.returned": GovernorChildReturnedPayload;
+	"governor.budget.warning": GovernorBudgetWarningPayload;
+	"governor.budget.exceeded": GovernorBudgetExceededPayload;
+	"governor.lock.stale_cleared": GovernorLockStaleClearedPayload;
+	"governor.session.complete": GovernorSessionCompletePayload;
+	"echo.suite.started": EchoSuiteStartedPayload;
+	"echo.suite.complete": EchoSuiteCompletePayload;
+	"echo.regression.detected": EchoRegressionDetectedPayload;
+	"echo.improvement.detected": EchoImprovementDetectedPayload;
+	"cartographer.audit.complete": CartographerAuditCompletePayload;
+	"cartographer.issue.found": CartographerIssueFoundPayload;
+	"counsel.brief.generated": CounselBriefGeneratedPayload;
+	"onlooker.session.summary": OnlookerSessionSummaryPayload;
+	"meridian.hint.generated": MeridianHintGeneratedPayload;
+	"meridian.hint.delivered": MeridianHintDeliveredPayload;
+	"meridian.outcome.recorded": MeridianOutcomeRecordedPayload;
+	"meridian.reliance.measured": MeridianRelianceMeasuredPayload;
+	"meridian.lesson.curated": MeridianLessonCuratedPayload;
+	"meridian.playbook.updated": MeridianPlaybookUpdatedPayload;
+	"memory.recalled": MemoryRecalledPayload;
+	"librarian.scan.started": LibrarianScanStartedPayload;
+	"librarian.scan.complete": LibrarianScanCompletePayload;
+	"librarian.candidate.proposed": LibrarianCandidateProposedPayload;
+	"librarian.candidate.dropped": LibrarianCandidateDroppedPayload;
+	"librarian.proposal.accepted": LibrarianProposalAcceptedPayload;
+	"librarian.proposal.rejected": LibrarianProposalRejectedPayload;
+	"librarian.proposal.merged": LibrarianProposalMergedPayload;
+	"librarian.proposal.superseded": LibrarianProposalSupersededPayload;
+	"librarian.tombstone.created": LibrarianTombstoneCreatedPayload;
+	"curator.scan.started": CuratorScanStartedPayload;
+	"curator.scan.complete": CuratorScanCompletePayload;
+	"curator.finding.date_decayed": CuratorFindingDateDecayedPayload;
+	"curator.finding.path_broken": CuratorFindingPathBrokenPayload;
+	"curator.finding.symbol_missing": CuratorFindingSymbolMissingPayload;
+	"curator.finding.url_unchecked": CuratorFindingUrlUncheckedPayload;
+	"curator.finding.unused_low_signal": CuratorFindingUnusedLowSignalPayload;
+	"curator.finding.contradiction": CuratorFindingContradictionPayload;
+	"curator.finding.redundant_pair": CuratorFindingRedundantPairPayload;
+	"curator.finding.broken_index": CuratorFindingBrokenIndexPayload;
+	"curator.finding.orphaned_memory": CuratorFindingOrphanedMemoryPayload;
+	"curator.finding.acknowledged": CuratorFindingAcknowledgedPayload;
+	"curator.finding.resolved": CuratorFindingResolvedPayload;
+	"historian.indexing.started": HistorianIndexingStartedPayload;
+	"historian.indexing.complete": HistorianIndexingCompletePayload;
+	"historian.chunk.sanitized": HistorianChunkSanitizedPayload;
+	"historian.chunk.dropped": HistorianChunkDroppedPayload;
+	"historian.embedder.unavailable": HistorianEmbedderUnavailablePayload;
+	"historian.retrieval.started": HistorianRetrievalStartedPayload;
+	"historian.retrieval.complete": HistorianRetrievalCompletePayload;
+	"historian.retrieval.surfaced": HistorianRetrievalSurfacedPayload;
+	"historian.prune.complete": HistorianPruneCompletePayload;
+	"historian.purge.complete": HistorianPurgeCompletePayload;
+	"historian.config.warning": HistorianConfigWarningPayload;
+}
+
+export type PayloadFor<T extends EventType> = T extends keyof PayloadMap
+	? PayloadMap[T]
+	: Record<string, unknown>;
+
+/**
+ * Compile-time exhaustiveness check: PayloadMap must declare an entry for
+ * every EventType.
+ *
+ * If a new EventType is added in event-types.ts without a corresponding
+ * PayloadMap entry above, `_PayloadMapMissingEntries` resolves to a union of
+ * the missing event_type strings, which fails the `extends never` constraint
+ * on `_AssertNoMissingPayloadEntries` below. TypeScript reports:
+ *
+ *     Type '"some.missing.event"' does not satisfy the constraint 'never'.
+ *
+ * pointing at the `_PayloadMapExhaustivenessCheck` line.
+ *
+ * Without this guard, `PayloadFor` would silently fall back to
+ * `Record<string, unknown>` for any forgotten EventType, weakening payload
+ * typing without warning.
+ */
+type _PayloadMapMissingEntries = Exclude<EventType, keyof PayloadMap>;
+type _AssertNoMissingPayloadEntries<_M extends never> = never;
+type _PayloadMapExhaustivenessCheck =
+	_AssertNoMissingPayloadEntries<_PayloadMapMissingEntries>;
 
 export interface OnlookerEvent<T extends EventType = EventType> {
 	id: string;

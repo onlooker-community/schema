@@ -7,6 +7,12 @@ import {
 	ARCHIVIST_COMPACT_STARTED,
 	ARCHIVIST_INJECT_COMPLETE,
 	ARCHIVIST_INJECT_STARTED,
+	CURATOR_FINDING_CONTRADICTION,
+	CURATOR_FINDING_DATE_DECAYED,
+	CURATOR_FINDING_PATH_BROKEN,
+	CURATOR_FINDING_RESOLVED,
+	CURATOR_SCAN_COMPLETE,
+	CURATOR_SCAN_STARTED,
 	type EventType,
 	GOVERNOR_BUDGET_EXCEEDED,
 	GOVERNOR_BUDGET_WARNING,
@@ -17,7 +23,20 @@ import {
 	GOVERNOR_LEDGER_WRITE_FAILED,
 	GOVERNOR_LOCK_STALE_CLEARED,
 	GOVERNOR_SESSION_COMPLETE,
+	HISTORIAN_CHUNK_SANITIZED,
+	HISTORIAN_EMBEDDER_UNAVAILABLE,
+	HISTORIAN_INDEXING_COMPLETE,
+	HISTORIAN_INDEXING_STARTED,
+	HISTORIAN_RETRIEVAL_COMPLETE,
+	HISTORIAN_RETRIEVAL_STARTED,
+	HISTORIAN_RETRIEVAL_SURFACED,
 	isEventType,
+	LIBRARIAN_CANDIDATE_DROPPED,
+	LIBRARIAN_CANDIDATE_PROPOSED,
+	LIBRARIAN_PROPOSAL_ACCEPTED,
+	LIBRARIAN_SCAN_COMPLETE,
+	LIBRARIAN_SCAN_STARTED,
+	MEMORY_RECALLED,
 	MERIDIAN_HINT_GENERATED,
 	SENTINEL_BLOCKED,
 	SESSION_START,
@@ -730,6 +749,319 @@ describe("governor lifecycle events", () => {
 	});
 });
 
+describe("librarian lifecycle events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const SID = "session-lib-1";
+	const PROPOSAL_ID = "01J5LIBPROPOSAL000000000000";
+	const ARTIFACT_ID = "01J5ARCHIVISTART00000000000";
+
+	function lib<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "librarian",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a full scan-to-acceptance flow", () => {
+		const events = [
+			lib(LIBRARIAN_SCAN_STARTED, {
+				trigger: "session_end",
+				last_scan_at: "2026-06-01T00:00:00Z",
+				artifact_count_in_window: 12,
+			}),
+			lib(LIBRARIAN_CANDIDATE_PROPOSED, {
+				proposal_id: PROPOSAL_ID,
+				memory_type: "feedback",
+				classifier_confidence: 0.84,
+				conflict_state: "none",
+				source_artifact_ids: [ARTIFACT_ID],
+			}),
+			lib(LIBRARIAN_CANDIDATE_DROPPED, {
+				reason: "low_confidence",
+				source_artifact_id: ARTIFACT_ID,
+			}),
+			lib(LIBRARIAN_SCAN_COMPLETE, {
+				outcome: "ok",
+				candidates_proposed: 1,
+				candidates_dropped: 4,
+				duration_ms: 1320,
+				artifact_count_in_window: 12,
+			}),
+			lib(LIBRARIAN_PROPOSAL_ACCEPTED, {
+				proposal_id: PROPOSAL_ID,
+				final_filename: "feedback_no_trailing_summaries.md",
+				accepted_via: "manual",
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates conflict_candidate proposal", () => {
+		const event = lib(LIBRARIAN_CANDIDATE_PROPOSED, {
+			proposal_id: PROPOSAL_ID,
+			memory_type: "project",
+			classifier_confidence: 0.71,
+			conflict_state: "conflict_candidate",
+			source_artifact_ids: [ARTIFACT_ID, "01J5ARCHIVISTART00000000001"],
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates scan.complete skipped path", () => {
+		const event = lib(LIBRARIAN_SCAN_COMPLETE, {
+			outcome: "skipped",
+			skip_reason: "archivist_not_present",
+			duration_ms: 4,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+});
+
+describe("curator lifecycle events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const SID = "session-cur-1";
+	const FINDING_ID = "01J5CURFINDING000000000000";
+
+	function cur<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "curator",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates cheap-tier scan with mixed findings", () => {
+		const events = [
+			cur(CURATOR_SCAN_STARTED, { mode: "cheap" }),
+			cur(CURATOR_FINDING_DATE_DECAYED, {
+				finding_id: FINDING_ID,
+				memory_file: "project_merge_freeze.md",
+				matched_phrase: "2026-03-05",
+				days_past: 89,
+			}),
+			cur(CURATOR_FINDING_PATH_BROKEN, {
+				finding_id: "01J5CURFINDING000000000001",
+				memory_file: "reference_legacy_ingest.md",
+				broken_path: "scripts/legacy_ingest.py",
+			}),
+			cur(CURATOR_SCAN_COMPLETE, {
+				mode: "cheap",
+				outcome: "ok",
+				findings_new: 2,
+				findings_resolved: 0,
+				duration_ms: 87,
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates LLM-sweep contradiction finding", () => {
+		const event = cur(CURATOR_FINDING_CONTRADICTION, {
+			finding_id: FINDING_ID,
+			memory_a: "user_prefer_functional.md",
+			memory_b: "feedback_use_class_for_hot_path.md",
+			rationale: "Both rules trigger on the same hot-path code shape.",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates scan.complete with skip_reason", () => {
+		const event = cur(CURATOR_SCAN_COMPLETE, {
+			mode: "llm",
+			outcome: "skipped",
+			skip_reason: "llm_interval_not_elapsed",
+			findings_new: 0,
+			findings_resolved: 0,
+			duration_ms: 3,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates finding resolution actions", () => {
+		const event = cur(CURATOR_FINDING_RESOLVED, {
+			finding_id: FINDING_ID,
+			action: "prune",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+});
+
+describe("historian lifecycle events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const SID = "session-hist-1";
+	const CHUNK_ID = "01J5HISTCHUNK0000000000000";
+
+	function hist<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "historian",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates end-to-end indexing then retrieval round-trip", () => {
+		const events = [
+			hist(HISTORIAN_INDEXING_STARTED, {
+				session_id: SID,
+				transcript_chars: 10240,
+			}),
+			hist(HISTORIAN_CHUNK_SANITIZED, {
+				chunk_id: CHUNK_ID,
+				redaction_count: 2,
+			}),
+			hist(HISTORIAN_INDEXING_COMPLETE, {
+				outcome: "ok",
+				chunks_indexed: 18,
+				chunks_dropped: 1,
+				duration_ms: 1820,
+			}),
+			hist(HISTORIAN_RETRIEVAL_STARTED, { prompt_chars: 240 }),
+			hist(HISTORIAN_RETRIEVAL_SURFACED, {
+				chunk_id: CHUNK_ID,
+				similarity: 0.72,
+				age_days: 47,
+				source_session_id: "01J5PASTSESSION00000000000",
+			}),
+			hist(HISTORIAN_RETRIEVAL_COMPLETE, {
+				outcome: "surfaced",
+				top_similarity: 0.72,
+				candidates_above_floor: 3,
+				duration_ms: 68,
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates indexing.complete skipped path", () => {
+		const event = hist(HISTORIAN_INDEXING_COMPLETE, {
+			outcome: "skipped",
+			skip_reason: "embedder_unavailable",
+			duration_ms: 1,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates embedder.unavailable diagnostic", () => {
+		const event = hist(HISTORIAN_EMBEDDER_UNAVAILABLE, {
+			backend: "ollama",
+			error_summary: "connection refused on http://127.0.0.1:11434",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates retrieval.complete skipped on cooldown", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_COMPLETE, {
+			outcome: "skipped",
+			skip_reason: "cooldown",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+});
+
+describe("memory.recalled substrate event", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	it("validates a recalled feedback memory", () => {
+		const event = createEvent({
+			runtime: "claude-code",
+			plugin: "ecosystem",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type: MEMORY_RECALLED,
+			payload: {
+				project_key: "abc123def456",
+				memory_file: "feedback_no_trailing_summaries.md",
+				memory_type: "feedback",
+				recall_position: 2,
+			},
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates each memory_type enum value", () => {
+		for (const memory_type of [
+			"user",
+			"feedback",
+			"project",
+			"reference",
+		] as const) {
+			const event = createEvent({
+				runtime: "claude-code",
+				plugin: "ecosystem",
+				machine_id: MACHINE_ID,
+				session_id: SESSION_ID,
+				event_type: MEMORY_RECALLED,
+				payload: {
+					project_key: "abc123def456",
+					memory_file: `${memory_type}_example.md`,
+					memory_type,
+				},
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+});
+
 describe("isEventOfType", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -794,7 +1126,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 71 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(71);
+	it("has exactly 105 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(105);
 	});
 });
