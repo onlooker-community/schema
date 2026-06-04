@@ -151,6 +151,11 @@ export const HISTORIAN_PRUNE_COMPLETE = "historian.prune.complete" as const;
 export const HISTORIAN_PURGE_COMPLETE = "historian.purge.complete" as const;
 export const HISTORIAN_CONFIG_WARNING = "historian.config.warning" as const;
 
+export const ASSAYER_AUDIT_STARTED = "assayer.audit.started" as const;
+export const ASSAYER_CLAIM_CONTRADICTED = "assayer.claim.contradicted" as const;
+export const ASSAYER_CLAIM_UNVERIFIED = "assayer.claim.unverified" as const;
+export const ASSAYER_AUDIT_COMPLETE = "assayer.audit.complete" as const;
+
 export const ALL_EVENT_TYPES = [
 	SESSION_START,
 	SESSION_END,
@@ -257,6 +262,10 @@ export const ALL_EVENT_TYPES = [
 	HISTORIAN_PRUNE_COMPLETE,
 	HISTORIAN_PURGE_COMPLETE,
 	HISTORIAN_CONFIG_WARNING,
+	ASSAYER_AUDIT_STARTED,
+	ASSAYER_CLAIM_CONTRADICTED,
+	ASSAYER_CLAIM_UNVERIFIED,
+	ASSAYER_AUDIT_COMPLETE,
 ] as const;
 
 export type EventType = (typeof ALL_EVENT_TYPES)[number];

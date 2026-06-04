@@ -965,6 +965,48 @@ export interface HistorianConfigWarningPayload {
 	detail?: string;
 }
 
+export type AssayerClaimType =
+	| "tests_pass"
+	| "build_succeeds"
+	| "lint_clean"
+	| "types_check"
+	| "command_succeeds"
+	| "generic";
+
+export interface AssayerAuditStartedPayload {
+	audit_id: string;
+	claim_count: number;
+	trigger?: "stop" | "manual";
+	command_count?: number;
+}
+
+export interface AssayerClaimContradictedPayload {
+	audit_id: string;
+	claim: string;
+	evidence_command: string;
+	claim_type?: AssayerClaimType;
+	result_excerpt?: string;
+	exit_code?: number;
+	confidence?: number;
+}
+
+export interface AssayerClaimUnverifiedPayload {
+	audit_id: string;
+	claim: string;
+	claim_type?: AssayerClaimType;
+	reason?: "no_matching_command" | "ambiguous" | "no_evidence";
+}
+
+export interface AssayerAuditCompletePayload {
+	audit_id: string;
+	claim_count: number;
+	corroborated: number;
+	contradicted: number;
+	unverified: number;
+	verdict?: "clean" | "contradictions_found" | "nothing_to_verify";
+	duration_ms?: number;
+}
+
 export interface PayloadMap {
 	"session.start": SessionStartPayload;
 	"session.end": SessionEndPayload;
@@ -1071,6 +1113,10 @@ export interface PayloadMap {
 	"historian.prune.complete": HistorianPruneCompletePayload;
 	"historian.purge.complete": HistorianPurgeCompletePayload;
 	"historian.config.warning": HistorianConfigWarningPayload;
+	"assayer.audit.started": AssayerAuditStartedPayload;
+	"assayer.claim.contradicted": AssayerClaimContradictedPayload;
+	"assayer.claim.unverified": AssayerClaimUnverifiedPayload;
+	"assayer.audit.complete": AssayerAuditCompletePayload;
 }
 
 export type PayloadFor<T extends EventType> = T extends keyof PayloadMap

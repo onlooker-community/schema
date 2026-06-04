@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-ops.json",
 	"title": "Ops plugin payloads",
-	"description": "Payload schemas for governor.*, echo.*, counsel.*, onlooker.*, and meridian.* events.",
+	"description": "Payload schemas for governor.*, echo.*, counsel.*, onlooker.*, meridian.*, and assayer.* events.",
 	"$defs": {
 		"governor.gate.checked": {
 			"type": "object",
@@ -470,6 +470,91 @@
 				},
 				"bullet_count_after": { "type": "integer", "minimum": 0 },
 				"bullets_removed": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"assayer.audit.started": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["audit_id", "claim_count"],
+			"properties": {
+				"audit_id": { "type": "string" },
+				"claim_count": { "type": "integer", "minimum": 0 },
+				"trigger": {
+					"type": "string",
+					"enum": ["stop", "manual"]
+				},
+				"command_count": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"assayer.claim.contradicted": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["audit_id", "claim", "evidence_command"],
+			"properties": {
+				"audit_id": { "type": "string" },
+				"claim": { "type": "string" },
+				"claim_type": {
+					"type": "string",
+					"enum": [
+						"tests_pass",
+						"build_succeeds",
+						"lint_clean",
+						"types_check",
+						"command_succeeds",
+						"generic"
+					]
+				},
+				"evidence_command": { "type": "string" },
+				"result_excerpt": { "type": "string" },
+				"exit_code": { "type": "integer" },
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+			}
+		},
+		"assayer.claim.unverified": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["audit_id", "claim"],
+			"properties": {
+				"audit_id": { "type": "string" },
+				"claim": { "type": "string" },
+				"claim_type": {
+					"type": "string",
+					"enum": [
+						"tests_pass",
+						"build_succeeds",
+						"lint_clean",
+						"types_check",
+						"command_succeeds",
+						"generic"
+					]
+				},
+				"reason": {
+					"type": "string",
+					"enum": ["no_matching_command", "ambiguous", "no_evidence"]
+				}
+			}
+		},
+		"assayer.audit.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"audit_id",
+				"claim_count",
+				"corroborated",
+				"contradicted",
+				"unverified"
+			],
+			"properties": {
+				"audit_id": { "type": "string" },
+				"claim_count": { "type": "integer", "minimum": 0 },
+				"corroborated": { "type": "integer", "minimum": 0 },
+				"contradicted": { "type": "integer", "minimum": 0 },
+				"unverified": { "type": "integer", "minimum": 0 },
+				"verdict": {
+					"type": "string",
+					"enum": ["clean", "contradictions_found", "nothing_to_verify"]
+				},
+				"duration_ms": { "type": "integer", "minimum": 0 }
 			}
 		}
 	}
