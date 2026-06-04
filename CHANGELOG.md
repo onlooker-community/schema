@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0](https://github.com/onlooker-community/schema/compare/v2.5.0...v2.6.0) (2026-06-04)
+
+
+### Features
+
+* **assayer:** add assayer.* event schema for claim verification :detective: ([#31](https://github.com/onlooker-community/schema/issues/31)) ([85fab2a](https://github.com/onlooker-community/schema/commit/85fab2a27e8ef0d23c578d0c2cafec12a164d80b))
+
 ## [2.5.0](https://github.com/onlooker-community/schema/compare/v2.4.0...v2.5.0) (2026-06-04)
 
 
