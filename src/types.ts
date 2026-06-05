@@ -336,6 +336,64 @@ export interface WardenGateBlockedPayload {
 	threat_source_type: "web_fetch" | "file_read";
 }
 
+export type CompassToolName = "Write" | "Edit" | "MultiEdit" | "Bash";
+
+export type CompassPrimaryConcern =
+	| "scope"
+	| "target"
+	| "context"
+	| "destructive"
+	| "none";
+
+export type CompassSkipReason =
+	| "skip_sentinel"
+	| "skip_glob"
+	| "dir_plus_stem_cooldown"
+	| "turn_budget_exhausted"
+	| "insufficient_context"
+	| "reply_to_question_pattern"
+	| "sampler_error"
+	| "circuit_open"
+	| "evaluator_budget_exhausted";
+
+export interface CompassCheckPassedPayload {
+	confidence: number;
+	stddev: number;
+	file_path: string;
+	tool_name: CompassToolName;
+	had_prior_turn?: boolean;
+	sample_count?: number;
+}
+
+export interface CompassCheckFailedPayload {
+	confidence: number;
+	stddev: number;
+	file_path: string;
+	tool_name?: CompassToolName;
+	primary_concern?: CompassPrimaryConcern;
+	had_prior_turn?: boolean;
+	sample_count?: number;
+}
+
+export interface CompassCheckSkippedPayload {
+	reason: CompassSkipReason;
+	file_path?: string;
+	tool_name?: CompassToolName;
+}
+
+export interface CompassCheckOverriddenPayload {
+	file_path: string;
+	user_acknowledgment: true;
+	confidence?: number;
+	stddev?: number;
+}
+
+export interface CompassCheckCanceledPayload {
+	file_path: string;
+	confidence?: number;
+	stddev?: number;
+}
+
 export interface OracleCalibrationRequestedPayload {
 	trigger: "user_prompt" | "pre_write" | "pre_bash";
 	task_summary?: string;
@@ -1173,6 +1231,11 @@ export interface PayloadMap {
 	"assayer.claim.contradicted": AssayerClaimContradictedPayload;
 	"assayer.claim.unverified": AssayerClaimUnverifiedPayload;
 	"assayer.audit.complete": AssayerAuditCompletePayload;
+	"compass.check.passed": CompassCheckPassedPayload;
+	"compass.check.failed": CompassCheckFailedPayload;
+	"compass.check.skipped": CompassCheckSkippedPayload;
+	"compass.check.overridden": CompassCheckOverriddenPayload;
+	"compass.check.canceled": CompassCheckCanceledPayload;
 }
 
 export type PayloadFor<T extends EventType> = T extends keyof PayloadMap
