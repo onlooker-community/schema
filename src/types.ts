@@ -593,6 +593,32 @@ export interface BursarRollupSkippedPayload {
 	project_key?: string;
 }
 
+export interface LineageChangeRecordedPayload {
+	project_key: string;
+	session_id: string;
+	file_path: string;
+	tool: "Edit" | "Write" | "MultiEdit";
+	operation: "create" | "overwrite" | "edit" | "multi_edit";
+	change_id?: string;
+	turn?: number;
+	tool_use_id?: string;
+	agent_type?: string;
+	lines_added?: number;
+	lines_removed?: number;
+	bytes?: number;
+	edit_count?: number;
+	content_sha256?: string;
+}
+
+export interface LineageQueryAnsweredPayload {
+	project_key: string;
+	file_path: string;
+	matches: number;
+	query?: string;
+	line?: number;
+	resolved_via?: "historian" | "transcript" | "none";
+}
+
 export interface EchoSuiteStartedPayload {
 	suite_id: string;
 	test_count: number;
@@ -1093,6 +1119,8 @@ export interface PayloadMap {
 	"bursar.session.recorded": BursarSessionRecordedPayload;
 	"bursar.rollup.surfaced": BursarRollupSurfacedPayload;
 	"bursar.rollup.skipped": BursarRollupSkippedPayload;
+	"lineage.change.recorded": LineageChangeRecordedPayload;
+	"lineage.query.answered": LineageQueryAnsweredPayload;
 	"echo.suite.started": EchoSuiteStartedPayload;
 	"echo.suite.complete": EchoSuiteCompletePayload;
 	"echo.regression.detected": EchoRegressionDetectedPayload;

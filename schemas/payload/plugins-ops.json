@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-ops.json",
 	"title": "Ops plugin payloads",
-	"description": "Payload schemas for governor.*, echo.*, counsel.*, onlooker.*, meridian.*, and assayer.* events.",
+	"description": "Payload schemas for governor.*, bursar.*, lineage.*, echo.*, counsel.*, onlooker.*, meridian.*, and assayer.* events.",
 	"$defs": {
 		"governor.gate.checked": {
 			"type": "object",
@@ -278,6 +278,55 @@
 					"enum": ["disabled", "no_data", "error"]
 				},
 				"project_key": { "type": "string" }
+			}
+		},
+		"lineage.change.recorded": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"project_key",
+				"session_id",
+				"file_path",
+				"tool",
+				"operation"
+			],
+			"properties": {
+				"project_key": { "type": "string" },
+				"session_id": { "type": "string" },
+				"file_path": { "type": "string" },
+				"tool": {
+					"type": "string",
+					"enum": ["Edit", "Write", "MultiEdit"]
+				},
+				"operation": {
+					"type": "string",
+					"enum": ["create", "overwrite", "edit", "multi_edit"]
+				},
+				"change_id": { "type": "string" },
+				"turn": { "type": "integer", "minimum": 1 },
+				"tool_use_id": { "type": "string" },
+				"agent_type": { "type": "string" },
+				"lines_added": { "type": "integer", "minimum": 0 },
+				"lines_removed": { "type": "integer", "minimum": 0 },
+				"bytes": { "type": "integer", "minimum": 0 },
+				"edit_count": { "type": "integer", "minimum": 0 },
+				"content_sha256": { "type": "string" }
+			}
+		},
+		"lineage.query.answered": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["project_key", "file_path", "matches"],
+			"properties": {
+				"project_key": { "type": "string" },
+				"file_path": { "type": "string" },
+				"matches": { "type": "integer", "minimum": 0 },
+				"query": { "type": "string" },
+				"line": { "type": "integer", "minimum": 0 },
+				"resolved_via": {
+					"type": "string",
+					"enum": ["historian", "transcript", "none"]
+				}
 			}
 		},
 		"echo.suite.started": {

@@ -43,6 +43,8 @@ import {
 	LIBRARIAN_PROPOSAL_ACCEPTED,
 	LIBRARIAN_SCAN_COMPLETE,
 	LIBRARIAN_SCAN_STARTED,
+	LINEAGE_CHANGE_RECORDED,
+	LINEAGE_QUERY_ANSWERED,
 	MEMORY_RECALLED,
 	MERIDIAN_HINT_GENERATED,
 	SENTINEL_BLOCKED,
@@ -849,6 +851,101 @@ describe("bursar rollup events", () => {
 	});
 });
 
+describe("lineage provenance events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const PROJECT_KEY = "a1b2c3d4e5f6";
+	const SID = "session-lineage-1";
+
+	function lineage<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "lineage",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a change-record + query-answered round-trip", () => {
+		const events = [
+			lineage(LINEAGE_CHANGE_RECORDED, {
+				project_key: PROJECT_KEY,
+				session_id: SID,
+				file_path: "src/main.ts",
+				tool: "Edit",
+				operation: "edit",
+				change_id: "01J0000000000000000000LNG1",
+				turn: 4,
+				tool_use_id: "toolu_edit_001",
+				agent_type: "main",
+				lines_added: 3,
+				lines_removed: 1,
+				bytes: 142,
+				content_sha256:
+					"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			}),
+			lineage(LINEAGE_QUERY_ANSWERED, {
+				project_key: PROJECT_KEY,
+				file_path: "src/main.ts",
+				matches: 2,
+				query: "src/main.ts:42",
+				line: 42,
+				resolved_via: "historian",
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates a minimal Write change record", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+			file_path: "README.md",
+			tool: "Write",
+			operation: "create",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates a query answered with no matches", () => {
+		const event = lineage(LINEAGE_QUERY_ANSWERED, {
+			project_key: PROJECT_KEY,
+			file_path: "src/gone.ts",
+			matches: 0,
+			resolved_via: "none",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects an unknown tool enum on lineage.change.recorded", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+			file_path: "src/main.ts",
+			tool: "NotebookEdit",
+			operation: "edit",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+});
+
 describe("librarian lifecycle events", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -1319,7 +1416,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 112 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(112);
+	it("has exactly 114 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(114);
 	});
 });

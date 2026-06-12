@@ -123,6 +123,8 @@
 				"bursar.session.recorded",
 				"bursar.rollup.surfaced",
 				"bursar.rollup.skipped",
+				"lineage.change.recorded",
+				"lineage.query.answered",
 				"echo.suite.started",
 				"echo.suite.complete",
 				"echo.regression.detected",
