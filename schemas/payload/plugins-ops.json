@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-ops.json",
 	"title": "Ops plugin payloads",
-	"description": "Payload schemas for governor.*, echo.*, counsel.*, onlooker.*, meridian.*, and assayer.* events.",
+	"description": "Payload schemas for governor.*, bursar.*, lineage.*, echo.*, counsel.*, onlooker.*, meridian.*, and assayer.* events.",
 	"$defs": {
 		"governor.gate.checked": {
 			"type": "object",
@@ -303,7 +303,7 @@
 					"enum": ["create", "overwrite", "edit", "multi_edit"]
 				},
 				"change_id": { "type": "string" },
-				"turn": { "type": "integer", "minimum": 0 },
+				"turn": { "type": "integer", "minimum": 1 },
 				"tool_use_id": { "type": "string" },
 				"agent_type": { "type": "string" },
 				"lines_added": { "type": "integer", "minimum": 0 },
