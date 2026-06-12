@@ -568,6 +568,31 @@ export interface GovernorSessionCompletePayload {
 	estimation_accuracy_pct?: number;
 }
 
+export interface BursarSessionRecordedPayload {
+	project_key: string;
+	session_id: string;
+	governor_present: boolean;
+	cost_usd?: number;
+	tokens?: number;
+	api_calls?: number;
+	model?: string;
+}
+
+export interface BursarRollupSurfacedPayload {
+	project_key: string;
+	window: "rolling_7d" | "calendar_week";
+	total_cost_usd: number;
+	session_count: number;
+	total_tokens: number;
+	sessions_with_cost: number;
+	window_start?: string;
+}
+
+export interface BursarRollupSkippedPayload {
+	reason: "disabled" | "no_data" | "error";
+	project_key?: string;
+}
+
 export interface EchoSuiteStartedPayload {
 	suite_id: string;
 	test_count: number;
@@ -1065,6 +1090,9 @@ export interface PayloadMap {
 	"governor.budget.exceeded": GovernorBudgetExceededPayload;
 	"governor.lock.stale_cleared": GovernorLockStaleClearedPayload;
 	"governor.session.complete": GovernorSessionCompletePayload;
+	"bursar.session.recorded": BursarSessionRecordedPayload;
+	"bursar.rollup.surfaced": BursarRollupSurfacedPayload;
+	"bursar.rollup.skipped": BursarRollupSkippedPayload;
 	"echo.suite.started": EchoSuiteStartedPayload;
 	"echo.suite.complete": EchoSuiteCompletePayload;
 	"echo.regression.detected": EchoRegressionDetectedPayload;

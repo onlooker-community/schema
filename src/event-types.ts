@@ -72,6 +72,10 @@ export const GOVERNOR_SESSION_COMPLETE = "governor.session.complete" as const;
 export const GOVERNOR_LOCK_STALE_CLEARED =
 	"governor.lock.stale_cleared" as const;
 
+export const BURSAR_SESSION_RECORDED = "bursar.session.recorded" as const;
+export const BURSAR_ROLLUP_SURFACED = "bursar.rollup.surfaced" as const;
+export const BURSAR_ROLLUP_SKIPPED = "bursar.rollup.skipped" as const;
+
 export const ECHO_SUITE_STARTED = "echo.suite.started" as const;
 export const ECHO_SUITE_COMPLETE = "echo.suite.complete" as const;
 export const ECHO_REGRESSION_DETECTED = "echo.regression.detected" as const;
@@ -214,6 +218,9 @@ export const ALL_EVENT_TYPES = [
 	GOVERNOR_BUDGET_EXCEEDED,
 	GOVERNOR_SESSION_COMPLETE,
 	GOVERNOR_LOCK_STALE_CLEARED,
+	BURSAR_SESSION_RECORDED,
+	BURSAR_ROLLUP_SURFACED,
+	BURSAR_ROLLUP_SKIPPED,
 	ECHO_SUITE_STARTED,
 	ECHO_SUITE_COMPLETE,
 	ECHO_REGRESSION_DETECTED,
