@@ -11,6 +11,9 @@ import {
 	ASSAYER_AUDIT_STARTED,
 	ASSAYER_CLAIM_CONTRADICTED,
 	ASSAYER_CLAIM_UNVERIFIED,
+	BURSAR_ROLLUP_SKIPPED,
+	BURSAR_ROLLUP_SURFACED,
+	BURSAR_SESSION_RECORDED,
 	CURATOR_FINDING_CONTRADICTION,
 	CURATOR_FINDING_DATE_DECAYED,
 	CURATOR_FINDING_PATH_BROKEN,
@@ -753,6 +756,99 @@ describe("governor lifecycle events", () => {
 	});
 });
 
+describe("bursar rollup events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const PROJECT_KEY = "a1b2c3d4e5f6";
+	const SID = "session-bursar-1";
+
+	function bursar<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "bursar",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a session-record + rollup-surface round-trip", () => {
+		const events = [
+			bursar(BURSAR_SESSION_RECORDED, {
+				project_key: PROJECT_KEY,
+				session_id: SID,
+				governor_present: true,
+				cost_usd: 0.42,
+				tokens: 42000,
+				api_calls: 12,
+				model: "claude-opus-4-8",
+			}),
+			bursar(BURSAR_ROLLUP_SURFACED, {
+				project_key: PROJECT_KEY,
+				window: "rolling_7d",
+				total_cost_usd: 3.17,
+				session_count: 8,
+				total_tokens: 310000,
+				sessions_with_cost: 7,
+				window_start: "2026-06-05T00:00:00Z",
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates bursar.session.recorded with governor absent (no cost)", () => {
+		const event = bursar(BURSAR_SESSION_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+			governor_present: false,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates bursar.rollup.surfaced for calendar_week", () => {
+		const event = bursar(BURSAR_ROLLUP_SURFACED, {
+			project_key: PROJECT_KEY,
+			window: "calendar_week",
+			total_cost_usd: 0,
+			session_count: 0,
+			total_tokens: 0,
+			sessions_with_cost: 0,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates bursar.rollup.skipped reasons", () => {
+		for (const reason of ["disabled", "no_data", "error"] as const) {
+			const event = bursar(BURSAR_ROLLUP_SKIPPED, { reason });
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("rejects bursar.session.recorded missing governor_present", () => {
+		const event = bursar(BURSAR_SESSION_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+});
+
 describe("librarian lifecycle events", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -1223,7 +1319,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 109 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(109);
+	it("has exactly 112 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(112);
 	});
 });
