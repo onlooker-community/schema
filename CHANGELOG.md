@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0](https://github.com/onlooker-community/schema/compare/v2.6.0...v2.7.0) (2026-06-12)
+
+
+### Features
+
+* **bursar:** add bursar.* event types for budget rollup ([#33](https://github.com/onlooker-community/schema/issues/33)) ([6a079c2](https://github.com/onlooker-community/schema/commit/6a079c26750e150bfd0aecbc494e037d0c88dff3))
+
 ## [2.6.0](https://github.com/onlooker-community/schema/compare/v2.5.0...v2.6.0) (2026-06-04)
 
 
