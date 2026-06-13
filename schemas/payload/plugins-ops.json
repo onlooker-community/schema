@@ -655,6 +655,124 @@
 				},
 				"duration_ms": { "type": "integer", "minimum": 0 }
 			}
+		},
+		"inspector.check.passed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["file_path", "tool_name", "check_name", "check_kind"],
+			"properties": {
+				"file_path": { "type": "string" },
+				"file_path_relative": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit"]
+				},
+				"check_name": { "type": "string" },
+				"check_kind": {
+					"type": "string",
+					"enum": ["lint", "typecheck"]
+				},
+				"argv": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"project_key": { "type": "string" }
+			}
+		},
+		"inspector.check.failed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"file_path",
+				"tool_name",
+				"check_name",
+				"check_kind",
+				"exit_code"
+			],
+			"properties": {
+				"file_path": { "type": "string" },
+				"file_path_relative": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit"]
+				},
+				"check_name": { "type": "string" },
+				"check_kind": {
+					"type": "string",
+					"enum": ["lint", "typecheck"]
+				},
+				"argv": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"exit_code": { "type": "integer" },
+				"issue_count": {
+					"type": ["integer", "null"],
+					"minimum": 0
+				},
+				"output_excerpt": { "type": "string" },
+				"output_truncated": { "type": "boolean" },
+				"project_key": { "type": "string" }
+			}
+		},
+		"inspector.check.skipped": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["file_path", "tool_name", "reason"],
+			"properties": {
+				"file_path": { "type": "string" },
+				"file_path_relative": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit"]
+				},
+				"check_name": { "type": "string" },
+				"check_kind": {
+					"type": "string",
+					"enum": ["lint", "typecheck"]
+				},
+				"reason": {
+					"type": "string",
+					"enum": [
+						"disabled",
+						"excluded_path",
+						"no_extension_match",
+						"not_in_repo",
+						"tool_missing",
+						"timeout",
+						"total_budget_exhausted"
+					]
+				},
+				"project_key": { "type": "string" }
+			}
+		},
+		"inspector.run.completed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"file_path",
+				"tool_name",
+				"checks_run",
+				"checks_passed",
+				"checks_failed",
+				"checks_skipped"
+			],
+			"properties": {
+				"file_path": { "type": "string" },
+				"file_path_relative": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit"]
+				},
+				"checks_run": { "type": "integer", "minimum": 0 },
+				"checks_passed": { "type": "integer", "minimum": 0 },
+				"checks_failed": { "type": "integer", "minimum": 0 },
+				"checks_skipped": { "type": "integer", "minimum": 0 },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"project_key": { "type": "string" }
+			}
 		}
 	}
 }

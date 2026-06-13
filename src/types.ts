@@ -1116,6 +1116,67 @@ export interface AssayerAuditCompletePayload {
 	duration_ms?: number;
 }
 
+export type InspectorToolName = "Write" | "Edit" | "MultiEdit";
+
+export type InspectorCheckKind = "lint" | "typecheck";
+
+export type InspectorSkipReason =
+	| "disabled"
+	| "excluded_path"
+	| "no_extension_match"
+	| "not_in_repo"
+	| "tool_missing"
+	| "timeout"
+	| "total_budget_exhausted";
+
+export interface InspectorCheckPassedPayload {
+	file_path: string;
+	tool_name: InspectorToolName;
+	check_name: string;
+	check_kind: InspectorCheckKind;
+	file_path_relative?: string;
+	argv?: string[];
+	duration_ms?: number;
+	project_key?: string;
+}
+
+export interface InspectorCheckFailedPayload {
+	file_path: string;
+	tool_name: InspectorToolName;
+	check_name: string;
+	check_kind: InspectorCheckKind;
+	exit_code: number;
+	file_path_relative?: string;
+	argv?: string[];
+	duration_ms?: number;
+	issue_count?: number | null;
+	output_excerpt?: string;
+	output_truncated?: boolean;
+	project_key?: string;
+}
+
+export interface InspectorCheckSkippedPayload {
+	file_path: string;
+	tool_name: InspectorToolName;
+	reason: InspectorSkipReason;
+	file_path_relative?: string;
+	check_name?: string;
+	check_kind?: InspectorCheckKind;
+	project_key?: string;
+}
+
+export interface InspectorRunCompletedPayload {
+	file_path: string;
+	tool_name: InspectorToolName;
+	checks_run: number;
+	checks_passed: number;
+	checks_failed: number;
+	checks_skipped: number;
+	file_path_relative?: string;
+	duration_ms?: number;
+	project_key?: string;
+}
+
 export interface PayloadMap {
 	"session.start": SessionStartPayload;
 	"session.end": SessionEndPayload;
@@ -1236,6 +1297,10 @@ export interface PayloadMap {
 	"compass.check.skipped": CompassCheckSkippedPayload;
 	"compass.check.overridden": CompassCheckOverriddenPayload;
 	"compass.check.canceled": CompassCheckCanceledPayload;
+	"inspector.check.passed": InspectorCheckPassedPayload;
+	"inspector.check.failed": InspectorCheckFailedPayload;
+	"inspector.check.skipped": InspectorCheckSkippedPayload;
+	"inspector.run.completed": InspectorRunCompletedPayload;
 }
 
 export type PayloadFor<T extends EventType> = T extends keyof PayloadMap

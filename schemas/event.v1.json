@@ -181,7 +181,11 @@
 				"assayer.audit.started",
 				"assayer.claim.contradicted",
 				"assayer.claim.unverified",
-				"assayer.audit.complete"
+				"assayer.audit.complete",
+				"inspector.check.passed",
+				"inspector.check.failed",
+				"inspector.check.skipped",
+				"inspector.run.completed"
 			]
 		},
 		"payload": {
