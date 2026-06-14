@@ -37,6 +37,10 @@ import {
 	HISTORIAN_RETRIEVAL_COMPLETE,
 	HISTORIAN_RETRIEVAL_STARTED,
 	HISTORIAN_RETRIEVAL_SURFACED,
+	INSPECTOR_CHECK_FAILED,
+	INSPECTOR_CHECK_PASSED,
+	INSPECTOR_CHECK_SKIPPED,
+	INSPECTOR_RUN_COMPLETED,
 	isEventType,
 	LIBRARIAN_CANDIDATE_DROPPED,
 	LIBRARIAN_CANDIDATE_PROPOSED,
@@ -1352,6 +1356,178 @@ describe("assayer lifecycle events", () => {
 	});
 });
 
+describe("inspector per-file check events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const SID = "session-inspector-1";
+
+	function inspect<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "inspector",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a full per-file run lifecycle end-to-end", () => {
+		const events = [
+			inspect(INSPECTOR_CHECK_PASSED, {
+				file_path: "/repo/src/cart.ts",
+				file_path_relative: "src/cart.ts",
+				tool_name: "Edit",
+				check_name: "biome",
+				check_kind: "lint",
+				argv: ["biome", "check", "/repo/src/cart.ts"],
+				duration_ms: 132,
+				project_key: "a1b2c3d4e5f6",
+			}),
+			inspect(INSPECTOR_CHECK_FAILED, {
+				file_path: "/repo/src/cart.ts",
+				file_path_relative: "src/cart.ts",
+				tool_name: "Edit",
+				check_name: "tsc",
+				check_kind: "typecheck",
+				argv: ["tsc", "--noEmit"],
+				exit_code: 2,
+				duration_ms: 940,
+				issue_count: 1,
+				output_excerpt:
+					"src/cart.ts:42:5 - Type 'string | undefined' is not assignable to 'string'",
+				output_truncated: false,
+				project_key: "a1b2c3d4e5f6",
+			}),
+			inspect(INSPECTOR_RUN_COMPLETED, {
+				file_path: "/repo/src/cart.ts",
+				file_path_relative: "src/cart.ts",
+				tool_name: "Edit",
+				checks_run: 2,
+				checks_passed: 1,
+				checks_failed: 1,
+				checks_skipped: 0,
+				duration_ms: 1080,
+				project_key: "a1b2c3d4e5f6",
+			}),
+		];
+
+		for (const event of events) {
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected ${event.event_type} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates a minimal passed event with only required fields", () => {
+		const event = inspect(INSPECTOR_CHECK_PASSED, {
+			file_path: "/repo/src/a.py",
+			tool_name: "Write",
+			check_name: "ruff",
+			check_kind: "lint",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates a skipped event for a missing tool", () => {
+		const event = inspect(INSPECTOR_CHECK_SKIPPED, {
+			file_path: "/repo/scripts/deploy.sh",
+			file_path_relative: "scripts/deploy.sh",
+			tool_name: "Edit",
+			check_name: "shellcheck",
+			check_kind: "lint",
+			reason: "tool_missing",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates a whole-file skipped event without check details", () => {
+		const event = inspect(INSPECTOR_CHECK_SKIPPED, {
+			file_path: "/repo/node_modules/foo/index.js",
+			file_path_relative: "node_modules/foo/index.js",
+			tool_name: "Write",
+			reason: "excluded_path",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("accepts a null issue_count when the format is unknown", () => {
+		const event = inspect(INSPECTOR_CHECK_FAILED, {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Edit",
+			check_name: "mystery-linter",
+			check_kind: "lint",
+			exit_code: 1,
+			issue_count: null,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects an unknown tool_name", () => {
+		const event = inspect(INSPECTOR_CHECK_PASSED, {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Bash",
+			check_name: "biome",
+			check_kind: "lint",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects an unknown check_kind", () => {
+		const event = inspect(INSPECTOR_CHECK_PASSED, {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Edit",
+			check_name: "biome",
+			check_kind: "format",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects an unknown skip reason", () => {
+		const event = inspect(INSPECTOR_CHECK_SKIPPED, {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Edit",
+			reason: "vibe_off",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects inspector.check.failed missing exit_code", () => {
+		const event = inspect(INSPECTOR_CHECK_FAILED, {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Edit",
+			check_name: "biome",
+			check_kind: "lint",
+			exit_code: 1,
+		}) as unknown as Record<string, unknown>;
+		delete (event.payload as Record<string, unknown>).exit_code;
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects inspector.run.completed missing checks_run", () => {
+		const event = inspect(INSPECTOR_RUN_COMPLETED, {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Edit",
+			checks_run: 2,
+			checks_passed: 2,
+			checks_failed: 0,
+			checks_skipped: 0,
+		}) as unknown as Record<string, unknown>;
+		delete (event.payload as Record<string, unknown>).checks_run;
+		expect(validate(event).valid).toBe(false);
+	});
+});
+
 describe("isEventOfType", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -1416,7 +1592,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 114 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(114);
+	it("has exactly 123 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(123);
 	});
 });

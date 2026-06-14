@@ -2,7 +2,7 @@
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"$id": "https://schema.onlooker.dev/schemas/payload/plugins-safety.json",
 	"title": "Safety plugin payloads",
-	"description": "Payload schemas for sentinel.*, tribunal.*, and warden.* events.",
+	"description": "Payload schemas for sentinel.*, tribunal.*, warden.*, and compass.* events.",
 	"$defs": {
 		"sentinel.blocked": {
 			"type": "object",
@@ -406,6 +406,89 @@
 					"type": "string",
 					"enum": ["web_fetch", "file_read"]
 				}
+			}
+		},
+		"compass.check.passed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["confidence", "stddev", "file_path", "tool_name"],
+			"properties": {
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+				"stddev": { "type": "number", "minimum": 0 },
+				"file_path": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
+				},
+				"had_prior_turn": { "type": "boolean" },
+				"sample_count": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"compass.check.failed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["confidence", "stddev", "file_path"],
+			"properties": {
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+				"stddev": { "type": "number", "minimum": 0 },
+				"file_path": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
+				},
+				"primary_concern": {
+					"type": "string",
+					"enum": ["scope", "target", "context", "destructive", "none"]
+				},
+				"had_prior_turn": { "type": "boolean" },
+				"sample_count": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"compass.check.skipped": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": [
+						"skip_sentinel",
+						"skip_glob",
+						"dir_plus_stem_cooldown",
+						"turn_budget_exhausted",
+						"insufficient_context",
+						"reply_to_question_pattern",
+						"sampler_error",
+						"circuit_open",
+						"evaluator_budget_exhausted"
+					]
+				},
+				"file_path": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
+				}
+			}
+		},
+		"compass.check.overridden": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["file_path", "user_acknowledgment"],
+			"properties": {
+				"file_path": { "type": "string" },
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+				"stddev": { "type": "number", "minimum": 0 },
+				"user_acknowledgment": { "type": "boolean", "const": true }
+			}
+		},
+		"compass.check.canceled": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["file_path"],
+			"properties": {
+				"file_path": { "type": "string" },
+				"confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+				"stddev": { "type": "number", "minimum": 0 }
 			}
 		}
 	}

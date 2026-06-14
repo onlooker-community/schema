@@ -163,6 +163,17 @@ export const ASSAYER_CLAIM_CONTRADICTED = "assayer.claim.contradicted" as const;
 export const ASSAYER_CLAIM_UNVERIFIED = "assayer.claim.unverified" as const;
 export const ASSAYER_AUDIT_COMPLETE = "assayer.audit.complete" as const;
 
+export const INSPECTOR_CHECK_PASSED = "inspector.check.passed" as const;
+export const INSPECTOR_CHECK_FAILED = "inspector.check.failed" as const;
+export const INSPECTOR_CHECK_SKIPPED = "inspector.check.skipped" as const;
+export const INSPECTOR_RUN_COMPLETED = "inspector.run.completed" as const;
+
+export const COMPASS_CHECK_PASSED = "compass.check.passed" as const;
+export const COMPASS_CHECK_FAILED = "compass.check.failed" as const;
+export const COMPASS_CHECK_SKIPPED = "compass.check.skipped" as const;
+export const COMPASS_CHECK_OVERRIDDEN = "compass.check.overridden" as const;
+export const COMPASS_CHECK_CANCELED = "compass.check.canceled" as const;
+
 export const ALL_EVENT_TYPES = [
 	SESSION_START,
 	SESSION_END,
@@ -278,6 +289,15 @@ export const ALL_EVENT_TYPES = [
 	ASSAYER_CLAIM_CONTRADICTED,
 	ASSAYER_CLAIM_UNVERIFIED,
 	ASSAYER_AUDIT_COMPLETE,
+	COMPASS_CHECK_PASSED,
+	COMPASS_CHECK_FAILED,
+	COMPASS_CHECK_SKIPPED,
+	COMPASS_CHECK_OVERRIDDEN,
+	COMPASS_CHECK_CANCELED,
+	INSPECTOR_CHECK_PASSED,
+	INSPECTOR_CHECK_FAILED,
+	INSPECTOR_CHECK_SKIPPED,
+	INSPECTOR_RUN_COMPLETED,
 ] as const;
 
 export type EventType = (typeof ALL_EVENT_TYPES)[number];
