@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0](https://github.com/onlooker-community/schema/compare/v2.8.0...v2.9.0) (2026-06-14)
+
+
+### Features
+
+* **inspector:** add inspector.* event types for per-edit verification ([#37](https://github.com/onlooker-community/schema/issues/37)) ([1e5a33d](https://github.com/onlooker-community/schema/commit/1e5a33d7dd7922d0ff51b36cf31d745ea41be131))
+
 ## [2.8.0](https://github.com/onlooker-community/schema/compare/v2.7.0...v2.8.0) (2026-06-12)
 
 
