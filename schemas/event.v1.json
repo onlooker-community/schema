@@ -185,7 +185,8 @@
 				"inspector.check.passed",
 				"inspector.check.failed",
 				"inspector.check.skipped",
-				"inspector.run.completed"
+				"inspector.run.completed",
+				"onlooker.artifact.ready"
 			]
 		},
 		"payload": {

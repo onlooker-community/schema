@@ -746,6 +746,15 @@ export interface CounselBriefGeneratedPayload {
 	sources_consulted?: CounselSource[];
 }
 
+export type ArtifactPlugin = "scribe" | "archivist" | "librarian" | "counsel";
+
+export interface ArtifactReadyPayload {
+	plugin: ArtifactPlugin;
+	artifact_kind: string;
+	artifact_path: string;
+	artifact_title: string;
+}
+
 export interface OnlookerToolCounts {
 	file_reads?: number;
 	file_writes?: number;
@@ -1248,6 +1257,7 @@ export interface PayloadMap {
 	"cartographer.issue.found": CartographerIssueFoundPayload;
 	"counsel.brief.generated": CounselBriefGeneratedPayload;
 	"onlooker.session.summary": OnlookerSessionSummaryPayload;
+	"onlooker.artifact.ready": ArtifactReadyPayload;
 	"meridian.hint.generated": MeridianHintGeneratedPayload;
 	"meridian.hint.delivered": MeridianHintDeliveredPayload;
 	"meridian.outcome.recorded": MeridianOutcomeRecordedPayload;

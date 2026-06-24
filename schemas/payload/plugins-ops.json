@@ -421,6 +421,25 @@
 				}
 			}
 		},
+		"onlooker.artifact.ready": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"plugin",
+				"artifact_kind",
+				"artifact_path",
+				"artifact_title"
+			],
+			"properties": {
+				"plugin": {
+					"type": "string",
+					"enum": ["scribe", "archivist", "librarian", "counsel"]
+				},
+				"artifact_kind": { "type": "string" },
+				"artifact_path": { "type": "string" },
+				"artifact_title": { "type": "string" }
+			}
+		},
 		"onlooker.session.summary": {
 			"type": "object",
 			"additionalProperties": false,
