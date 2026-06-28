@@ -91,7 +91,7 @@ export const CARTOGRAPHER_ISSUE_FOUND = "cartographer.issue.found" as const;
 export const COUNSEL_BRIEF_GENERATED = "counsel.brief.generated" as const;
 
 export const ONLOOKER_SESSION_SUMMARY = "onlooker.session.summary" as const;
-export const ARTIFACT_READY = "onlooker.artifact.ready" as const;
+export const ONLOOKER_ARTIFACT_READY = "onlooker.artifact.ready" as const;
 
 export const MERIDIAN_HINT_GENERATED = "meridian.hint.generated" as const;
 export const MERIDIAN_HINT_DELIVERED = "meridian.hint.delivered" as const;
@@ -246,7 +246,7 @@ export const ALL_EVENT_TYPES = [
 	CARTOGRAPHER_ISSUE_FOUND,
 	COUNSEL_BRIEF_GENERATED,
 	ONLOOKER_SESSION_SUMMARY,
-	ARTIFACT_READY,
+	ONLOOKER_ARTIFACT_READY,
 	MERIDIAN_HINT_GENERATED,
 	MERIDIAN_HINT_DELIVERED,
 	MERIDIAN_OUTCOME_RECORDED,
