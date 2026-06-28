@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.0](https://github.com/onlooker-community/schema/compare/v2.10.0...v2.11.0) (2026-06-28)
+
+
+### Features
+
+* **event-types:** export ONLOOKER_ARTIFACT_READY, ArtifactReadyPayload, ArtifactPlugin :sparkles: ([#42](https://github.com/onlooker-community/schema/issues/42)) ([81f68f4](https://github.com/onlooker-community/schema/commit/81f68f49535ecce9d5d73aefe623dca64036eb4e))
+
 ## [2.10.0](https://github.com/onlooker-community/schema/compare/v2.9.0...v2.10.0) (2026-06-24)
 
 
