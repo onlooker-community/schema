@@ -637,6 +637,61 @@ describe("tribunal full-loop events", () => {
 		);
 		expect(result.valid).toBe(true);
 	});
+
+	it("accepts a gate.blocked with reason criterion_floor and a failed_criterion", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_BLOCKED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				reason: "criterion_floor",
+				failed_criterion: "safety",
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("accepts a gate.blocked with reason criterion_floor and no failed_criterion", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_BLOCKED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				reason: "criterion_floor",
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("rejects an unknown gate.blocked reason", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_BLOCKED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				reason: "not_a_real_reason",
+			} as never),
+		);
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors.some((e) => e.path.includes("reason"))).toBe(true);
+		}
+	});
+
+	it("validates all four pre-existing gate.blocked reasons", () => {
+		for (const reason of [
+			"low_score",
+			"meta_override",
+			"bias_detected",
+			"dissent_unresolved",
+		] as const) {
+			const result = validate(
+				tribunal(TRIBUNAL_GATE_BLOCKED, {
+					task_id: TASK_ID,
+					iteration_id: ITERATION_ID,
+					reason,
+				}),
+			);
+			expect(result.valid).toBe(true);
+		}
+	});
 });
 
 describe("archivist lifecycle events", () => {

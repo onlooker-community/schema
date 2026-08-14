@@ -359,13 +359,15 @@
 						"low_score",
 						"meta_override",
 						"bias_detected",
-						"dissent_unresolved"
+						"dissent_unresolved",
+						"criterion_floor"
 					]
 				},
 				"final_score": { "type": "number", "minimum": 0, "maximum": 1 },
 				"iteration_number": { "type": "integer", "minimum": 0 },
 				"will_retry": { "type": "boolean" },
-				"retry_iteration_number": { "type": "integer", "minimum": 0 }
+				"retry_iteration_number": { "type": "integer", "minimum": 0 },
+				"failed_criterion": { "type": "string" }
 			}
 		},
 		"warden.threat.detected": {

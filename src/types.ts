@@ -306,11 +306,13 @@ export interface TribunalGateBlockedPayload {
 		| "low_score"
 		| "meta_override"
 		| "bias_detected"
-		| "dissent_unresolved";
+		| "dissent_unresolved"
+		| "criterion_floor";
 	final_score?: number;
 	iteration_number?: number;
 	will_retry?: boolean;
 	retry_iteration_number?: number;
+	failed_criterion?: string;
 }
 
 export interface WardenThreatDetectedPayload {
