@@ -520,6 +520,178 @@ describe("tribunal full-loop events", () => {
 		});
 		expect(validate(biased).valid).toBe(true);
 	});
+
+	it("accepts a verdict carrying per-criterion scores", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_VERDICT, {
+				task_id: TASK_ID,
+				score: 0.85,
+				passed: true,
+				judge_type: "standard",
+				criterion_scores: { correctness: 0.9, safety: 0.8 },
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("accepts a verdict with no criterion_scores at all", () => {
+		// Every producer today omits it. Making the field required would
+		// invalidate all three shipped plugins on the version bump.
+		const result = validate(
+			tribunal(TRIBUNAL_VERDICT, {
+				task_id: TASK_ID,
+				score: 0.85,
+				passed: true,
+				judge_type: "standard",
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("accepts an arbitrary criterion name", () => {
+		// The point of the map: criterion names come from user-extensible
+		// rubrics, so they cannot be enumerated in the schema. These four are
+		// librarian's lesson-promotion rubric, none of which tribunal's own
+		// default rubric uses.
+		const result = validate(
+			tribunal(TRIBUNAL_VERDICT, {
+				task_id: TASK_ID,
+				score: 0.85,
+				passed: true,
+				judge_type: "standard",
+				criterion_scores: {
+					grounding: 0.9,
+					scope_accuracy: 0.8,
+					generality: 0.7,
+					disclosure: 0.95,
+				},
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("rejects a criterion score above 1", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_VERDICT, {
+				task_id: TASK_ID,
+				score: 0.85,
+				passed: true,
+				judge_type: "standard",
+				criterion_scores: { correctness: 1.5 },
+			}),
+		);
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(
+				result.errors.some((e) => e.path.includes("criterion_scores")),
+			).toBe(true);
+		}
+	});
+
+	it("rejects a criterion score below 0", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_VERDICT, {
+				task_id: TASK_ID,
+				score: 0.85,
+				passed: true,
+				judge_type: "standard",
+				criterion_scores: { correctness: -0.1 },
+			}),
+		);
+		expect(result.valid).toBe(false);
+	});
+
+	it("rejects a non-number criterion score", () => {
+		// The `tribunal()` helper is generic over EventType, so casting its
+		// *argument* collapses T to the union of every payload type and fails
+		// typecheck. Cast the built event instead, matching the idiom used
+		// elsewhere in this file for injecting an invalid value.
+		const event = tribunal(TRIBUNAL_VERDICT, {
+			task_id: TASK_ID,
+			score: 0.85,
+			passed: true,
+			judge_type: "standard",
+			criterion_scores: { correctness: 0.9 },
+		}) as unknown as Record<string, unknown>;
+		(event.payload as Record<string, unknown>).criterion_scores = {
+			correctness: "high",
+		};
+		const result = validate(event);
+		expect(result.valid).toBe(false);
+	});
+
+	it("allows criteria_evaluated and criterion_scores to disagree", () => {
+		// Deliberate: a judge may evaluate a criterion it cannot score.
+		// Cross-field consistency belongs at ingest, not in a JSON Schema —
+		// the same reasoning that keeps `agreed <= judges` out of ZConsensus
+		// in the lesson contract.
+		const result = validate(
+			tribunal(TRIBUNAL_VERDICT, {
+				task_id: TASK_ID,
+				score: 0.85,
+				passed: true,
+				judge_type: "standard",
+				criteria_evaluated: ["correctness", "safety", "clarity"],
+				criterion_scores: { correctness: 0.9 },
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("accepts a gate.blocked with reason criterion_floor and a failed_criterion", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_BLOCKED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				reason: "criterion_floor",
+				failed_criterion: "safety",
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("accepts a gate.blocked with reason criterion_floor and no failed_criterion", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_BLOCKED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				reason: "criterion_floor",
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("rejects an unknown gate.blocked reason", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_BLOCKED, {
+				task_id: TASK_ID,
+				iteration_id: ITERATION_ID,
+				reason: "not_a_real_reason",
+			} as never),
+		);
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors.some((e) => e.path.includes("reason"))).toBe(true);
+		}
+	});
+
+	it("validates all four pre-existing gate.blocked reasons", () => {
+		for (const reason of [
+			"low_score",
+			"meta_override",
+			"bias_detected",
+			"dissent_unresolved",
+		] as const) {
+			const result = validate(
+				tribunal(TRIBUNAL_GATE_BLOCKED, {
+					task_id: TASK_ID,
+					iteration_id: ITERATION_ID,
+					reason,
+				}),
+			);
+			expect(result.valid).toBe(true);
+		}
+	});
 });
 
 describe("archivist lifecycle events", () => {

@@ -181,6 +181,15 @@
 					"type": "array",
 					"items": { "type": "string" }
 				},
+				"criterion_scores": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "number",
+						"minimum": 0,
+						"maximum": 1
+					},
+					"description": "Per-criterion score keyed by criterion name, in [0,1]. Criterion names come from the active rubric and are not enumerable here. May disagree with criteria_evaluated: a judge can evaluate a criterion it cannot score. Consistency between the two is an ingest concern."
+				},
 				"strengths_count": { "type": "integer", "minimum": 0 },
 				"weaknesses_count": { "type": "integer", "minimum": 0 },
 				"confidence": { "type": "number", "minimum": 0, "maximum": 1 }
@@ -350,13 +359,15 @@
 						"low_score",
 						"meta_override",
 						"bias_detected",
-						"dissent_unresolved"
+						"dissent_unresolved",
+						"criterion_floor"
 					]
 				},
 				"final_score": { "type": "number", "minimum": 0, "maximum": 1 },
 				"iteration_number": { "type": "integer", "minimum": 0 },
 				"will_retry": { "type": "boolean" },
-				"retry_iteration_number": { "type": "integer", "minimum": 0 }
+				"retry_iteration_number": { "type": "integer", "minimum": 0 },
+				"failed_criterion": { "type": "string" }
 			}
 		},
 		"warden.threat.detected": {
