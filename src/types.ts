@@ -226,6 +226,7 @@ export interface TribunalVerdictPayload {
 	judge_id?: string;
 	judge_model_id?: string;
 	criteria_evaluated?: string[];
+	criterion_scores?: Record<string, number>;
 	strengths_count?: number;
 	weaknesses_count?: number;
 	confidence?: number;
