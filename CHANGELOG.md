@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.12.0](https://github.com/onlooker-community/schema/compare/v2.11.0...v2.12.0) (2026-08-14)
+
+
+### Features
+
+* **tribunal:** carry per-criterion scores and a criterion_floor block reason :straight_ruler: ([#44](https://github.com/onlooker-community/schema/issues/44)) ([e1b5e2b](https://github.com/onlooker-community/schema/commit/e1b5e2b92f76d721b63ed9b0e82b43c19c33982d))
+
 ## [2.11.0](https://github.com/onlooker-community/schema/compare/v2.10.0...v2.11.0) (2026-06-28)
 
 
