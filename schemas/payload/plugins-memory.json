@@ -171,47 +171,72 @@
 		"cartographer.audit.complete": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["files_audited", "issues_found"],
+			"required": ["audit_id", "new_finding_count", "total_finding_count"],
 			"properties": {
-				"files_audited": { "type": "integer", "minimum": 0 },
-				"issues_found": { "type": "integer", "minimum": 0 },
+				"audit_id": {
+					"type": "string",
+					"description": "ULID correlating this event with the cartographer.issue.found events from the same run."
+				},
+				"new_finding_count": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Findings not previously seen, i.e. the number of cartographer.issue.found events emitted by this run."
+				},
+				"total_finding_count": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "All findings the run produced, new and already-known."
+				},
+				"duration_ms": { "type": "integer", "minimum": 0 },
 				"trigger": {
 					"type": "string",
-					"enum": ["instructions_loaded", "config_change", "manual"]
-				},
-				"issue_categories": {
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"contradictions": { "type": "integer", "minimum": 0 },
-						"stale_references": { "type": "integer", "minimum": 0 },
-						"orphaned_plugins": { "type": "integer", "minimum": 0 },
-						"dead_tools": { "type": "integer", "minimum": 0 },
-						"duplicates": { "type": "integer", "minimum": 0 },
-						"hierarchy_conflicts": { "type": "integer", "minimum": 0 }
-					}
+					"enum": [
+						"session_start_first_run",
+						"session_start_interval",
+						"post_tool_use",
+						"manual"
+					]
 				}
 			}
 		},
 		"cartographer.issue.found": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["issue_type", "file_path", "severity"],
+			"required": [
+				"audit_id",
+				"finding_hash",
+				"finding_type",
+				"severity",
+				"affected_files"
+			],
 			"properties": {
-				"issue_type": {
+				"audit_id": {
+					"type": "string",
+					"description": "ULID of the audit run that produced this finding."
+				},
+				"finding_hash": {
+					"type": "string",
+					"description": "Stable content hash of the finding. Delivery is at-least-once, so consumers MUST deduplicate on this value; a re-emitted finding carries the same hash."
+				},
+				"finding_type": {
 					"type": "string",
 					"enum": [
 						"contradiction",
-						"stale_reference",
-						"orphaned_plugin",
-						"dead_tool",
-						"duplicate",
-						"hierarchy_conflict"
+						"stale_ref",
+						"dead_rule",
+						"scope_collision",
+						"undocumented_entity"
 					]
 				},
-				"file_path": { "type": "string" },
 				"severity": { "type": "string", "enum": ["error", "warning", "info"] },
-				"description": { "type": "string" }
+				"affected_files": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 2,
+					"items": { "type": "string" },
+					"description": "The instruction files the finding implicates. One entry for single-file findings; two when the finding relates a pair (contradiction, scope_collision)."
+				},
+				"summary": { "type": "string" }
 			}
 		},
 		"memory.recalled": {

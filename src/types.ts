@@ -482,33 +482,39 @@ export interface PromptRuleAppliedPayload {
 	guidance_chars?: number;
 }
 
-export interface CartographerIssueCategories {
-	contradictions?: number;
-	stale_references?: number;
-	orphaned_plugins?: number;
-	dead_tools?: number;
-	duplicates?: number;
-	hierarchy_conflicts?: number;
-}
+export type CartographerFindingType =
+	| "contradiction"
+	| "stale_ref"
+	| "dead_rule"
+	| "scope_collision"
+	| "undocumented_entity";
+
+export type CartographerTrigger =
+	| "session_start_first_run"
+	| "session_start_interval"
+	| "post_tool_use"
+	| "manual";
 
 export interface CartographerAuditCompletePayload {
-	files_audited: number;
-	issues_found: number;
-	trigger?: "instructions_loaded" | "config_change" | "manual";
-	issue_categories?: CartographerIssueCategories;
+	audit_id: string;
+	new_finding_count: number;
+	total_finding_count: number;
+	duration_ms?: number;
+	trigger?: CartographerTrigger;
 }
 
 export interface CartographerIssueFoundPayload {
-	issue_type:
-		| "contradiction"
-		| "stale_reference"
-		| "orphaned_plugin"
-		| "dead_tool"
-		| "duplicate"
-		| "hierarchy_conflict";
-	file_path: string;
+	audit_id: string;
+	/**
+	 * Delivery is at-least-once: consumers must deduplicate on this value.
+	 * A re-emitted finding carries the same hash.
+	 */
+	finding_hash: string;
+	finding_type: CartographerFindingType;
 	severity: "error" | "warning" | "info";
-	description?: string;
+	/** One entry, or two when the finding relates a pair of files. */
+	affected_files: string[];
+	summary?: string;
 }
 
 export type GovernorEstimationMethod = "tiktoken" | "char_ratio" | "tier_table";
