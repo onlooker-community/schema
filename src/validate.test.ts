@@ -14,6 +14,8 @@ import {
 	BURSAR_ROLLUP_SKIPPED,
 	BURSAR_ROLLUP_SURFACED,
 	BURSAR_SESSION_RECORDED,
+	CARTOGRAPHER_AUDIT_COMPLETE,
+	CARTOGRAPHER_ISSUE_FOUND,
 	CURATOR_FINDING_CONTRADICTION,
 	CURATOR_FINDING_DATE_DECAYED,
 	CURATOR_FINDING_PATH_BROKEN,
@@ -68,7 +70,13 @@ import {
 	TRIBUNAL_SESSION_START,
 	TRIBUNAL_VERDICT,
 } from "./event-types.js";
-import type { OnlookerEvent } from "./types.js";
+import type {
+	CartographerAuditCompletePayload,
+	CartographerFindingType,
+	CartographerIssueFoundPayload,
+	CartographerTrigger,
+	OnlookerEvent,
+} from "./types.js";
 import {
 	_resetSequence,
 	createEvent,
@@ -1432,6 +1440,139 @@ describe("memory.recalled substrate event", () => {
 			});
 			expect(validate(event).valid).toBe(true);
 		}
+	});
+});
+
+describe("cartographer audit events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const issueFound = (payload: CartographerIssueFoundPayload) =>
+		createEvent({
+			runtime: "claude-code",
+			plugin: "cartographer",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type: CARTOGRAPHER_ISSUE_FOUND,
+			payload,
+		});
+
+	const auditComplete = (payload: CartographerAuditCompletePayload) =>
+		createEvent({
+			runtime: "claude-code",
+			plugin: "cartographer",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type: CARTOGRAPHER_AUDIT_COMPLETE,
+			payload,
+		});
+
+	// These two payloads are copied from what run-audit.sh's run_emit actually
+	// builds. They are the regression guard for the drift that made cartographer
+	// emit nothing at all: the published schema described a design that was never
+	// implemented, and no test ever ran a real payload through validation.
+	it("validates the payload run_emit builds for a new finding", () => {
+		const event = issueFound({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			finding_hash: "a3f19c8e4b2d",
+			finding_type: "undocumented_entity",
+			severity: "warning",
+			affected_files: ["CLAUDE.md"],
+			summary:
+				"skills/list-prompt-rules exists at skills/list-prompt-rules but is not mentioned in any instruction file.",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates the payload run_emit builds at end of run", () => {
+		const event = auditComplete({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			trigger: "session_start_first_run",
+			new_finding_count: 1,
+			total_finding_count: 3,
+			duration_ms: 8420,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates every finding_type the analysis phases produce", () => {
+		for (const finding_type of [
+			"contradiction",
+			"stale_ref",
+			"dead_rule",
+			"scope_collision",
+			"undocumented_entity",
+		] as const satisfies readonly CartographerFindingType[]) {
+			const event = issueFound({
+				audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+				finding_hash: `hash-${finding_type}`,
+				finding_type,
+				severity: "warning",
+				affected_files: ["CLAUDE.md"],
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("validates every trigger the hooks set", () => {
+		for (const trigger of [
+			"session_start_first_run",
+			"session_start_interval",
+			"post_tool_use",
+			"manual",
+		] as const satisfies readonly CartographerTrigger[]) {
+			const event = auditComplete({
+				audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+				trigger,
+				new_finding_count: 0,
+				total_finding_count: 0,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("accepts a two-file finding, as relate-phase findings carry", () => {
+		const event = issueFound({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			finding_hash: "b7c2",
+			finding_type: "contradiction",
+			severity: "error",
+			affected_files: ["CLAUDE.md", "AGENTS.md"],
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a finding with no affected_files", () => {
+		const event = issueFound({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			finding_hash: "b7c2",
+			finding_type: "contradiction",
+			severity: "error",
+			affected_files: [],
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	// finding_hash is the deduplication key for at-least-once delivery
+	// (cartographer ADR-003), so a payload without it is not consumable.
+	it("rejects a finding with no finding_hash", () => {
+		const event = issueFound({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			finding_type: "contradiction",
+			severity: "error",
+			affected_files: ["CLAUDE.md"],
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects the retired pre-implementation vocabulary", () => {
+		const event = issueFound({
+			issue_type: "orphaned_plugin",
+			file_path: "CLAUDE.md",
+			severity: "warning",
+		} as never);
+		expect(validate(event).valid).toBe(false);
 	});
 });
 
