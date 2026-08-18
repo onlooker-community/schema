@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.0](https://github.com/onlooker-community/schema/compare/v2.13.0...v2.14.0) (2026-08-18)
+
+
+### Features
+
+* **librarian:** let a scan say it ran out of time :hourglass_flowing_sand: ([#48](https://github.com/onlooker-community/schema/issues/48)) ([fe2c43e](https://github.com/onlooker-community/schema/commit/fe2c43eac746a70ce0e551fec81f19600a9fdd72))
+
 ## [2.13.0](https://github.com/onlooker-community/schema/compare/v2.12.0...v2.13.0) (2026-08-17)
 
 
