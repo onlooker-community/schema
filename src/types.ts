@@ -880,10 +880,21 @@ export interface LibrarianScanStartedPayload {
 }
 
 export interface LibrarianScanCompletePayload {
-	outcome: "ok" | "empty" | "skipped";
+	/**
+	 * `budget_exceeded` means the scan abandoned classification to stay inside
+	 * the SessionEnd budget. Retained artifacts are reconsidered on a later
+	 * scan, so it is a deferral rather than a loss.
+	 */
+	outcome: "ok" | "empty" | "skipped" | "budget_exceeded";
 	skip_reason?: "archivist_not_present" | "memory_path_unresolved" | "disabled";
 	candidates_proposed?: number;
 	candidates_dropped?: number;
+	/**
+	 * Artifacts the lesson transform did not reach before its aggregate budget
+	 * ran out. Distinct from `outcome`: the scan itself completed and only that
+	 * stage truncated, so a nonzero value can accompany `ok` or `empty`.
+	 */
+	lessons_skipped?: number;
 	duration_ms: number;
 	artifact_count_in_window?: number;
 }
