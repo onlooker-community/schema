@@ -273,7 +273,8 @@
 			"properties": {
 				"outcome": {
 					"type": "string",
-					"enum": ["ok", "empty", "skipped"]
+					"enum": ["ok", "empty", "skipped", "budget_exceeded"],
+					"description": "budget_exceeded means the scan abandoned classification to stay inside the SessionEnd budget. Retained artifacts are reconsidered on a later scan, so it is a deferral rather than a loss."
 				},
 				"skip_reason": {
 					"type": "string",
@@ -285,6 +286,11 @@
 				},
 				"candidates_proposed": { "type": "integer", "minimum": 0 },
 				"candidates_dropped": { "type": "integer", "minimum": 0 },
+				"lessons_skipped": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Artifacts the lesson transform did not reach before its aggregate budget ran out. Distinct from outcome: the scan itself completed, only that stage truncated, so a nonzero value can accompany outcome ok or empty."
+				},
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"artifact_count_in_window": { "type": "integer", "minimum": 0 }
 			}

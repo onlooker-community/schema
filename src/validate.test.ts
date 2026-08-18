@@ -1153,6 +1153,63 @@ describe("librarian lifecycle events", () => {
 		});
 	}
 
+	// The budget gate has emitted outcome:"budget_exceeded" since it was written,
+	// against an enum that did not carry it — so the one event that says "this
+	// scan gave up early to protect SessionEnd" never reached the bus. Nothing
+	// ran a real payload through validation, which is how the two diverged.
+	it("validates the payload the classifier budget gate builds", () => {
+		const event = lib(LIBRARIAN_SCAN_COMPLETE, {
+			outcome: "budget_exceeded",
+			duration_ms: 1200,
+			candidates_proposed: 0,
+			candidates_dropped: 3,
+			artifact_count_in_window: 5,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates every scan outcome", () => {
+		for (const outcome of [
+			"ok",
+			"empty",
+			"skipped",
+			"budget_exceeded",
+		] as const) {
+			const event = lib(LIBRARIAN_SCAN_COMPLETE, { outcome, duration_ms: 10 });
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	// A truncated lesson transform is not a truncated scan: the scan finishes
+	// normally and only that stage stops early, so the count rides alongside a
+	// healthy outcome rather than replacing it.
+	it("accepts lessons_skipped alongside a successful outcome", () => {
+		const event = lib(LIBRARIAN_SCAN_COMPLETE, {
+			outcome: "ok",
+			duration_ms: 900,
+			candidates_proposed: 2,
+			lessons_skipped: 4,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a negative lessons_skipped", () => {
+		const event = lib(LIBRARIAN_SCAN_COMPLETE, {
+			outcome: "ok",
+			duration_ms: 900,
+			lessons_skipped: -1,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("still rejects an outcome outside the enum", () => {
+		const event = lib(LIBRARIAN_SCAN_COMPLETE, {
+			outcome: "gave_up",
+			duration_ms: 900,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
 	it("validates a full scan-to-acceptance flow", () => {
 		const events = [
 			lib(LIBRARIAN_SCAN_STARTED, {
