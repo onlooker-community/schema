@@ -87,6 +87,8 @@ export const ECHO_IMPROVEMENT_DETECTED = "echo.improvement.detected" as const;
 export const CARTOGRAPHER_AUDIT_COMPLETE =
 	"cartographer.audit.complete" as const;
 export const CARTOGRAPHER_ISSUE_FOUND = "cartographer.issue.found" as const;
+export const CARTOGRAPHER_ISSUE_RESOLVED =
+	"cartographer.issue.resolved" as const;
 
 export const COUNSEL_BRIEF_GENERATED = "counsel.brief.generated" as const;
 
@@ -244,6 +246,7 @@ export const ALL_EVENT_TYPES = [
 	ECHO_IMPROVEMENT_DETECTED,
 	CARTOGRAPHER_AUDIT_COMPLETE,
 	CARTOGRAPHER_ISSUE_FOUND,
+	CARTOGRAPHER_ISSUE_RESOLVED,
 	COUNSEL_BRIEF_GENERATED,
 	ONLOOKER_SESSION_SUMMARY,
 	ONLOOKER_ARTIFACT_READY,

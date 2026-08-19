@@ -499,6 +499,8 @@ export interface CartographerAuditCompletePayload {
 	audit_id: string;
 	new_finding_count: number;
 	total_finding_count: number;
+	/** Findings this run retired. Absent when the run could not evaluate resolution. */
+	resolved_finding_count?: number;
 	duration_ms?: number;
 	trigger?: CartographerTrigger;
 }
@@ -515,6 +517,23 @@ export interface CartographerIssueFoundPayload {
 	/** One entry, or two when the finding relates a pair of files. */
 	affected_files: string[];
 	summary?: string;
+}
+
+/**
+ * A finding a full audit stopped observing, and therefore retired.
+ *
+ * Emitted only by a run that looked everywhere. A targeted audit sees a single
+ * file and a run with a failed phase sees an incomplete corpus, so neither can
+ * treat a finding's absence as evidence its drift is gone.
+ */
+export interface CartographerIssueResolvedPayload {
+	audit_id: string;
+	/**
+	 * The hash the cartographer.issue.found event carried, so a consumer can
+	 * close the finding it opened. The envelope timestamp is the resolution
+	 * time.
+	 */
+	finding_hash: string;
 }
 
 export type GovernorEstimationMethod = "tiktoken" | "char_ratio" | "tier_table";
@@ -1275,6 +1294,7 @@ export interface PayloadMap {
 	"echo.improvement.detected": EchoImprovementDetectedPayload;
 	"cartographer.audit.complete": CartographerAuditCompletePayload;
 	"cartographer.issue.found": CartographerIssueFoundPayload;
+	"cartographer.issue.resolved": CartographerIssueResolvedPayload;
 	"counsel.brief.generated": CounselBriefGeneratedPayload;
 	"onlooker.session.summary": OnlookerSessionSummaryPayload;
 	"onlooker.artifact.ready": ArtifactReadyPayload;
