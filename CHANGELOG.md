@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.0](https://github.com/onlooker-community/schema/compare/v2.14.0...v2.15.0) (2026-08-19)
+
+
+### Features
+
+* **cartographer:** let an audit announce a finding it retired :wave: ([#50](https://github.com/onlooker-community/schema/issues/50)) ([c70a7bf](https://github.com/onlooker-community/schema/commit/c70a7bf7bf091b9388f97ddf7bbd2616b9004390))
+
 ## [2.14.0](https://github.com/onlooker-community/schema/compare/v2.13.0...v2.14.0) (2026-08-18)
 
 
