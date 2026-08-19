@@ -136,6 +136,7 @@
 				"echo.improvement.detected",
 				"cartographer.audit.complete",
 				"cartographer.issue.found",
+				"cartographer.issue.resolved",
 				"counsel.brief.generated",
 				"onlooker.session.summary",
 				"meridian.hint.generated",

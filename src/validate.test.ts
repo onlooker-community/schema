@@ -16,6 +16,7 @@ import {
 	BURSAR_SESSION_RECORDED,
 	CARTOGRAPHER_AUDIT_COMPLETE,
 	CARTOGRAPHER_ISSUE_FOUND,
+	CARTOGRAPHER_ISSUE_RESOLVED,
 	CURATOR_FINDING_CONTRADICTION,
 	CURATOR_FINDING_DATE_DECAYED,
 	CURATOR_FINDING_PATH_BROKEN,
@@ -74,6 +75,7 @@ import type {
 	CartographerAuditCompletePayload,
 	CartographerFindingType,
 	CartographerIssueFoundPayload,
+	CartographerIssueResolvedPayload,
 	CartographerTrigger,
 	OnlookerEvent,
 } from "./types.js";
@@ -1525,6 +1527,16 @@ describe("cartographer audit events", () => {
 			payload,
 		});
 
+	const issueResolved = (payload: CartographerIssueResolvedPayload) =>
+		createEvent({
+			runtime: "claude-code",
+			plugin: "cartographer",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type: CARTOGRAPHER_ISSUE_RESOLVED,
+			payload,
+		});
+
 	// These two payloads are copied from what run-audit.sh's run_emit actually
 	// builds. They are the regression guard for the drift that made cartographer
 	// emit nothing at all: the published schema described a design that was never
@@ -1630,6 +1642,65 @@ describe("cartographer audit events", () => {
 			severity: "warning",
 		} as never);
 		expect(validate(event).valid).toBe(false);
+	});
+
+	// A full audit retires findings it no longer observes, and that state never
+	// reached the bus: a consumer reading only the event log saw every finding
+	// ever discovered and none ever closed, so its view of instruction-file health
+	// drifted monotonically worse no matter how much drift the user actually fixed
+	// (ecosystem-w2i).
+	it("validates the payload the resolution sweep builds", () => {
+		const event = issueResolved({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			finding_hash: "a3f19c8e4b2d",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// Symmetry with issue.found is the point: the same hash opens and closes a
+	// finding, so a consumer can maintain open/closed state from the log alone.
+	it("rejects a resolution with no finding_hash", () => {
+		const event = issueResolved({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	// The envelope's required timestamp already records when the finding was
+	// retired. A payload-level resolved_at would be a second timestamp free to
+	// disagree with the first, so it was deliberately left out — this is the test
+	// that keeps it out.
+	it("rejects a resolved_at in the payload", () => {
+		const event = issueResolved({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			finding_hash: "a3f19c8e4b2d",
+			resolved_at: 1755500000,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("accepts resolved_finding_count on a completed audit", () => {
+		const event = auditComplete({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			trigger: "session_start_interval",
+			new_finding_count: 0,
+			total_finding_count: 2,
+			resolved_finding_count: 3,
+			duration_ms: 5100,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// A targeted audit and a run with a failed phase both skip the sweep, so they
+	// report no count at all rather than a misleading zero.
+	it("still validates a completed audit that reports no resolved count", () => {
+		const event = auditComplete({
+			audit_id: "01KZ45MKAM734ZS7JK24D2DK0R",
+			trigger: "post_tool_use",
+			new_finding_count: 1,
+			total_finding_count: 1,
+		});
+		expect(validate(event).valid).toBe(true);
 	});
 });
 
@@ -1962,7 +2033,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 124 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(124);
+	it("has exactly 125 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(125);
 	});
 });

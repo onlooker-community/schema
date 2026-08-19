@@ -187,6 +187,11 @@
 					"minimum": 0,
 					"description": "All findings the run produced, new and already-known."
 				},
+				"resolved_finding_count": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Findings this run retired, i.e. the number of cartographer.issue.resolved events it emitted. Absent from a run that could not evaluate resolution at all: a targeted audit sees one file, and a run with a failed phase sees an incomplete corpus, so neither can treat absence as evidence."
+				},
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"trigger": {
 					"type": "string",
@@ -237,6 +242,21 @@
 					"description": "The instruction files the finding implicates. One entry for single-file findings; two when the finding relates a pair (contradiction, scope_collision)."
 				},
 				"summary": { "type": "string" }
+			}
+		},
+		"cartographer.issue.resolved": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["audit_id", "finding_hash"],
+			"properties": {
+				"audit_id": {
+					"type": "string",
+					"description": "ULID of the audit run that retired this finding."
+				},
+				"finding_hash": {
+					"type": "string",
+					"description": "The same hash the cartographer.issue.found event carried, so a consumer can close the finding it opened. The envelope timestamp is the resolution time; the payload deliberately carries no second timestamp that could disagree with it."
+				}
 			}
 		},
 		"memory.recalled": {
