@@ -296,11 +296,11 @@
 				"file_path": { "type": "string" },
 				"tool": {
 					"type": "string",
-					"enum": ["Edit", "Write", "MultiEdit"]
+					"enum": ["Edit", "Write", "MultiEdit", "Bash"]
 				},
 				"operation": {
 					"type": "string",
-					"enum": ["create", "overwrite", "edit", "multi_edit"]
+					"enum": ["create", "overwrite", "edit", "multi_edit", "shell_edit"]
 				},
 				"change_id": { "type": "string" },
 				"turn": { "type": "integer", "minimum": 1 },
@@ -310,7 +310,15 @@
 				"lines_removed": { "type": "integer", "minimum": 0 },
 				"bytes": { "type": "integer", "minimum": 0 },
 				"edit_count": { "type": "integer", "minimum": 0 },
-				"content_sha256": { "type": "string" }
+				"content_sha256": { "type": "string" },
+				"provenance_kind": {
+					"type": "string",
+					"enum": ["authored", "tool_generated"]
+				},
+				"content_scope": {
+					"type": "string",
+					"enum": ["delta", "cumulative"]
+				}
 			}
 		},
 		"lineage.query.answered": {
