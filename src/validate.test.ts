@@ -1130,6 +1130,43 @@ describe("lineage provenance events", () => {
 		} as never);
 		expect(validate(event).valid).toBe(false);
 	});
+
+	it("validates a shell-detected change record", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+			file_path: "docs/plan.md",
+			tool: "Bash",
+			operation: "shell_edit",
+			provenance_kind: "authored",
+			content_scope: "cumulative",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects an unknown provenance_kind", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+			file_path: "docs/plan.md",
+			tool: "Bash",
+			operation: "shell_edit",
+			provenance_kind: "guessed",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects an unknown content_scope", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+			file_path: "docs/plan.md",
+			tool: "Bash",
+			operation: "shell_edit",
+			content_scope: "partial",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
 });
 
 describe("librarian lifecycle events", () => {

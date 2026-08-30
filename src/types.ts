@@ -683,8 +683,8 @@ export interface LineageChangeRecordedPayload {
 	project_key: string;
 	session_id: string;
 	file_path: string;
-	tool: "Edit" | "Write" | "MultiEdit";
-	operation: "create" | "overwrite" | "edit" | "multi_edit";
+	tool: "Edit" | "Write" | "MultiEdit" | "Bash";
+	operation: "create" | "overwrite" | "edit" | "multi_edit" | "shell_edit";
 	change_id?: string;
 	turn?: number;
 	tool_use_id?: string;
@@ -694,6 +694,8 @@ export interface LineageChangeRecordedPayload {
 	bytes?: number;
 	edit_count?: number;
 	content_sha256?: string;
+	provenance_kind?: "authored" | "tool_generated";
+	content_scope?: "delta" | "cumulative";
 }
 
 export interface LineageQueryAnsweredPayload {
