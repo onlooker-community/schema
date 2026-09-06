@@ -1980,6 +1980,37 @@ describe("inspector per-file check events", () => {
 		expect(validate(event).valid).toBe(false);
 	});
 
+	it("validates a skip that reports how long deciding to skip took", () => {
+		const event = inspect(INSPECTOR_CHECK_SKIPPED, {
+			file_path: "/repo/README.md",
+			file_path_relative: "README.md",
+			tool_name: "Edit",
+			reason: "no_extension_match",
+			duration_ms: 96,
+			project_key: "a1b2c3d4e5f6",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("still validates a skip that omits duration_ms", () => {
+		const event = inspect(INSPECTOR_CHECK_SKIPPED, {
+			file_path: "/repo/README.md",
+			tool_name: "Edit",
+			reason: "no_extension_match",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a negative skip duration", () => {
+		const event = inspect(INSPECTOR_CHECK_SKIPPED, {
+			file_path: "/repo/README.md",
+			tool_name: "Edit",
+			reason: "no_extension_match",
+			duration_ms: -1,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
 	it("rejects inspector.check.failed missing exit_code", () => {
 		const event = inspect(INSPECTOR_CHECK_FAILED, {
 			file_path: "/repo/src/a.ts",
