@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.17.0](https://github.com/onlooker-community/schema/compare/v2.16.0...v2.17.0) (2026-09-06)
+
+
+### Features
+
+* **inspector:** let a skip say how long deciding took :stopwatch: ([#54](https://github.com/onlooker-community/schema/issues/54)) ([0c4672c](https://github.com/onlooker-community/schema/commit/0c4672c6c10ae819384d7d87ad9ab963ce100578))
+
 ## [2.16.0](https://github.com/onlooker-community/schema/compare/v2.15.0...v2.16.0) (2026-08-30)
 
 
