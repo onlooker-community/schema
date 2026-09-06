@@ -772,6 +772,7 @@
 						"total_budget_exhausted"
 					]
 				},
+				"duration_ms": { "type": "integer", "minimum": 0 },
 				"project_key": { "type": "string" }
 			}
 		},

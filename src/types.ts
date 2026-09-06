@@ -1212,6 +1212,7 @@ export interface InspectorCheckSkippedPayload {
 	file_path_relative?: string;
 	check_name?: string;
 	check_kind?: InspectorCheckKind;
+	duration_ms?: number;
 	project_key?: string;
 }
 
