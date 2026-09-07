@@ -54,6 +54,7 @@ import {
 	LINEAGE_QUERY_ANSWERED,
 	MEMORY_RECALLED,
 	MERIDIAN_HINT_GENERATED,
+	ONLOOKER_WATCH_UNMATCHED,
 	SENTINEL_BLOCKED,
 	SESSION_START,
 	TRIBUNAL_ACTOR_COMPLETE,
@@ -1866,6 +1867,76 @@ describe("assayer lifecycle events", () => {
 	});
 });
 
+describe("onlooker.watch.unmatched", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function watch(
+		payload: Parameters<
+			typeof createEvent<typeof ONLOOKER_WATCH_UNMATCHED>
+		>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "echo",
+			machine_id: MACHINE_ID,
+			session_id: "session-watch-1",
+			event_type: ONLOOKER_WATCH_UNMATCHED,
+			payload,
+		});
+	}
+
+	it("validates a watcher whose patterns match nothing in the repo", () => {
+		const event = watch({
+			plugin: "echo",
+			config_key: "echo.watch_paths",
+			patterns: ["plugins/*/agents/*.md"],
+			candidates_scanned: 412,
+			project_key: "a1b2c3d4e5f6",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates without the optional fields", () => {
+		const event = watch({
+			plugin: "cartographer",
+			config_key: "cartographer.undocumented_entity.globs",
+			patterns: ["src/**/*.ts"],
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// The patterns are the point: an event saying something matched nothing,
+	// without saying what was configured, cannot be acted on.
+	it("rejects a payload with no patterns field", () => {
+		const event = watch({
+			plugin: "echo",
+			config_key: "echo.watch_paths",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects a plugin outside the enum", () => {
+		const event = watch({
+			plugin: "inspector",
+			config_key: "inspector.checks",
+			patterns: ["*.ts"],
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects a negative candidates_scanned", () => {
+		const event = watch({
+			plugin: "echo",
+			config_key: "echo.watch_paths",
+			patterns: ["a"],
+			candidates_scanned: -1,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+});
+
 describe("inspector per-file check events", () => {
 	beforeEach(() => {
 		_resetSequence();
@@ -2133,7 +2204,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 125 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(125);
+	it("has exactly 126 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(126);
 	});
 });

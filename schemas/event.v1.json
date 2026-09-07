@@ -187,7 +187,8 @@
 				"inspector.check.failed",
 				"inspector.check.skipped",
 				"inspector.run.completed",
-				"onlooker.artifact.ready"
+				"onlooker.artifact.ready",
+				"onlooker.watch.unmatched"
 			]
 		},
 		"payload": {

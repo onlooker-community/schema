@@ -429,6 +429,24 @@
 				}
 			}
 		},
+		"onlooker.watch.unmatched": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["plugin", "config_key", "patterns"],
+			"properties": {
+				"plugin": {
+					"type": "string",
+					"enum": ["echo", "cartographer"]
+				},
+				"config_key": { "type": "string" },
+				"patterns": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"candidates_scanned": { "type": "integer", "minimum": 0 },
+				"project_key": { "type": "string" }
+			}
+		},
 		"onlooker.artifact.ready": {
 			"type": "object",
 			"additionalProperties": false,
