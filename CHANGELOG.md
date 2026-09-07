@@ -4,6 +4,14 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.18.0](https://github.com/onlooker-community/schema/compare/v2.17.0...v2.18.0) (2026-09-07)
+
+
+### Features
+
+* **librarian:** name the skip when archivist has nothing new :label: ([#56](https://github.com/onlooker-community/schema/issues/56)) ([5603724](https://github.com/onlooker-community/schema/commit/56037249adc3fe358b5e403ab91b9a3cd379c251))
+* **onlooker:** let a plugin report that it can never match anything :telescope: ([#58](https://github.com/onlooker-community/schema/issues/58)) ([a4d3171](https://github.com/onlooker-community/schema/commit/a4d31718a37f332a33f4b813157b9c3b78598ef8))
+
 ## [2.17.0](https://github.com/onlooker-community/schema/compare/v2.16.0...v2.17.0) (2026-09-06)
 
 
