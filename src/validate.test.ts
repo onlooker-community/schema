@@ -1249,6 +1249,38 @@ describe("librarian lifecycle events", () => {
 		expect(validate(event).valid).toBe(false);
 	});
 
+	// `outcome: "empty"` is emitted from two paths that mean opposite things:
+	// the bail taken when archivist has nothing new, where the scan never
+	// reached classification and nothing was ever going to be written, and the
+	// full pipeline that classified everything and legitimately proposed
+	// nothing. A consumer cannot tell those apart, and the difference is
+	// exactly what a write-health check needs.
+	//
+	// `skipped` plus a reason is the vocabulary this schema already carries for
+	// "we did not do the work"; librarian simply never used it. This adds the
+	// one reason it needs, leaving the `outcome` enum a clean four-value
+	// partition rather than growing it.
+	it("accepts no_new_artifacts as a skip reason", () => {
+		const event = lib(LIBRARIAN_SCAN_COMPLETE, {
+			outcome: "skipped",
+			skip_reason: "no_new_artifacts",
+			duration_ms: 3,
+			candidates_proposed: 0,
+			candidates_dropped: 0,
+			artifact_count_in_window: 0,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("still rejects a skip reason outside the enum", () => {
+		const event = lib(LIBRARIAN_SCAN_COMPLETE, {
+			outcome: "skipped",
+			skip_reason: "felt_like_it",
+			duration_ms: 3,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
 	it("validates a full scan-to-acceptance flow", () => {
 		const events = [
 			lib(LIBRARIAN_SCAN_STARTED, {

@@ -905,9 +905,22 @@ export interface LibrarianScanCompletePayload {
 	 * `budget_exceeded` means the scan abandoned classification to stay inside
 	 * the SessionEnd budget. Retained artifacts are reconsidered on a later
 	 * scan, so it is a deferral rather than a loss.
+	 *
+	 * `empty` means classification ran and proposed nothing, which is a
+	 * different claim from `skipped`: a skipped scan never reached
+	 * classification, so it was never a chance to write. The two were
+	 * indistinguishable while the no-new-artifacts bail also reported `empty`.
 	 */
 	outcome: "ok" | "empty" | "skipped" | "budget_exceeded";
-	skip_reason?: "archivist_not_present" | "memory_path_unresolved" | "disabled";
+	/**
+	 * `no_new_artifacts` means archivist produced nothing since the last
+	 * watermark, so the scan ended before classification.
+	 */
+	skip_reason?:
+		| "archivist_not_present"
+		| "memory_path_unresolved"
+		| "disabled"
+		| "no_new_artifacts";
 	candidates_proposed?: number;
 	candidates_dropped?: number;
 	/**
