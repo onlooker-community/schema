@@ -94,6 +94,7 @@ export const COUNSEL_BRIEF_GENERATED = "counsel.brief.generated" as const;
 
 export const ONLOOKER_SESSION_SUMMARY = "onlooker.session.summary" as const;
 export const ONLOOKER_ARTIFACT_READY = "onlooker.artifact.ready" as const;
+export const ONLOOKER_WATCH_UNMATCHED = "onlooker.watch.unmatched" as const;
 
 export const MERIDIAN_HINT_GENERATED = "meridian.hint.generated" as const;
 export const MERIDIAN_HINT_DELIVERED = "meridian.hint.delivered" as const;
@@ -250,6 +251,7 @@ export const ALL_EVENT_TYPES = [
 	COUNSEL_BRIEF_GENERATED,
 	ONLOOKER_SESSION_SUMMARY,
 	ONLOOKER_ARTIFACT_READY,
+	ONLOOKER_WATCH_UNMATCHED,
 	MERIDIAN_HINT_GENERATED,
 	MERIDIAN_HINT_DELIVERED,
 	MERIDIAN_OUTCOME_RECORDED,

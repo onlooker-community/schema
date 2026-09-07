@@ -785,6 +785,19 @@ export interface ArtifactReadyPayload {
 	artifact_title: string;
 }
 
+/** A plugin's configured watch patterns match nothing in this repository.
+ *
+ * Distinct from "nothing changed this turn": this is a property of repo plus
+ * config, so it is a misconfiguration signal rather than a per-turn no-op. */
+export interface WatchUnmatchedPayload {
+	plugin: "echo" | "cartographer";
+	/** Dotted config path, e.g. "echo.watch_paths". */
+	config_key: string;
+	patterns: string[];
+	candidates_scanned?: number;
+	project_key?: string;
+}
+
 export interface OnlookerToolCounts {
 	file_reads?: number;
 	file_writes?: number;
@@ -1314,6 +1327,7 @@ export interface PayloadMap {
 	"counsel.brief.generated": CounselBriefGeneratedPayload;
 	"onlooker.session.summary": OnlookerSessionSummaryPayload;
 	"onlooker.artifact.ready": ArtifactReadyPayload;
+	"onlooker.watch.unmatched": WatchUnmatchedPayload;
 	"meridian.hint.generated": MeridianHintGeneratedPayload;
 	"meridian.hint.delivered": MeridianHintDeliveredPayload;
 	"meridian.outcome.recorded": MeridianOutcomeRecordedPayload;
