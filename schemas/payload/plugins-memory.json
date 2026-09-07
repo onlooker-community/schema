@@ -294,15 +294,17 @@
 				"outcome": {
 					"type": "string",
 					"enum": ["ok", "empty", "skipped", "budget_exceeded"],
-					"description": "budget_exceeded means the scan abandoned classification to stay inside the SessionEnd budget. Retained artifacts are reconsidered on a later scan, so it is a deferral rather than a loss."
+					"description": "budget_exceeded means the scan abandoned classification to stay inside the SessionEnd budget. Retained artifacts are reconsidered on a later scan, so it is a deferral rather than a loss. empty means classification ran and proposed nothing, which is a different claim from skipped: a skipped scan never reached classification, so it was never a chance to write."
 				},
 				"skip_reason": {
 					"type": "string",
 					"enum": [
 						"archivist_not_present",
 						"memory_path_unresolved",
-						"disabled"
-					]
+						"disabled",
+						"no_new_artifacts"
+					],
+					"description": "no_new_artifacts means archivist produced nothing since the last watermark, so the scan ended before classification. It is emitted with outcome skipped rather than empty on purpose: the two were previously indistinguishable, and only one of them means the scan had something to write and declined."
 				},
 				"candidates_proposed": { "type": "integer", "minimum": 0 },
 				"candidates_dropped": { "type": "integer", "minimum": 0 },
