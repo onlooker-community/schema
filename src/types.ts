@@ -960,7 +960,10 @@ export interface LibrarianCandidateDroppedPayload {
 		| "low_confidence"
 		| "classified_null"
 		| "filter_marker_missing"
+		/** No markers were configured to match against — a fault, not a verdict. */
+		| "filter_markers_unavailable"
 		| "filter_repetition_missing"
+		| "filter_drop_pattern"
 		| "detail_too_short";
 	source_artifact_id?: string;
 }

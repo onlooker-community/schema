@@ -359,7 +359,9 @@
 						"low_confidence",
 						"classified_null",
 						"filter_marker_missing",
+						"filter_markers_unavailable",
 						"filter_repetition_missing",
+						"filter_drop_pattern",
 						"detail_too_short"
 					]
 				},
