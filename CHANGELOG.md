@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.18.1](https://github.com/onlooker-community/schema/compare/v2.18.0...v2.18.1) (2026-09-11)
+
+
+### Bug Fixes
+
+* **librarian:** name the drop reasons the filter already emits :label: ([#60](https://github.com/onlooker-community/schema/issues/60)) ([01359ce](https://github.com/onlooker-community/schema/commit/01359ce4efe0fd727a17a5fbfcb96ea337896e1c))
+
 ## [2.18.0](https://github.com/onlooker-community/schema/compare/v2.17.0...v2.18.0) (2026-09-07)
 
 
