@@ -1345,6 +1345,26 @@ describe("librarian lifecycle events", () => {
 		});
 		expect(validate(event).valid).toBe(true);
 	});
+
+	// Both reasons below are produced by librarian_durability_filter, and the
+	// contract has to name them or it is describing something the code does not
+	// do. The emitter fails open when ONLOOKER_VALIDATE is unset, so a missing
+	// value costs nothing in a real session — but under validation the event is
+	// refused and silently discarded, which is exactly where the bats suites and
+	// CI run. filter_drop_pattern has been absent for the life of the drop list,
+	// so no test could ever assert on one (ecosystem-449.56).
+	it.each([
+		"filter_drop_pattern",
+		"filter_markers_unavailable",
+	])("accepts the %s drop reason the filter can emit", (reason) => {
+		const event = lib(LIBRARIAN_CANDIDATE_DROPPED, {
+			reason,
+			source_artifact_id: ARTIFACT_ID,
+		} as Parameters<
+			typeof createEvent<typeof LIBRARIAN_CANDIDATE_DROPPED>
+		>[0]["payload"]);
+		expect(validate(event).valid).toBe(true);
+	});
 });
 
 describe("curator lifecycle events", () => {
