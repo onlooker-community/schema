@@ -964,7 +964,9 @@ export interface LibrarianCandidateDroppedPayload {
 		| "filter_markers_unavailable"
 		| "filter_repetition_missing"
 		| "filter_drop_pattern"
-		| "detail_too_short";
+		| "detail_too_short"
+		/** The fault backlog outgrew the retry ceiling and was abandoned. */
+		| "retry_cap_exceeded";
 	source_artifact_id?: string;
 }
 

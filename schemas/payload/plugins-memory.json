@@ -294,7 +294,7 @@
 				"outcome": {
 					"type": "string",
 					"enum": ["ok", "empty", "skipped", "budget_exceeded"],
-					"description": "budget_exceeded means the scan abandoned classification to stay inside the SessionEnd budget. Retained artifacts are reconsidered on a later scan, so it is a deferral rather than a loss. empty means classification ran and proposed nothing, which is a different claim from skipped: a skipped scan never reached classification, so it was never a chance to write."
+					"description": "budget_exceeded means the scan abandoned classification to stay inside the SessionEnd budget. Retained artifacts are NOT currently reconsidered: the watermark advances on this path, so they fall outside the next scan's window. empty means classification ran and proposed nothing, which is a different claim from skipped: a skipped scan never reached classification, so it was never a chance to write."
 				},
 				"skip_reason": {
 					"type": "string",
@@ -362,7 +362,8 @@
 						"filter_markers_unavailable",
 						"filter_repetition_missing",
 						"filter_drop_pattern",
-						"detail_too_short"
+						"detail_too_short",
+						"retry_cap_exceeded"
 					]
 				},
 				"source_artifact_id": { "type": "string" }
