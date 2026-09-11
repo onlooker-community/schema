@@ -362,7 +362,8 @@
 						"filter_markers_unavailable",
 						"filter_repetition_missing",
 						"filter_drop_pattern",
-						"detail_too_short"
+						"detail_too_short",
+						"retry_cap_exceeded"
 					]
 				},
 				"source_artifact_id": { "type": "string" }

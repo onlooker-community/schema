@@ -1356,6 +1356,7 @@ describe("librarian lifecycle events", () => {
 	it.each([
 		"filter_drop_pattern",
 		"filter_markers_unavailable",
+		"retry_cap_exceeded",
 	])("accepts the %s drop reason the filter can emit", (reason) => {
 		const event = lib(LIBRARIAN_CANDIDATE_DROPPED, {
 			reason,
