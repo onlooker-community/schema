@@ -1258,6 +1258,56 @@ export interface InspectorRunCompletedPayload {
 	duration_ms?: number;
 	project_key?: string;
 }
+export interface OnlookerCurrencyCheckedPayload {
+	/**
+	 * `failed` means the probe could not reach a marketplace origin. The cached
+	 * answer is left untouched rather than restamped, so a failed probe never
+	 * makes a stale answer look fresh.
+	 */
+	probe_outcome: "ok" | "failed";
+	marketplaces_checked?: number;
+	findings_count?: number;
+	duration_ms?: number;
+}
+
+export interface OnlookerCurrencyFinding {
+	reason:
+		| "clone_behind"
+		| "stale_install"
+		| "not_installed"
+		| "installed_elsewhere";
+	/** The marketplace name for `clone_behind`, otherwise the plugin key. */
+	subject: string;
+	effective?: string;
+	available?: string;
+}
+
+export interface OnlookerCurrencyStalePayload {
+	findings_count: number;
+	/**
+	 * Age of the cached answer this event reports. Required, because a currency
+	 * claim without its age is precisely how a stale answer gets read as a
+	 * current one.
+	 */
+	answer_age_seconds: number;
+	findings?: OnlookerCurrencyFinding[];
+}
+
+export interface OnlookerCurrencySkippedPayload {
+	/**
+	 * Named rather than collapsed to a single skip: "nothing to report" and
+	 * "could not check" are opposite conditions that are otherwise
+	 * indistinguishable in the log.
+	 */
+	skip_reason:
+		| "cache_fresh"
+		| "disabled"
+		| "no_manifest"
+		| "no_git_context"
+		| "budget_exceeded"
+		| "probe_failed";
+	answer_age_seconds?: number;
+}
 
 export interface PayloadMap {
 	"session.start": SessionStartPayload;
@@ -1386,6 +1436,9 @@ export interface PayloadMap {
 	"inspector.check.failed": InspectorCheckFailedPayload;
 	"inspector.check.skipped": InspectorCheckSkippedPayload;
 	"inspector.run.completed": InspectorRunCompletedPayload;
+	"onlooker.currency.checked": OnlookerCurrencyCheckedPayload;
+	"onlooker.currency.stale": OnlookerCurrencyStalePayload;
+	"onlooker.currency.skipped": OnlookerCurrencySkippedPayload;
 }
 
 export type PayloadFor<T extends EventType> = T extends keyof PayloadMap

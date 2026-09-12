@@ -54,6 +54,9 @@ import {
 	LINEAGE_QUERY_ANSWERED,
 	MEMORY_RECALLED,
 	MERIDIAN_HINT_GENERATED,
+	ONLOOKER_CURRENCY_CHECKED,
+	ONLOOKER_CURRENCY_SKIPPED,
+	ONLOOKER_CURRENCY_STALE,
 	ONLOOKER_WATCH_UNMATCHED,
 	SENTINEL_BLOCKED,
 	SESSION_START,
@@ -2221,13 +2224,109 @@ describe("isEventType", () => {
 	});
 });
 
+describe("onlooker.currency.* events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const SID = "session-currency-1";
+
+	function currency<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "onlooker",
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates a successful probe", () => {
+		const event = currency(ONLOOKER_CURRENCY_CHECKED, {
+			probe_outcome: "ok",
+			marketplaces_checked: 1,
+			findings_count: 1,
+			duration_ms: 412,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates a failed probe with only the outcome", () => {
+		const event = currency(ONLOOKER_CURRENCY_CHECKED, {
+			probe_outcome: "failed",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates a stale report carrying its findings", () => {
+		const event = currency(ONLOOKER_CURRENCY_STALE, {
+			findings_count: 1,
+			answer_age_seconds: 7200,
+			findings: [
+				{
+					reason: "clone_behind",
+					subject: "onlooker-community",
+					effective: "6caacd39",
+					available: "ff773b41",
+				},
+			],
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// The age rule, expressed at the schema level. A currency claim without its
+	// age is the failure this event type exists to prevent: it is how a stale
+	// cached answer gets reported as a current one.
+	it("rejects a stale report with no answer age", () => {
+		const event = currency(ONLOOKER_CURRENCY_STALE, {
+			findings_count: 1,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects a finding whose reason is off-enum", () => {
+		const event = currency(ONLOOKER_CURRENCY_STALE, {
+			findings_count: 1,
+			answer_age_seconds: 60,
+			findings: [{ reason: "vibes", subject: "onlooker-community" }],
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates each named skip reason", () => {
+		const reasons = [
+			"cache_fresh",
+			"disabled",
+			"no_manifest",
+			"no_git_context",
+			"budget_exceeded",
+			"probe_failed",
+		] as const;
+		for (const skip_reason of reasons) {
+			const event = currency(ONLOOKER_CURRENCY_SKIPPED, { skip_reason });
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("rejects an unnamed skip reason", () => {
+		const event = currency(ONLOOKER_CURRENCY_SKIPPED, {
+			skip_reason: "because_i_said_so",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+});
+
 describe("ALL_EVENT_TYPES", () => {
 	it("has no duplicates", () => {
 		const set = new Set<EventType>(ALL_EVENT_TYPES);
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 126 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(126);
+	it("has exactly 129 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(129);
 	});
 });
