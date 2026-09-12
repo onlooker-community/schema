@@ -188,7 +188,10 @@
 				"inspector.check.skipped",
 				"inspector.run.completed",
 				"onlooker.artifact.ready",
-				"onlooker.watch.unmatched"
+				"onlooker.watch.unmatched",
+				"onlooker.currency.checked",
+				"onlooker.currency.stale",
+				"onlooker.currency.skipped"
 			]
 		},
 		"payload": {

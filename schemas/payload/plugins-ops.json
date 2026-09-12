@@ -819,6 +819,79 @@
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"project_key": { "type": "string" }
 			}
+		},
+		"onlooker.currency.checked": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["probe_outcome"],
+			"properties": {
+				"probe_outcome": {
+					"type": "string",
+					"enum": ["ok", "failed"],
+					"description": "failed means the probe could not reach a marketplace origin. The cached answer is left untouched rather than restamped, so a failed probe never makes a stale answer look fresh."
+				},
+				"marketplaces_checked": { "type": "integer", "minimum": 0 },
+				"findings_count": { "type": "integer", "minimum": 0 },
+				"duration_ms": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"onlooker.currency.stale": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["findings_count", "answer_age_seconds"],
+			"properties": {
+				"findings_count": { "type": "integer", "minimum": 1 },
+				"answer_age_seconds": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Age of the cached answer this event reports. Required, because a currency claim without its age is precisely how a stale answer gets read as a current one."
+				},
+				"findings": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["reason", "subject"],
+						"properties": {
+							"reason": {
+								"type": "string",
+								"enum": [
+									"clone_behind",
+									"stale_install",
+									"not_installed",
+									"installed_elsewhere"
+								]
+							},
+							"subject": {
+								"type": "string",
+								"description": "The marketplace name for clone_behind, otherwise the plugin key."
+							},
+							"effective": { "type": "string" },
+							"available": { "type": "string" }
+						}
+					}
+				}
+			}
+		},
+		"onlooker.currency.skipped": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["skip_reason"],
+			"properties": {
+				"skip_reason": {
+					"type": "string",
+					"enum": [
+						"cache_fresh",
+						"disabled",
+						"no_manifest",
+						"no_git_context",
+						"budget_exceeded",
+						"probe_failed"
+					],
+					"description": "Named rather than collapsed to a single skip: 'nothing to report' and 'could not check' are opposite conditions that are otherwise indistinguishable in the log. See ecosystem-449.39 for the same mistake made against librarian.scan.complete."
+				},
+				"answer_age_seconds": { "type": "integer", "minimum": 0 }
+			}
 		}
 	}
 }
