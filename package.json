@@ -1,6 +1,6 @@
 {
 	"name": "@onlooker-community/schema",
-	"version": "2.19.0",
+	"version": "2.20.0",
 	"description": "Canonical event schema for the Onlooker ecosystem",
 	"type": "module",
 	"main": "./dist/index.js",

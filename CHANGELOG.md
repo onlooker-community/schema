@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.20.0](https://github.com/onlooker-community/schema/compare/v2.19.0...v2.20.0) (2026-09-12)
+
+
+### Features
+
+* **onlooker:** register events for the stale-pin warning :bell: ([#64](https://github.com/onlooker-community/schema/issues/64)) ([a57779f](https://github.com/onlooker-community/schema/commit/a57779f290f38ca1f4db7ac4ba55c4b8dd0f4baa))
+
 ## [2.19.0](https://github.com/onlooker-community/schema/compare/v2.18.1...v2.19.0) (2026-09-11)
 
 
