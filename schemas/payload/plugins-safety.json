@@ -440,8 +440,27 @@
 			"additionalProperties": false,
 			"required": ["confidence", "stddev", "file_path"],
 			"properties": {
-				"confidence": { "type": "number", "minimum": 0, "maximum": 1 },
-				"stddev": { "type": "number", "minimum": 0 },
+				"confidence": {
+					"type": ["number", "null"],
+					"minimum": 0,
+					"maximum": 1,
+					"description": "null when the evaluator failed and no measurement exists. Kept required so the key is always present: an absent key and a measured value are the same shape to a consumer, but null and 0 are not. Emitting 0 here would assert a measured zero confidence, which is a stronger and different claim than 'not measured'. See ecosystem-449.52."
+				},
+				"stddev": {
+					"type": ["number", "null"],
+					"minimum": 0,
+					"description": "null when the evaluator failed and no measurement exists. See confidence."
+				},
+				"reason": {
+					"type": "string",
+					"enum": [
+						"low_confidence",
+						"high_stddev",
+						"low_confidence_and_high_stddev",
+						"sampler_error"
+					],
+					"description": "Why the write was denied. sampler_error is the case that has no measurement; the other three are thresholds the gate actually distinguishes. Optional so existing emitters keep validating."
+				},
 				"file_path": { "type": "string" },
 				"tool_name": {
 					"type": "string",

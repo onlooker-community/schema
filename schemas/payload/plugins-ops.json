@@ -337,6 +337,24 @@
 				}
 			}
 		},
+		"echo.suite.skipped": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": ["no_changes", "no_watched_changes", "content_unchanged"],
+					"description": "Why no suite ran. Without this the only signal is the ABSENCE of echo.suite.started, which cannot distinguish 'nothing was dirty' from 'everything dirty was already scored' from 'the hook never fired'. content_unchanged is the case the ecosystem-449.40 content-hash filter created. See ecosystem-449.52 and ecosystem-449.21."
+				},
+				"considered_count": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Watched files examined before the decision to skip."
+				},
+				"changed_file": { "type": "string" }
+			}
+		},
 		"echo.suite.started": {
 			"type": "object",
 			"additionalProperties": false,
@@ -886,7 +904,8 @@
 						"no_manifest",
 						"no_git_context",
 						"budget_exceeded",
-						"probe_failed"
+						"probe_failed",
+						"refresh_deferred"
 					],
 					"description": "Named rather than collapsed to a single skip: 'nothing to report' and 'could not check' are opposite conditions that are otherwise indistinguishable in the log. See ecosystem-449.39 for the same mistake made against librarian.scan.complete."
 				},

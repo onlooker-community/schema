@@ -17,12 +17,14 @@ import {
 	CARTOGRAPHER_AUDIT_COMPLETE,
 	CARTOGRAPHER_ISSUE_FOUND,
 	CARTOGRAPHER_ISSUE_RESOLVED,
+	COMPASS_CHECK_FAILED,
 	CURATOR_FINDING_CONTRADICTION,
 	CURATOR_FINDING_DATE_DECAYED,
 	CURATOR_FINDING_PATH_BROKEN,
 	CURATOR_FINDING_RESOLVED,
 	CURATOR_SCAN_COMPLETE,
 	CURATOR_SCAN_STARTED,
+	ECHO_SUITE_SKIPPED,
 	type EventType,
 	GOVERNOR_BUDGET_EXCEEDED,
 	GOVERNOR_BUDGET_WARNING,
@@ -2305,11 +2307,24 @@ describe("onlooker.currency.* events", () => {
 			"no_git_context",
 			"budget_exceeded",
 			"probe_failed",
+			"refresh_deferred",
 		] as const;
 		for (const skip_reason of reasons) {
 			const event = currency(ONLOOKER_CURRENCY_SKIPPED, { skip_reason });
 			expect(validate(event).valid).toBe(true);
 		}
+	});
+
+	// The surfacer's most common path: the cached answer expired and a detached
+	// probe is already running, so this session has no answer yet. Before this
+	// value existed the hook emitted nothing there rather than emit something
+	// false, so the bus could not answer how often a session starts stale.
+	it("carries the answer age on a deferred refresh", () => {
+		const event = currency(ONLOOKER_CURRENCY_SKIPPED, {
+			skip_reason: "refresh_deferred",
+			answer_age_seconds: 90_000,
+		});
+		expect(validate(event).valid).toBe(true);
 	});
 
 	it("rejects an unnamed skip reason", () => {
@@ -2320,13 +2335,142 @@ describe("onlooker.currency.* events", () => {
 	});
 });
 
+// compass denies a write for two different kinds of reason, and only one of
+// them comes with numbers. Before this, a denial caused by an evaluator failure
+// had no valid event at all: confidence and stddev were required numbers, so
+// the gate labeled the denial compass.check.skipped — the bus said compass
+// declined to act when in fact it had blocked the tool call (ecosystem-449.45
+// defect 3, ecosystem-449.52 gap 2).
+describe("compass.check.failed measurements", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function failed(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "compass",
+			machine_id: MACHINE_ID,
+			session_id: "session-compass-1",
+			event_type: COMPASS_CHECK_FAILED,
+			payload: payload as never,
+		});
+	}
+
+	it("validates a measured denial", () => {
+		const event = failed({
+			confidence: 0.42,
+			stddev: 0.11,
+			file_path: "src/app.ts",
+			reason: "low_confidence",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// The point of the change. An evaluator that failed measured nothing, and
+	// emitting 0 would assert a measured zero — a different and stronger claim.
+	it("validates a denial with no measurement", () => {
+		const event = failed({
+			confidence: null,
+			stddev: null,
+			file_path: "src/app.ts",
+			reason: "sampler_error",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// Nullable is not the same as optional. Keeping the keys required means a
+	// consumer never has to distinguish "absent" from "not measured".
+	it("rejects a denial that omits the measurement keys entirely", () => {
+		const event = failed({ file_path: "src/app.ts", reason: "sampler_error" });
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("still validates existing emitters that send no reason", () => {
+		const event = failed({
+			confidence: 0.3,
+			stddev: 0.25,
+			file_path: "src/app.ts",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects an off-enum reason", () => {
+		const event = failed({
+			confidence: null,
+			stddev: null,
+			file_path: "src/app.ts",
+			reason: "vibes",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("still rejects a confidence outside 0..1", () => {
+		const event = failed({
+			confidence: 1.5,
+			stddev: 0.1,
+			file_path: "src/app.ts",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+});
+
+// echo deciding not to score was previously invisible: the signal was the
+// ABSENCE of echo.suite.started, indistinguishable from "nothing was dirty" and
+// from "the hook never fired" (ecosystem-449.40 acceptance 7, ecosystem-449.52
+// gap 1).
+describe("echo.suite.skipped", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function skipped(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "echo",
+			machine_id: MACHINE_ID,
+			session_id: "session-echo-1",
+			event_type: ECHO_SUITE_SKIPPED,
+			payload: payload as never,
+		});
+	}
+
+	it("validates each named skip reason", () => {
+		const reasons = [
+			"no_changes",
+			"no_watched_changes",
+			"content_unchanged",
+		] as const;
+		for (const reason of reasons) {
+			expect(validate(skipped({ reason })).valid).toBe(true);
+		}
+	});
+
+	it("carries what it considered before skipping", () => {
+		const event = skipped({
+			reason: "content_unchanged",
+			considered_count: 2,
+			changed_file: "skills/writing-tests/SKILL.md",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a skip with no reason", () => {
+		expect(validate(skipped({ considered_count: 0 })).valid).toBe(false);
+	});
+
+	it("rejects an unnamed skip reason", () => {
+		expect(validate(skipped({ reason: "felt_like_it" })).valid).toBe(false);
+	});
+});
+
 describe("ALL_EVENT_TYPES", () => {
 	it("has no duplicates", () => {
 		const set = new Set<EventType>(ALL_EVENT_TYPES);
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 129 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(129);
+	it("has exactly 130 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(130);
 	});
 });

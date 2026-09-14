@@ -81,6 +81,7 @@ export const LINEAGE_QUERY_ANSWERED = "lineage.query.answered" as const;
 
 export const ECHO_SUITE_STARTED = "echo.suite.started" as const;
 export const ECHO_SUITE_COMPLETE = "echo.suite.complete" as const;
+export const ECHO_SUITE_SKIPPED = "echo.suite.skipped" as const;
 export const ECHO_REGRESSION_DETECTED = "echo.regression.detected" as const;
 export const ECHO_IMPROVEMENT_DETECTED = "echo.improvement.detected" as const;
 
@@ -246,6 +247,7 @@ export const ALL_EVENT_TYPES = [
 	LINEAGE_QUERY_ANSWERED,
 	ECHO_SUITE_STARTED,
 	ECHO_SUITE_COMPLETE,
+	ECHO_SUITE_SKIPPED,
 	ECHO_REGRESSION_DETECTED,
 	ECHO_IMPROVEMENT_DETECTED,
 	CARTOGRAPHER_AUDIT_COMPLETE,
