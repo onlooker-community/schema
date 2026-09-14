@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.21.0](https://github.com/onlooker-community/schema/compare/v2.20.0...v2.21.0) (2026-09-14)
+
+
+### Features
+
+* **plugins:** let compass, echo and the currency probe report what they decided :satellite: ([#66](https://github.com/onlooker-community/schema/issues/66)) ([32f70bc](https://github.com/onlooker-community/schema/commit/32f70bc3b05ad3609c148a250c6f97531866170c))
+
 ## [2.20.0](https://github.com/onlooker-community/schema/compare/v2.19.0...v2.20.0) (2026-09-12)
 
 
