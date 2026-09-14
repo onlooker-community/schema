@@ -368,10 +368,28 @@ export interface CompassCheckPassedPayload {
 	sample_count?: number;
 }
 
+/**
+ * Why a write was denied. `sampler_error` is the case that carries no
+ * measurement; the other three are thresholds the gate actually distinguishes.
+ */
+export type CompassFailReason =
+	| "low_confidence"
+	| "high_stddev"
+	| "low_confidence_and_high_stddev"
+	| "sampler_error";
+
 export interface CompassCheckFailedPayload {
-	confidence: number;
-	stddev: number;
+	/**
+	 * `null` when the evaluator failed and no measurement exists. Required, so
+	 * the key is always present — `0` would assert a measured zero confidence,
+	 * which is a different and stronger claim than "not measured".
+	 * See ecosystem-449.52.
+	 */
+	confidence: number | null;
+	/** `null` when the evaluator failed and no measurement exists. */
+	stddev: number | null;
 	file_path: string;
+	reason?: CompassFailReason;
 	tool_name?: CompassToolName;
 	primary_concern?: CompassPrimaryConcern;
 	had_prior_turn?: boolean;
@@ -705,6 +723,25 @@ export interface LineageQueryAnsweredPayload {
 	query?: string;
 	line?: number;
 	resolved_via?: "historian" | "transcript" | "none";
+}
+
+/**
+ * Why no suite ran. Without this the only signal is the *absence* of
+ * `echo.suite.started`, which cannot distinguish "nothing was dirty" from
+ * "everything dirty was already scored" from "the hook never fired".
+ * `content_unchanged` is the case the ecosystem-449.40 content-hash filter
+ * created. See ecosystem-449.52.
+ */
+export type EchoSuiteSkipReason =
+	| "no_changes"
+	| "no_watched_changes"
+	| "content_unchanged";
+
+export interface EchoSuiteSkippedPayload {
+	reason: EchoSuiteSkipReason;
+	/** Watched files examined before the decision to skip. */
+	considered_count?: number;
+	changed_file?: string;
 }
 
 export interface EchoSuiteStartedPayload {
@@ -1305,7 +1342,15 @@ export interface OnlookerCurrencySkippedPayload {
 		| "no_manifest"
 		| "no_git_context"
 		| "budget_exceeded"
-		| "probe_failed";
+		| "probe_failed"
+		/**
+		 * The cached answer expired and a DETACHED probe is already running,
+		 * so this session has no answer yet. Distinct from probe_failed: the
+		 * probe has not failed, it has not finished. This is the surfacer's
+		 * most common path, and without a value for it the transition emits
+		 * nothing at all. See ecosystem-449.60.
+		 */
+		| "refresh_deferred";
 	answer_age_seconds?: number;
 }
 
@@ -1374,6 +1419,7 @@ export interface PayloadMap {
 	"lineage.query.answered": LineageQueryAnsweredPayload;
 	"echo.suite.started": EchoSuiteStartedPayload;
 	"echo.suite.complete": EchoSuiteCompletePayload;
+	"echo.suite.skipped": EchoSuiteSkippedPayload;
 	"echo.regression.detected": EchoRegressionDetectedPayload;
 	"echo.improvement.detected": EchoImprovementDetectedPayload;
 	"cartographer.audit.complete": CartographerAuditCompletePayload;
