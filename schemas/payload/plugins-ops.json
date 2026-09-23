@@ -344,8 +344,18 @@
 			"properties": {
 				"reason": {
 					"type": "string",
-					"enum": ["no_changes", "no_watched_changes", "content_unchanged"],
-					"description": "Why no suite ran. Without this the only signal is the ABSENCE of echo.suite.started, which cannot distinguish 'nothing was dirty' from 'everything dirty was already scored' from 'the hook never fired'. content_unchanged is the case the ecosystem-449.40 content-hash filter created. See ecosystem-449.52 and ecosystem-449.21."
+					"enum": [
+						"no_changes",
+						"no_watched_changes",
+						"content_unchanged",
+						"all_suppressed",
+						"no_scorable_files"
+					],
+					"description": "Why no suite ran, or why one that started scored nothing. Without this the only signal is the ABSENCE of echo.suite.started, which cannot distinguish 'nothing was dirty' from 'everything dirty was already scored' from 'the hook never fired'. content_unchanged is the case the ecosystem-449.40 content-hash filter created. The last two close a suite that DID start: all_suppressed means every file was already scored from identical bytes by a concurrent session (the ecosystem-449.46 check), no_scorable_files means every judge call returned nothing usable. Before ONL-101 both exited silently, so a started suite could have no terminating event at all. See ecosystem-449.52 and ecosystem-449.21."
+				},
+				"suite_id": {
+					"type": "string",
+					"description": "The suite this terminates, when one had already started. Absent for the three pre-start reasons, which are emitted before any suite_id is minted."
 				},
 				"considered_count": {
 					"type": "integer",
