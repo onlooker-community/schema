@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.22.0](https://github.com/onlooker-community/schema/compare/v2.21.0...v2.22.0) (2026-09-23)
+
+
+### Features
+
+* **plugins:** give a started echo suite a terminator :satellite: ([#68](https://github.com/onlooker-community/schema/issues/68)) ([c14f9c0](https://github.com/onlooker-community/schema/commit/c14f9c0c5d9f59ff4588b05d55203fcd99dff018))
+
 ## [2.21.0](https://github.com/onlooker-community/schema/compare/v2.20.0...v2.21.0) (2026-09-14)
 
 
