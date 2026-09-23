@@ -726,19 +726,32 @@ export interface LineageQueryAnsweredPayload {
 }
 
 /**
- * Why no suite ran. Without this the only signal is the *absence* of
- * `echo.suite.started`, which cannot distinguish "nothing was dirty" from
- * "everything dirty was already scored" from "the hook never fired".
- * `content_unchanged` is the case the ecosystem-449.40 content-hash filter
- * created. See ecosystem-449.52.
+ * Why no suite ran, or why one that started scored nothing. Without this the
+ * only signal is the *absence* of `echo.suite.started`, which cannot
+ * distinguish "nothing was dirty" from "everything dirty was already scored"
+ * from "the hook never fired". `content_unchanged` is the case the
+ * ecosystem-449.40 content-hash filter created. See ecosystem-449.52.
+ *
+ * The first three are decided *before* a suite starts. The last two close one
+ * that already did: `all_suppressed` when every file was already scored from
+ * identical bytes by a concurrent session (the ecosystem-449.46 check), and
+ * `no_scorable_files` when every judge call returned nothing usable. Before
+ * ONL-101 both exited silently, leaving a started suite with no terminator.
  */
 export type EchoSuiteSkipReason =
 	| "no_changes"
 	| "no_watched_changes"
-	| "content_unchanged";
+	| "content_unchanged"
+	| "all_suppressed"
+	| "no_scorable_files";
 
 export interface EchoSuiteSkippedPayload {
 	reason: EchoSuiteSkipReason;
+	/**
+	 * The suite this terminates, when one had already started. Absent for the
+	 * three pre-start reasons, which are emitted before a suite_id is minted.
+	 */
+	suite_id?: string;
 	/** Watched files examined before the decision to skip. */
 	considered_count?: number;
 	changed_file?: string;

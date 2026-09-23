@@ -2462,6 +2462,28 @@ describe("echo.suite.skipped", () => {
 	it("rejects an unnamed skip reason", () => {
 		expect(validate(skipped({ reason: "felt_like_it" })).valid).toBe(false);
 	});
+
+	// A suite that has already emitted echo.suite.started can still end with
+	// nothing scored: every file suppressed as already-judged, or every judge
+	// call returning nothing usable. Those need a terminator, and the three
+	// reasons above all describe deciding NOT to start (ONL-101).
+	it("validates each reason for a suite that started and scored nothing", () => {
+		const reasons = ["all_suppressed", "no_scorable_files"] as const;
+		for (const reason of reasons) {
+			expect(validate(skipped({ reason })).valid).toBe(true);
+		}
+	});
+
+	// Without suite_id the terminator cannot be joined to the started event it
+	// closes, which is the whole point of emitting one.
+	it("carries the suite it terminates", () => {
+		const event = skipped({
+			reason: "all_suppressed",
+			suite_id: "01M2XDN3BBCXRVJXKCRYNB9FHK",
+			considered_count: 1,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
 });
 
 describe("ALL_EVENT_TYPES", () => {
