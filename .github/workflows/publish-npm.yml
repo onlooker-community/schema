@@ -28,7 +28,7 @@ permissions:
 jobs:
   validate:
     name: Validate
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     outputs:
       version: ${{ steps.version.outputs.value }}
       npm_tag: ${{ steps.tag.outputs.value }}
@@ -80,7 +80,7 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     strategy:
       matrix:
         node: ['20', '22']
@@ -99,7 +99,7 @@ jobs:
 
   publish:
     name: Publish to npm
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
       id-token: write
@@ -128,7 +128,7 @@ jobs:
             --provenance
   release:
     name: Create GitHub Release
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     needs: [validate, publish]
     permissions:
       contents: write
