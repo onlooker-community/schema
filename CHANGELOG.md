@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.24.0](https://github.com/onlooker-community/schema/compare/v2.23.2...v2.24.0) (2026-09-27)
+
+
+### Features
+
+* **plugins:** split the skip reason historian could not attribute :mag: ([#78](https://github.com/onlooker-community/schema/issues/78)) ([1a52ce9](https://github.com/onlooker-community/schema/commit/1a52ce94d75d9796811f0c60e5846bccf349155f))
+
 ## [2.23.2](https://github.com/onlooker-community/schema/compare/v2.23.1...v2.23.2) (2026-09-27)
 
 
