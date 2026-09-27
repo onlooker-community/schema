@@ -1163,11 +1163,23 @@ export interface HistorianIndexingStartedPayload {
 
 export interface HistorianIndexingCompletePayload {
 	outcome: "ok" | "skipped";
+	/**
+	 * Why nothing was indexed.
+	 *
+	 * `transcript_path_absent` and `transcript_file_missing` split the older
+	 * `transcript_unavailable`, which collapsed two causes with different
+	 * fixes: a SessionEnd payload carrying no `transcript_path` at all, versus
+	 * a path that was supplied with no file at it. ONL-121 could not tell them
+	 * apart after the fact. `transcript_unavailable` is retained so historical
+	 * events stay valid; new emissions use one of the specific two.
+	 */
 	skip_reason?:
 		| "too_short"
 		| "embedder_unavailable"
 		| "disabled"
-		| "transcript_unavailable";
+		| "transcript_unavailable"
+		| "transcript_path_absent"
+		| "transcript_file_missing";
 	chunks_indexed?: number;
 	chunks_dropped?: number;
 	duration_ms: number;
