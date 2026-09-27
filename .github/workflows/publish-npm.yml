@@ -114,9 +114,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: npm
 
-      - name: Update npm
-        run: npm install -g npm@latest
-
       - run: npm ci
       - run: npm run build
 
