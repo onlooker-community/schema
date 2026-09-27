@@ -114,6 +114,7 @@
 				"relay.handoff.injected",
 				"scribe.capture.complete",
 				"scribe.distill.complete",
+				"scribe.distill.skipped",
 				"prompt_rule.matched",
 				"prompt_rule.applied",
 				"governor.gate.checked",

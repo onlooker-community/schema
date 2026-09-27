@@ -60,6 +60,7 @@ import {
 	ONLOOKER_CURRENCY_SKIPPED,
 	ONLOOKER_CURRENCY_STALE,
 	ONLOOKER_WATCH_UNMATCHED,
+	SCRIBE_DISTILL_SKIPPED,
 	SENTINEL_BLOCKED,
 	SESSION_START,
 	TRIBUNAL_ACTOR_COMPLETE,
@@ -2486,13 +2487,85 @@ describe("echo.suite.skipped", () => {
 	});
 });
 
+describe("scribe.distill.skipped", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function skipped(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "scribe",
+			machine_id: MACHINE_ID,
+			session_id: "session-scribe-1",
+			event_type: SCRIBE_DISTILL_SKIPPED,
+			payload: payload as never,
+		});
+	}
+
+	it("validates each named skip reason", () => {
+		const reasons = [
+			"no_transcript",
+			"below_min_turns",
+			"no_new_turns",
+			"already_running",
+		] as const;
+		for (const reason of reasons) {
+			expect(validate(skipped({ reason })).valid).toBe(true);
+		}
+	});
+
+	it("rejects a skip with no reason", () => {
+		expect(validate(skipped({ turn_count: 2 })).valid).toBe(false);
+	});
+
+	it("rejects an unnamed skip reason", () => {
+		expect(validate(skipped({ reason: "not_in_the_mood" })).valid).toBe(false);
+	});
+
+	// below_min_turns and no_new_turns are both "not enough turns", and reading
+	// them apart after the fact needs the two numbers that were compared.
+	it("carries the comparison behind a turn-count skip", () => {
+		expect(
+			validate(
+				skipped({ reason: "below_min_turns", turn_count: 1, threshold: 3 }),
+			).valid,
+		).toBe(true);
+		expect(
+			validate(
+				skipped({
+					reason: "no_new_turns",
+					turn_count: 7,
+					last_distilled_turns: 5,
+					threshold: 10,
+				}),
+			).valid,
+		).toBe(true);
+	});
+
+	// Turn zero is a real count, not a missing one — the minimum is 0, not 1.
+	it("accepts a zero turn count", () => {
+		expect(
+			validate(
+				skipped({ reason: "below_min_turns", turn_count: 0, threshold: 3 }),
+			).valid,
+		).toBe(true);
+	});
+
+	it("rejects a negative turn count", () => {
+		expect(
+			validate(skipped({ reason: "below_min_turns", turn_count: -1 })).valid,
+		).toBe(false);
+	});
+});
+
 describe("ALL_EVENT_TYPES", () => {
 	it("has no duplicates", () => {
 		const set = new Set<EventType>(ALL_EVENT_TYPES);
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 130 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(130);
+	it("has exactly 131 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(131);
 	});
 });

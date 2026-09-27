@@ -487,6 +487,30 @@ export interface ScribeDistillCompletePayload {
 	artifacts_produced: number;
 }
 
+export type ScribeDistillSkipReason =
+	| "no_transcript"
+	| "below_min_turns"
+	| "no_new_turns"
+	| "already_running";
+
+export interface ScribeDistillSkippedPayload {
+	reason: ScribeDistillSkipReason;
+	/** Turns counted at the moment the decision was made. */
+	turn_count?: number;
+	/**
+	 * Turn count recorded by the previous successful distillation. Present on
+	 * no_new_turns, which is the only reason that consults it.
+	 */
+	last_distilled_turns?: number;
+	/**
+	 * The turn count this decision was compared against: min_turns for
+	 * below_min_turns, last_distilled_turns + redistill_min_new_turns for
+	 * no_new_turns. Carried so the event explains itself without the reader
+	 * having to resolve the config that was live at the time.
+	 */
+	threshold?: number;
+}
+
 export interface PromptRuleMatchedPayload {
 	rule_id: string;
 	match_type: "regex" | "vocabulary" | "semantic";
@@ -1414,6 +1438,7 @@ export interface PayloadMap {
 	"relay.handoff.injected": RelayHandoffInjectedPayload;
 	"scribe.capture.complete": ScribeCaptureCompletePayload;
 	"scribe.distill.complete": ScribeDistillCompletePayload;
+	"scribe.distill.skipped": ScribeDistillSkippedPayload;
 	"prompt_rule.matched": PromptRuleMatchedPayload;
 	"prompt_rule.applied": PromptRuleAppliedPayload;
 	"governor.gate.checked": GovernorGateCheckedPayload;

@@ -115,6 +115,38 @@
 				"artifacts_produced": { "type": "integer", "minimum": 0 }
 			}
 		},
+		"scribe.distill.skipped": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": [
+						"no_transcript",
+						"below_min_turns",
+						"no_new_turns",
+						"already_running"
+					],
+					"description": "Why no intent document was produced. Without this the only signal is the ABSENCE of scribe.distill.complete, which cannot distinguish 'the session was too short' from 'this transcript was already distilled' from 'the hook never fired' — the gap ecosystem-449.21 exists to close. no_new_turns is the case the ONL-41 turn-delta gate created: before it, scribe re-distilled on every Stop, and 42 of 62 measured Haiku passes wrote an artifact the next pass immediately overwrote. already_running means a concurrent pass for the same session holds the lock and this one declined rather than queueing behind work that already covers the transcript."
+				},
+				"turn_count": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Turns counted at the moment the decision was made."
+				},
+				"last_distilled_turns": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Turn count recorded by the previous successful distillation. Present on no_new_turns, the only reason that consults it."
+				},
+				"threshold": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "The turn count this decision was compared against: min_turns for below_min_turns, last_distilled_turns + redistill_min_new_turns for no_new_turns. Carried so the event explains itself without the reader resolving the config that was live at the time."
+				}
+			}
+		},
 		"oracle.calibration.requested": {
 			"type": "object",
 			"additionalProperties": false,
