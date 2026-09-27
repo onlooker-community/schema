@@ -2559,6 +2559,81 @@ describe("scribe.distill.skipped", () => {
 	});
 });
 
+describe("historian.indexing.complete skip reasons", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function indexed(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "historian",
+			machine_id: MACHINE_ID,
+			session_id: "session-historian-1",
+			event_type: HISTORIAN_INDEXING_COMPLETE,
+			payload: payload as never,
+		});
+	}
+
+	// The split ONL-121 needed. transcript_unavailable merged two causes with
+	// different fixes — a SessionEnd payload with no transcript_path at all,
+	// versus a path supplied with no file at it — so 2881 of 4611 skips could
+	// not be attributed afterwards.
+	it("validates the two causes the merged reason could not separate", () => {
+		for (const reason of [
+			"transcript_path_absent",
+			"transcript_file_missing",
+		] as const) {
+			expect(
+				validate(
+					indexed({ outcome: "skipped", skip_reason: reason, duration_ms: 3 }),
+				).valid,
+			).toBe(true);
+		}
+	});
+
+	// Retained deliberately: 2881 events already carry it, and dropping it from
+	// the enum would invalidate the history the split exists to explain.
+	it("still accepts the superseded merged reason", () => {
+		expect(
+			validate(
+				indexed({
+					outcome: "skipped",
+					skip_reason: "transcript_unavailable",
+					duration_ms: 3,
+				}),
+			).valid,
+		).toBe(true);
+	});
+
+	it("validates a successful index with no skip reason", () => {
+		expect(
+			validate(
+				indexed({
+					outcome: "ok",
+					chunks_indexed: 12,
+					chunks_dropped: 1,
+					duration_ms: 420,
+				}),
+			).valid,
+		).toBe(true);
+	});
+
+	it("rejects an unnamed skip reason", () => {
+		expect(
+			validate(
+				indexed({ outcome: "skipped", skip_reason: "no_idea", duration_ms: 3 }),
+			).valid,
+		).toBe(false);
+	});
+
+	it("rejects a skip with no duration", () => {
+		expect(
+			validate(indexed({ outcome: "skipped", skip_reason: "too_short" })).valid,
+		).toBe(false);
+	});
+});
+
 describe("ALL_EVENT_TYPES", () => {
 	it("has no duplicates", () => {
 		const set = new Set<EventType>(ALL_EVENT_TYPES);
