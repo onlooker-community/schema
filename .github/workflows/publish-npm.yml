@@ -114,6 +114,21 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: npm
 
+      # REQUIRED, and not for provenance. This package authenticates to npm by
+      # trusted publishing (OIDC) — there is no NODE_AUTH_TOKEN anywhere in this
+      # workflow, and the XXXXX-XXXXX-XXXXX-XXXXX that appears in the step env is
+      # setup-node's literal placeholder, not a masked secret. Trusted publishing
+      # needs npm >= 11.5.1; node 22 bundles 10.9.4, which has no OIDC support and
+      # no token to fall back on, so `npm publish` reaches the registry
+      # unauthenticated and 404s on the PUT.
+      #
+      # Pinned to ^11 rather than @latest: npm 12 raised its floor to node
+      # ^22.22.2, above the 22.22.0 this job runs, and @latest crossing that line
+      # is what broke the v2.23.0 publish with EBADENGINE. ^11 keeps trusted
+      # publishing and stays inside node 22.22.0's range.
+      - name: Update npm
+        run: npm install -g npm@^11
+
       - run: npm ci
       - run: npm run build
 
