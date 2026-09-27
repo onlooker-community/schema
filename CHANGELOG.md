@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.23.0](https://github.com/onlooker-community/schema/compare/v2.22.0...v2.23.0) (2026-09-27)
+
+
+### Features
+
+* **plugins:** let scribe say when it declined to distill :satellite: ([#71](https://github.com/onlooker-community/schema/issues/71)) ([7a2812c](https://github.com/onlooker-community/schema/commit/7a2812c42eec07ee843e3c82ef67b1c1e208e6cd))
+
 ## [2.22.0](https://github.com/onlooker-community/schema/compare/v2.21.0...v2.22.0) (2026-09-23)
 
 
