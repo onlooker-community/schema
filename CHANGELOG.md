@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.23.1](https://github.com/onlooker-community/schema/compare/v2.23.0...v2.23.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* **ci:** stop the publish chasing npm past its own node floor :wrench: ([#73](https://github.com/onlooker-community/schema/issues/73)) ([eb45190](https://github.com/onlooker-community/schema/commit/eb451908d4bef0a135c7fd7198f78d001207903c))
+
 ## [2.23.0](https://github.com/onlooker-community/schema/compare/v2.22.0...v2.23.0) (2026-09-27)
 
 
