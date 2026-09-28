@@ -1227,6 +1227,7 @@ export interface HistorianEmbedderFailedPayload {
 		| "payload_build_failed"
 		| "timeout"
 		| "http_error"
+		| "request_failed"
 		| "empty_response"
 		| "no_embedding_field"
 		| "malformed_vector"
