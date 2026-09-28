@@ -1249,7 +1249,10 @@ export interface HistorianRetrievalCompletePayload {
 		| "budget"
 		| "short_prompt"
 		| "disabled"
-		| "embedder_unavailable";
+		/** The probe failed, so no embed was attempted. */
+		| "embedder_unavailable"
+		/** The probe passed and the embed call itself failed. */
+		| "embed_failed";
 	top_similarity?: number;
 	candidates_above_floor?: number;
 	duration_ms?: number;

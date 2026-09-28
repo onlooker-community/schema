@@ -1637,6 +1637,16 @@ describe("historian lifecycle events", () => {
 
 	// `failed` has minimum 1: the event exists to report a failure, so a zero
 	// count means the emitter should not have emitted at all.
+	// The prompt path reported a failed embed as embedder_unavailable, which
+	// says the probe failed when the probe had in fact passed.
+	it("validates retrieval.complete skipped on a failed embed", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_COMPLETE, {
+			outcome: "skipped",
+			skip_reason: "embed_failed",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
 	it("rejects embedder.failed reporting zero failures", () => {
 		const event = hist(HISTORIAN_EMBEDDER_FAILED, {
 			backend: "ollama",

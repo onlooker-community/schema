@@ -725,8 +725,10 @@
 						"budget",
 						"short_prompt",
 						"disabled",
-						"embedder_unavailable"
-					]
+						"embedder_unavailable",
+						"embed_failed"
+					],
+					"description": "Why nothing was retrieved. embedder_unavailable means the PROBE failed, so no embed was attempted; embed_failed means the probe passed and the embed call itself lost. The prompt path reported both as embedder_unavailable, which is wrong in the second case and is the same merge ONL-121 spent 2881 unattributable events paying for. The accompanying historian.embedder.failed carries which failure it was."
 				},
 				"top_similarity": { "type": "number", "minimum": 0, "maximum": 1 },
 				"candidates_above_floor": { "type": "integer", "minimum": 0 },
