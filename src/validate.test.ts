@@ -36,6 +36,7 @@ import {
 	GOVERNOR_LOCK_STALE_CLEARED,
 	GOVERNOR_SESSION_COMPLETE,
 	HISTORIAN_CHUNK_SANITIZED,
+	HISTORIAN_EMBEDDER_FAILED,
 	HISTORIAN_EMBEDDER_UNAVAILABLE,
 	HISTORIAN_INDEXING_COMPLETE,
 	HISTORIAN_INDEXING_STARTED,
@@ -1553,6 +1554,108 @@ describe("historian lifecycle events", () => {
 		});
 		expect(validate(event).valid).toBe(true);
 	});
+
+	// ONL-123. An index that silently lost its largest chunks reported
+	// outcome "ok" with no way to tell, because the count of chunks written
+	// without a vector existed only in the store. These two counters put it
+	// in the event stream.
+	it("validates indexing.complete carrying the embedding counters", () => {
+		const event = hist(HISTORIAN_INDEXING_COMPLETE, {
+			outcome: "ok",
+			chunks_indexed: 117,
+			chunks_dropped: 0,
+			chunks_embedded: 113,
+			chunks_unembedded: 4,
+			duration_ms: 842,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a negative chunks_unembedded", () => {
+		const event = hist(HISTORIAN_INDEXING_COMPLETE, {
+			outcome: "ok",
+			chunks_unembedded: -1,
+			duration_ms: 842,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	// embedder.failed reports that embed calls were made and failed;
+	// embedder.unavailable reports that the probe failed so none were tried.
+	// Collapsing them is what made ONL-123 invisible.
+	it("validates embedder.failed for each failure reason", () => {
+		const reasons = [
+			"no_curl",
+			"payload_build_failed",
+			"timeout",
+			"http_error",
+			"request_failed",
+			"empty_response",
+			"no_embedding_field",
+			"malformed_vector",
+			"oversized",
+			"backend_unsupported",
+		] as const;
+		for (const reason of reasons) {
+			const event = hist(HISTORIAN_EMBEDDER_FAILED, {
+				backend: "ollama",
+				reason,
+				attempted: 38,
+				failed: 6,
+			});
+			const result = validate(event);
+			if (!result.valid) {
+				throw new Error(
+					`expected reason ${reason} to validate, got: ${result.errors
+						.map((e) => `${e.path}: ${e.message}`)
+						.join("; ")}`,
+				);
+			}
+		}
+	});
+
+	it("validates embedder.failed with an error summary", () => {
+		const event = hist(HISTORIAN_EMBEDDER_FAILED, {
+			backend: "ollama",
+			reason: "timeout",
+			attempted: 38,
+			failed: 38,
+			error_summary: "curl exit 28 after 8000ms",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects embedder.failed with a reason outside the enum", () => {
+		const event = hist(HISTORIAN_EMBEDDER_FAILED, {
+			backend: "ollama",
+			reason: "who_knows",
+			attempted: 1,
+			failed: 1,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	// `failed` has minimum 1: the event exists to report a failure, so a zero
+	// count means the emitter should not have emitted at all.
+	// The prompt path reported a failed embed as embedder_unavailable, which
+	// says the probe failed when the probe had in fact passed.
+	it("validates retrieval.complete skipped on a failed embed", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_COMPLETE, {
+			outcome: "skipped",
+			skip_reason: "embed_failed",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects embedder.failed reporting zero failures", () => {
+		const event = hist(HISTORIAN_EMBEDDER_FAILED, {
+			backend: "ollama",
+			reason: "timeout",
+			attempted: 4,
+			failed: 0,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
 });
 
 describe("memory.recalled substrate event", () => {
@@ -2640,7 +2743,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 131 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(131);
+	it("has exactly 132 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(132);
 	});
 });

@@ -626,6 +626,16 @@
 				},
 				"chunks_indexed": { "type": "integer", "minimum": 0 },
 				"chunks_dropped": { "type": "integer", "minimum": 0 },
+				"chunks_embedded": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Chunks written with a vector."
+				},
+				"chunks_unembedded": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Chunks written without a vector. The retriever is embedding-only, so these are persisted and unreachable. ONL-123: this count was previously knowable only by reading the store, which is how an index that silently lost its largest chunks kept reporting outcome ok."
+				},
 				"duration_ms": { "type": "integer", "minimum": 0 }
 			}
 		},
@@ -661,6 +671,36 @@
 				"error_summary": { "type": "string" }
 			}
 		},
+		"historian.embedder.failed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["backend", "reason", "attempted", "failed"],
+			"properties": {
+				"backend": {
+					"type": "string",
+					"enum": ["ollama", "fastembed", "remote"]
+				},
+				"reason": {
+					"type": "string",
+					"enum": [
+						"no_curl",
+						"payload_build_failed",
+						"timeout",
+						"http_error",
+						"request_failed",
+						"empty_response",
+						"no_embedding_field",
+						"malformed_vector",
+						"oversized",
+						"backend_unsupported"
+					],
+					"description": "Why the embed calls failed, as the most common reason across the run. Distinct from historian.embedder.unavailable, which reports that the PROBE failed so no embed was attempted at all. Before ONL-123 all nine of these paths returned an empty string and emitted nothing, so a request that timed out and one that was never made were indistinguishable in the log."
+				},
+				"attempted": { "type": "integer", "minimum": 0 },
+				"failed": { "type": "integer", "minimum": 1 },
+				"error_summary": { "type": "string" }
+			}
+		},
 		"historian.retrieval.started": {
 			"type": "object",
 			"additionalProperties": false,
@@ -685,8 +725,10 @@
 						"budget",
 						"short_prompt",
 						"disabled",
-						"embedder_unavailable"
-					]
+						"embedder_unavailable",
+						"embed_failed"
+					],
+					"description": "Why nothing was retrieved. embedder_unavailable means the PROBE failed, so no embed was attempted; embed_failed means the probe passed and the embed call itself lost. The prompt path reported both as embedder_unavailable, which is wrong in the second case and is the same merge ONL-121 spent 2881 unattributable events paying for. The accompanying historian.embedder.failed carries which failure it was."
 				},
 				"top_similarity": { "type": "number", "minimum": 0, "maximum": 1 },
 				"candidates_above_floor": { "type": "integer", "minimum": 0 },

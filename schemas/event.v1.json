@@ -175,6 +175,7 @@
 				"historian.chunk.sanitized",
 				"historian.chunk.dropped",
 				"historian.embedder.unavailable",
+				"historian.embedder.failed",
 				"historian.retrieval.started",
 				"historian.retrieval.complete",
 				"historian.retrieval.surfaced",
