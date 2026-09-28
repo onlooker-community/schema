@@ -157,6 +157,7 @@ export const HISTORIAN_CHUNK_SANITIZED = "historian.chunk.sanitized" as const;
 export const HISTORIAN_CHUNK_DROPPED = "historian.chunk.dropped" as const;
 export const HISTORIAN_EMBEDDER_UNAVAILABLE =
 	"historian.embedder.unavailable" as const;
+export const HISTORIAN_EMBEDDER_FAILED = "historian.embedder.failed" as const;
 export const HISTORIAN_RETRIEVAL_STARTED =
 	"historian.retrieval.started" as const;
 export const HISTORIAN_RETRIEVAL_COMPLETE =
@@ -296,6 +297,7 @@ export const ALL_EVENT_TYPES = [
 	HISTORIAN_CHUNK_SANITIZED,
 	HISTORIAN_CHUNK_DROPPED,
 	HISTORIAN_EMBEDDER_UNAVAILABLE,
+	HISTORIAN_EMBEDDER_FAILED,
 	HISTORIAN_RETRIEVAL_STARTED,
 	HISTORIAN_RETRIEVAL_COMPLETE,
 	HISTORIAN_RETRIEVAL_SURFACED,

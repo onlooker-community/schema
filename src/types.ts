@@ -1182,6 +1182,15 @@ export interface HistorianIndexingCompletePayload {
 		| "transcript_file_missing";
 	chunks_indexed?: number;
 	chunks_dropped?: number;
+	/** Chunks written with a vector. */
+	chunks_embedded?: number;
+	/**
+	 * Chunks written without a vector. The retriever is embedding-only, so
+	 * these are persisted and unreachable. ONL-123: this count was previously
+	 * knowable only by reading the store, which is how an index that silently
+	 * lost its largest chunks kept reporting `outcome: "ok"`.
+	 */
+	chunks_unembedded?: number;
 	duration_ms: number;
 }
 
@@ -1196,6 +1205,35 @@ export interface HistorianChunkDroppedPayload {
 
 export interface HistorianEmbedderUnavailablePayload {
 	backend: HistorianEmbedderBackend;
+	error_summary?: string;
+}
+
+/**
+ * An embedder that was reachable but failed on the actual embed calls.
+ *
+ * Distinct from `historian.embedder.unavailable`, which reports that the
+ * *probe* failed so no embed was attempted at all. Before ONL-123 all nine
+ * failure paths returned an empty string and emitted nothing, so a request
+ * that timed out and one that was never made looked identical in the log.
+ *
+ * Aggregated per indexing run rather than per chunk: the SessionEnd hook runs
+ * against a ~1500ms budget and per-chunk emission would spend it.
+ */
+export interface HistorianEmbedderFailedPayload {
+	backend: HistorianEmbedderBackend;
+	/** The most common failure reason across the run. */
+	reason:
+		| "no_curl"
+		| "payload_build_failed"
+		| "timeout"
+		| "http_error"
+		| "empty_response"
+		| "no_embedding_field"
+		| "malformed_vector"
+		| "oversized"
+		| "backend_unsupported";
+	attempted: number;
+	failed: number;
 	error_summary?: string;
 }
 
@@ -1513,6 +1551,7 @@ export interface PayloadMap {
 	"historian.chunk.sanitized": HistorianChunkSanitizedPayload;
 	"historian.chunk.dropped": HistorianChunkDroppedPayload;
 	"historian.embedder.unavailable": HistorianEmbedderUnavailablePayload;
+	"historian.embedder.failed": HistorianEmbedderFailedPayload;
 	"historian.retrieval.started": HistorianRetrievalStartedPayload;
 	"historian.retrieval.complete": HistorianRetrievalCompletePayload;
 	"historian.retrieval.surfaced": HistorianRetrievalSurfacedPayload;
