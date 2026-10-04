@@ -1571,6 +1571,26 @@ describe("historian lifecycle events", () => {
 		expect(validate(event).valid).toBe(true);
 	});
 
+	// ONL-131. The retrieval query had no ceiling in front of it, so a prompt
+	// past the embedder's max_input_chars failed `oversized` inside the embedder
+	// and retrieval returned an empty context block — 93 of 246 live retrievals.
+	// Fitting the query to the limit fixes that, but a truncated query that looks
+	// identical to a complete one is the same silent degradation ONL-123 removed.
+	// embed_chars is what was actually sent, so embed_chars < prompt_chars is the
+	// truncation, readable from the one event without knowing the config.
+	it("validates retrieval.started reporting a truncated query", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_STARTED, {
+			prompt_chars: 42925,
+			embed_chars: 6000,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates retrieval.started omitting embed_chars when nothing was cut", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_STARTED, { prompt_chars: 240 });
+		expect(validate(event).valid).toBe(true);
+	});
+
 	it("rejects a negative chunks_unembedded", () => {
 		const event = hist(HISTORIAN_INDEXING_COMPLETE, {
 			outcome: "ok",
