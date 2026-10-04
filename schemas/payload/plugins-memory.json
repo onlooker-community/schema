@@ -706,7 +706,12 @@
 			"additionalProperties": false,
 			"required": ["prompt_chars"],
 			"properties": {
-				"prompt_chars": { "type": "integer", "minimum": 0 }
+				"prompt_chars": { "type": "integer", "minimum": 0 },
+				"embed_chars": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Characters actually sent to the embedder, when that differs from prompt_chars because the query was fitted to the embedder's max_input_chars. Absent means the whole prompt was embedded. The chunker fits indexed turns to that limit but nothing is upstream of the query, so a long prompt used to fail `oversized` and retrieve nothing — 93 of 246 live retrievals. Truncating fixes the retrieval; this field is what keeps the truncation from being invisible, since a shortened query that looks identical to a complete one is the same silent degradation ONL-123 removed. embed_chars < prompt_chars is the signal, readable without knowing the config at the time."
+				}
 			}
 		},
 		"historian.retrieval.complete": {
