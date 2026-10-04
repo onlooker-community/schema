@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.26.0](https://github.com/onlooker-community/schema/compare/v2.25.0...v2.26.0) (2026-10-04)
+
+
+### Features
+
+* **plugins:** make a truncated retrieval query observable :mag: ([#82](https://github.com/onlooker-community/schema/issues/82)) ([d75a2f9](https://github.com/onlooker-community/schema/commit/d75a2f9420c7a89def3280fddda89cc993404b5e))
+
 ## [2.25.0](https://github.com/onlooker-community/schema/compare/v2.24.0...v2.25.0) (2026-09-28)
 
 
