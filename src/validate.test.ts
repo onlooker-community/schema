@@ -2206,10 +2206,31 @@ describe("inspector per-file check events", () => {
 		expect(validate(event).valid).toBe(true);
 	});
 
-	it("rejects an unknown tool_name", () => {
+	// inspector watches Bash as well as Write/Edit/MultiEdit: a file edited
+	// through the shell -- a heredoc, sed -i, a short python script -- changes
+	// the filesystem without producing an edit tool call, and the per-edit gate
+	// had a hole exactly the width of the shell (ONL-28).
+	//
+	// Without this, inspector runs on shell edits and every resulting event is
+	// rejected here, which in production means silently dropped: the emitter
+	// fails open by design. The gate would look fixed while reporting nothing.
+	it("accepts Bash as a tool_name, for shell-shaped edits", () => {
 		const event = inspect(INSPECTOR_CHECK_PASSED, {
 			file_path: "/repo/src/a.ts",
 			tool_name: "Bash",
+			check_name: "biome",
+			check_kind: "lint",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// This case used "Bash" as its unknown tool, which is now a watched one. The
+	// example has to be a tool inspector genuinely never sees, or the test would
+	// assert the opposite of the behavior above.
+	it("rejects an unknown tool_name", () => {
+		const event = inspect(INSPECTOR_CHECK_PASSED, {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Read",
 			check_name: "biome",
 			check_kind: "lint",
 		} as never);

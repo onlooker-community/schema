@@ -738,7 +738,7 @@
 				"file_path_relative": { "type": "string" },
 				"tool_name": {
 					"type": "string",
-					"enum": ["Write", "Edit", "MultiEdit"]
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
 				},
 				"check_name": { "type": "string" },
 				"check_kind": {
@@ -768,7 +768,7 @@
 				"file_path_relative": { "type": "string" },
 				"tool_name": {
 					"type": "string",
-					"enum": ["Write", "Edit", "MultiEdit"]
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
 				},
 				"check_name": { "type": "string" },
 				"check_kind": {
@@ -799,7 +799,7 @@
 				"file_path_relative": { "type": "string" },
 				"tool_name": {
 					"type": "string",
-					"enum": ["Write", "Edit", "MultiEdit"]
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
 				},
 				"check_name": { "type": "string" },
 				"check_kind": {
@@ -838,7 +838,7 @@
 				"file_path_relative": { "type": "string" },
 				"tool_name": {
 					"type": "string",
-					"enum": ["Write", "Edit", "MultiEdit"]
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
 				},
 				"checks_run": { "type": "integer", "minimum": 0 },
 				"checks_passed": { "type": "integer", "minimum": 0 },
