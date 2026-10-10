@@ -1327,7 +1327,10 @@ export interface AssayerAuditCompletePayload {
 	duration_ms?: number;
 }
 
-export type InspectorToolName = "Write" | "Edit" | "MultiEdit";
+// Bash included because inspector watches shell-shaped edits too: a file
+// changed by a heredoc, sed -i or a short script produces no edit tool call
+// (ONL-28). Keep in step with the enum in schemas/payload/plugins-ops.json.
+export type InspectorToolName = "Write" | "Edit" | "MultiEdit" | "Bash";
 
 export type InspectorCheckKind = "lint" | "typecheck";
 
