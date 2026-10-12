@@ -46,6 +46,16 @@
 			"format": "uuid",
 			"description": "Stable, anonymous machine identifier (UUID)."
 		},
+		"project": {
+			"type": "string",
+			"pattern": "^[0-9a-f]{12}$",
+			"description": "Optional project identifier: the first 12 hex chars of SHA256(\"remote:<origin-url>\"), falling back to SHA256(\"root:<repo-root>\"). A hash, never a path, so no directory or repository name leaves the machine. Absent when the emitter could not resolve one - which means either not a git repository, or an emitter older than 2.28.0."
+		},
+		"project_basis": {
+			"type": "string",
+			"enum": ["remote", "root"],
+			"description": "Which derivation produced `project`. \"remote\" is portable across machines; \"root\" is machine-local, so the same remote-less repository on two machines yields two different keys. Consumers aggregating per repository should treat the two differently."
+		},
 		"timestamp": {
 			"type": "string",
 			"format": "date-time",
@@ -157,6 +167,7 @@
 				"librarian.proposal.merged",
 				"librarian.proposal.superseded",
 				"librarian.tombstone.created",
+				"librarian.lesson.promoted",
 				"curator.scan.started",
 				"curator.scan.complete",
 				"curator.finding.date_decayed",

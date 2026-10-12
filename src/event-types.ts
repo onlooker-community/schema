@@ -123,6 +123,7 @@ export const LIBRARIAN_PROPOSAL_REJECTED =
 export const LIBRARIAN_PROPOSAL_MERGED = "librarian.proposal.merged" as const;
 export const LIBRARIAN_PROPOSAL_SUPERSEDED =
 	"librarian.proposal.superseded" as const;
+export const LIBRARIAN_LESSON_PROMOTED = "librarian.lesson.promoted" as const;
 export const LIBRARIAN_TOMBSTONE_CREATED =
 	"librarian.tombstone.created" as const;
 
@@ -278,6 +279,7 @@ export const ALL_EVENT_TYPES = [
 	LIBRARIAN_PROPOSAL_REJECTED,
 	LIBRARIAN_PROPOSAL_MERGED,
 	LIBRARIAN_PROPOSAL_SUPERSEDED,
+	LIBRARIAN_LESSON_PROMOTED,
 	LIBRARIAN_TOMBSTONE_CREATED,
 	CURATOR_SCAN_STARTED,
 	CURATOR_SCAN_COMPLETE,
