@@ -1070,6 +1070,22 @@ export interface LibrarianTombstoneCreatedPayload {
 	original_filename?: string;
 }
 
+/**
+ * Emitted where `lessons/` is actually written, which is the promotion step and
+ * not session end. Distinguishes "wrote a lesson" from "ran a scan": the three
+ * `librarian.scan.*` types report on the scan, so without this a consumer can
+ * never open a write axis for librarian.
+ *
+ * `outcome` is approved|rejected because that is the status vocabulary
+ * `librarian_lesson_promote` branches on. `declined.jsonl` is the file a
+ * rejected lesson lands in, not a status.
+ */
+export interface LibrarianLessonPromotedPayload {
+	lesson_id: string;
+	outcome: "approved" | "rejected";
+	duration_ms: number;
+}
+
 export type CuratorScanMode = "cheap" | "llm" | "manual";
 
 export interface CuratorScanStartedPayload {
@@ -1541,6 +1557,7 @@ export interface PayloadMap {
 	"librarian.proposal.rejected": LibrarianProposalRejectedPayload;
 	"librarian.proposal.merged": LibrarianProposalMergedPayload;
 	"librarian.proposal.superseded": LibrarianProposalSupersededPayload;
+	"librarian.lesson.promoted": LibrarianLessonPromotedPayload;
 	"librarian.tombstone.created": LibrarianTombstoneCreatedPayload;
 	"curator.scan.started": CuratorScanStartedPayload;
 	"curator.scan.complete": CuratorScanCompletePayload;
@@ -1626,4 +1643,16 @@ export interface OnlookerEvent<T extends EventType = EventType> {
 	cost_usd?: number;
 	token_count?: number;
 	redacted?: boolean;
+	/**
+	 * Project identifier: first 12 hex chars of SHA256("remote:<origin-url>"),
+	 * falling back to SHA256("root:<repo-root>"). A hash, never a path. Absent
+	 * when unresolvable - not a git repository, or a pre-2.28.0 emitter.
+	 */
+	project?: string;
+	/**
+	 * Which derivation produced `project`. "remote" is portable across machines;
+	 * "root" is machine-local, so one remote-less repository checked out on two
+	 * machines yields two different keys.
+	 */
+	project_basis?: "remote" | "root";
 }

@@ -50,6 +50,7 @@ import {
 	isEventType,
 	LIBRARIAN_CANDIDATE_DROPPED,
 	LIBRARIAN_CANDIDATE_PROPOSED,
+	LIBRARIAN_LESSON_PROMOTED,
 	LIBRARIAN_PROPOSAL_ACCEPTED,
 	LIBRARIAN_SCAN_COMPLETE,
 	LIBRARIAN_SCAN_STARTED,
@@ -1374,6 +1375,69 @@ describe("librarian lifecycle events", () => {
 			typeof createEvent<typeof LIBRARIAN_CANDIDATE_DROPPED>
 		>[0]["payload"]);
 		expect(validate(event).valid).toBe(true);
+	});
+
+	// ONL-7: librarian's analytical output is lessons/, and until now it emitted no
+	// event when it wrote there. The three scan.* types report on the SCAN, not the
+	// write, so a consumer could never distinguish "wrote a lesson" from "ran a
+	// scan". The outcome vocabulary is approved|rejected because that is what
+	// librarian_lesson_promote actually branches on; declined.jsonl is only the
+	// file a rejected lesson lands in, not a status.
+	it("validates an approved lesson promotion", () => {
+		const event = lib(LIBRARIAN_LESSON_PROMOTED, {
+			lesson_id: "01M4PD9CBE2F2QTH6D5690K1W6",
+			outcome: "approved",
+			duration_ms: 42,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates both promotion outcomes", () => {
+		for (const outcome of ["approved", "rejected"]) {
+			const event = lib(LIBRARIAN_LESSON_PROMOTED, {
+				lesson_id: "01M4PD9CBE2F2QTH6D5690K1W6",
+				outcome,
+				duration_ms: 7,
+			} as Parameters<
+				typeof createEvent<typeof LIBRARIAN_LESSON_PROMOTED>
+			>[0]["payload"]);
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	// "declined" is the plausible wrong value: it is the filename, and it was in an
+	// earlier draft of this schema. Pinning it keeps the enum matching the code.
+	it("rejects a promotion outcome outside the enum", () => {
+		const event = lib(LIBRARIAN_LESSON_PROMOTED, {
+			lesson_id: "01M4PD9CBE2F2QTH6D5690K1W6",
+			outcome: "declined",
+			duration_ms: 7,
+		} as unknown as Parameters<
+			typeof createEvent<typeof LIBRARIAN_LESSON_PROMOTED>
+		>[0]["payload"]);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects a promotion missing duration_ms", () => {
+		const event = lib(LIBRARIAN_LESSON_PROMOTED, {
+			lesson_id: "01M4PD9CBE2F2QTH6D5690K1W6",
+			outcome: "approved",
+		} as unknown as Parameters<
+			typeof createEvent<typeof LIBRARIAN_LESSON_PROMOTED>
+		>[0]["payload"]);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects an unknown field on a promotion payload", () => {
+		const event = lib(LIBRARIAN_LESSON_PROMOTED, {
+			lesson_id: "01M4PD9CBE2F2QTH6D5690K1W6",
+			outcome: "approved",
+			duration_ms: 7,
+			visibility: "public",
+		} as unknown as Parameters<
+			typeof createEvent<typeof LIBRARIAN_LESSON_PROMOTED>
+		>[0]["payload"]);
+		expect(validate(event).valid).toBe(false);
 	});
 });
 
@@ -2778,13 +2842,80 @@ describe("historian.indexing.complete skip reasons", () => {
 	});
 });
 
+describe("the project dimension on the envelope", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	// ONL-129. A project key existed before this, but only inside payload and only
+	// for five plugins — and payloads never cross into the hosted side by design,
+	// so the key that did exist was structurally unreachable. Both fields are
+	// optional: absence means "not attributable", which covers both a non-git
+	// directory and an emitter older than this release.
+	it("accepts a remote-derived project key", () => {
+		const event = {
+			...baseValid(),
+			project: "ee2cfbe428c7",
+			project_basis: "remote",
+		};
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("accepts a root-derived project key", () => {
+		const event = {
+			...baseValid(),
+			project: "bc046590dad9",
+			project_basis: "root",
+		};
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("accepts an envelope carrying neither field", () => {
+		expect(validate(baseValid()).valid).toBe(true);
+	});
+
+	// The key must stay byte-identical to the on-disk directory name under
+	// $ONLOOKER_DIR/<plugin>/<key>/, so the shape is pinned rather than left to a
+	// bare string. These are the shapes a hand-written or truncated value takes.
+	it("rejects a project key that is not 12 lowercase hex chars", () => {
+		for (const bad of [
+			"EE2CFBE428C7",
+			"ee2cfbe428c",
+			"ee2cfbe428c7a",
+			"ee2cfbe428g7",
+			"",
+			"remote:ee2cfbe428c7",
+		]) {
+			const event = { ...baseValid(), project: bad };
+			expect(validate(event).valid, `expected ${bad} to be rejected`).toBe(
+				false,
+			);
+		}
+	});
+
+	it("rejects a basis outside the enum", () => {
+		const event = { ...baseValid(), project_basis: "cwd" };
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("names project_basis in the error path", () => {
+		const result = validate({ ...baseValid(), project_basis: "cwd" });
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors.some((e) => e.path.includes("project_basis"))).toBe(
+				true,
+			);
+		}
+	});
+});
+
 describe("ALL_EVENT_TYPES", () => {
 	it("has no duplicates", () => {
 		const set = new Set<EventType>(ALL_EVENT_TYPES);
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 132 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(132);
+	it("has exactly 133 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(133);
 	});
 });

@@ -447,6 +447,16 @@
 				"original_filename": { "type": "string" }
 			}
 		},
+		"librarian.lesson.promoted": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lesson_id", "outcome", "duration_ms"],
+			"properties": {
+				"lesson_id": { "type": "string" },
+				"outcome": { "type": "string", "enum": ["approved", "rejected"] },
+				"duration_ms": { "type": "integer", "minimum": 0 }
+			}
+		},
 		"curator.scan.started": {
 			"type": "object",
 			"additionalProperties": false,
