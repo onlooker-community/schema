@@ -4,6 +4,17 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0](https://github.com/onlooker-community/schema/compare/v2.28.0...v3.0.0) (2026-10-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* **counsel:** name signal classes, not plugins that never shipped :broom: ([#88](https://github.com/onlooker-community/schema/issues/88))
+
+### Features
+
+* **counsel:** name signal classes, not plugins that never shipped :broom: ([#88](https://github.com/onlooker-community/schema/issues/88)) ([903124d](https://github.com/onlooker-community/schema/commit/903124d64ddd26a09b312ce14d4eafa7f0470ca1))
+
 ## [2.28.0](https://github.com/onlooker-community/schema/compare/v2.27.0...v2.28.0) (2026-10-12)
 
 
