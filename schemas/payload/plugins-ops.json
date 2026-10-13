@@ -444,14 +444,14 @@
 					"type": "array",
 					"items": {
 						"type": "string",
+						"description": "Which classes of signal the brief reasoned over. Named by what the brief consulted, not by which plugin emitted: a weekly brief distinguishes a blocked gate from a failed check from budget pressure, and does not need to know that compass rather than warden did the blocking - the synthesis prompt reads the event types themselves for that. Buckets also survive a new plugin, which a per-plugin value cannot: a plugin added to an existing bucket needs no schema release before counsel can see it.",
 						"enum": [
 							"onlooker_events",
-							"tribunal_verdicts",
-							"echo_regressions",
-							"sentinel_audit",
-							"warden_audit",
-							"oracle_calibrations",
-							"meridian_reliance"
+							"gate_blocks",
+							"verification",
+							"memory",
+							"cost",
+							"provenance"
 						]
 					}
 				}
