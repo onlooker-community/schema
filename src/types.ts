@@ -834,14 +834,35 @@ export interface EchoImprovementDetectedPayload {
 	confidence?: number;
 }
 
+/**
+ * Which classes of signal a weekly brief reasoned over.
+ *
+ * Buckets, not one value per plugin. A brief distinguishes a blocked gate from
+ * a failed check from budget pressure; it does not need the value to say which
+ * plugin did the blocking, because the synthesis prompt reads the event types
+ * themselves. And a bucket survives a new plugin where a per-plugin value
+ * cannot - one added to an existing bucket needs no schema release before
+ * counsel can report it.
+ *
+ * - `gate_blocks`   compass, warden, tribunal
+ * - `verification`  inspector, assayer, echo
+ * - `memory`        librarian, curator, historian, scribe
+ * - `cost`          governor, bursar
+ * - `provenance`    lineage, cartographer
+ * - `onlooker_events` the substrate's own: session, tool, skill, task, memory
+ *
+ * Replaces an earlier per-plugin set whose `sentinel_audit`,
+ * `oracle_calibrations` and `meridian_reliance` named plugins that were never
+ * built, and which left every real plugin but three falling through to
+ * `onlooker_events`. No stored event carried any of the six retired values.
+ */
 export type CounselSource =
 	| "onlooker_events"
-	| "tribunal_verdicts"
-	| "echo_regressions"
-	| "sentinel_audit"
-	| "warden_audit"
-	| "oracle_calibrations"
-	| "meridian_reliance";
+	| "gate_blocks"
+	| "verification"
+	| "memory"
+	| "cost"
+	| "provenance";
 
 export interface CounselBriefGeneratedPayload {
 	period_start: string;

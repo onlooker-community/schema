@@ -18,6 +18,7 @@ import {
 	CARTOGRAPHER_ISSUE_FOUND,
 	CARTOGRAPHER_ISSUE_RESOLVED,
 	COMPASS_CHECK_FAILED,
+	COUNSEL_BRIEF_GENERATED,
 	CURATOR_FINDING_CONTRADICTION,
 	CURATOR_FINDING_DATE_DECAYED,
 	CURATOR_FINDING_PATH_BROKEN,
@@ -2906,6 +2907,84 @@ describe("the project dimension on the envelope", () => {
 				true,
 			);
 		}
+	});
+});
+
+describe("counsel.brief.generated sources_consulted", () => {
+	function brief(sources: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "counsel",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type: COUNSEL_BRIEF_GENERATED,
+			payload: {
+				period_start: "2026-10-01T00:00:00Z",
+				period_end: "2026-10-08T00:00:00Z",
+				recommendation_count: 3,
+				sources_consulted: sources,
+			} as never,
+		});
+	}
+
+	// Every bucket, so a typo in one value cannot hide behind the others
+	// passing. These are the only values anything may emit.
+	it.each([
+		"onlooker_events",
+		"gate_blocks",
+		"verification",
+		"memory",
+		"cost",
+		"provenance",
+	])("accepts %s", (source) => {
+		expect(validate(brief([source])).valid).toBe(true);
+	});
+
+	it("accepts several buckets at once", () => {
+		const result = validate(
+			brief(["gate_blocks", "verification", "cost", "onlooker_events"]),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	// The six values this enum replaced. Three named plugins that were never
+	// built (sentinel, oracle, meridian); the other three were per-plugin
+	// values absorbed into buckets. No stored event carried any of them, which
+	// is what made removing them safe - so emitting one now is a regression
+	// toward the old scheme, not backward compatibility.
+	it.each([
+		"tribunal_verdicts",
+		"echo_regressions",
+		"warden_audit",
+		"sentinel_audit",
+		"oracle_calibrations",
+		"meridian_reliance",
+	])("rejects the retired value %s", (retired) => {
+		const result = validate(brief([retired]));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(
+				result.errors.some((e) => e.path.includes("sources_consulted")),
+			).toBe(true);
+		}
+	});
+
+	// sources_consulted is optional, and counsel omits it rather than sending
+	// an empty array when it has read nothing.
+	it("accepts a brief with no sources_consulted at all", () => {
+		const event = createEvent({
+			runtime: "claude-code",
+			plugin: "counsel",
+			machine_id: MACHINE_ID,
+			session_id: SESSION_ID,
+			event_type: COUNSEL_BRIEF_GENERATED,
+			payload: {
+				period_start: "2026-10-01T00:00:00Z",
+				period_end: "2026-10-08T00:00:00Z",
+				recommendation_count: 0,
+			},
+		});
+		expect(validate(event).valid).toBe(true);
 	});
 });
 
