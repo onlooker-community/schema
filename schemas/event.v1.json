@@ -105,6 +105,7 @@
 				"tribunal.dissent.recorded",
 				"tribunal.gate.passed",
 				"tribunal.gate.blocked",
+				"tribunal.gate.skipped",
 				"warden.threat.detected",
 				"warden.threat.cleared",
 				"warden.gate.blocked",
