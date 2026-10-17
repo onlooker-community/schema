@@ -315,6 +315,21 @@ export interface TribunalGateBlockedPayload {
 	failed_criterion?: string;
 }
 
+export interface TribunalGateSkippedPayload {
+	reason:
+		| "disabled"
+		| "no_project_context"
+		| "no_transcript"
+		| "empty_transcript"
+		| "no_file_changes"
+		| "claude_unavailable"
+		| "judge_timeout"
+		| "judge_error"
+		| "judge_no_response"
+		| "judge_unparseable";
+	iteration_id?: string;
+}
+
 export interface WardenThreatDetectedPayload {
 	source_type: "web_fetch" | "file_read";
 	threat_type:
@@ -1520,6 +1535,7 @@ export interface PayloadMap {
 	"tribunal.dissent.recorded": TribunalDissentRecordedPayload;
 	"tribunal.gate.passed": TribunalGatePassedPayload;
 	"tribunal.gate.blocked": TribunalGateBlockedPayload;
+	"tribunal.gate.skipped": TribunalGateSkippedPayload;
 	"warden.threat.detected": WardenThreatDetectedPayload;
 	"warden.threat.cleared": WardenThreatClearedPayload;
 	"warden.gate.blocked": WardenGateBlockedPayload;

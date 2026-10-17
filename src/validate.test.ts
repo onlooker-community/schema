@@ -72,6 +72,7 @@ import {
 	TRIBUNAL_DISSENT_RECORDED,
 	TRIBUNAL_GATE_BLOCKED,
 	TRIBUNAL_GATE_PASSED,
+	TRIBUNAL_GATE_SKIPPED,
 	TRIBUNAL_ITERATION_START,
 	TRIBUNAL_JUDGE_START,
 	TRIBUNAL_JURY_EMPANELED,
@@ -656,6 +657,70 @@ describe("tribunal full-loop events", () => {
 			}),
 		);
 		expect(result.valid).toBe(true);
+	});
+
+	it("accepts a gate.skipped with only a reason", () => {
+		// The pre-dispatch shape. A skipped gate never minted a task or an
+		// iteration, so unlike gate.passed/blocked neither is required.
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_SKIPPED, { reason: "disabled" }),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	it("accepts a gate.skipped carrying the iteration it abandoned", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_SKIPPED, {
+				reason: "judge_timeout",
+				iteration_id: ITERATION_ID,
+			}),
+		);
+		expect(result.valid).toBe(true);
+	});
+
+	// Each of the three below needs an explicit cast to reach the validator at
+	// all: TribunalGateSkippedPayload rejects them at compile time too, which is
+	// the hand-written types in src/types.ts agreeing with the JSON schema. The
+	// cast is what lets the runtime guard be tested independently of that.
+	it("rejects a gate.skipped with no reason", () => {
+		// The reason IS the event. Without it this says only "something was
+		// skipped", which is the ambiguity ONL-172 exists to close.
+		const result = validate(
+			tribunal(
+				TRIBUNAL_GATE_SKIPPED,
+				{} as unknown as Parameters<
+					typeof createEvent<typeof TRIBUNAL_GATE_SKIPPED>
+				>[0]["payload"],
+			),
+		);
+		expect(result.valid).toBe(false);
+	});
+
+	it("rejects a gate.skipped with an unregistered reason", () => {
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_SKIPPED, {
+				reason: "because_i_said_so",
+			} as unknown as Parameters<
+				typeof createEvent<typeof TRIBUNAL_GATE_SKIPPED>
+			>[0]["payload"]),
+		);
+		expect(result.valid).toBe(false);
+	});
+
+	it("rejects a gate.skipped carrying task_id, which it never has", () => {
+		// gate.passed and gate.blocked both REQUIRE task_id. This one never
+		// minted a task, so carrying one would mean the gate had started work
+		// it then skipped -- a contradiction additionalProperties:false keeps
+		// out of the store.
+		const result = validate(
+			tribunal(TRIBUNAL_GATE_SKIPPED, {
+				reason: "disabled",
+				task_id: TASK_ID,
+			} as unknown as Parameters<
+				typeof createEvent<typeof TRIBUNAL_GATE_SKIPPED>
+			>[0]["payload"]),
+		);
+		expect(result.valid).toBe(false);
 	});
 
 	it("accepts a gate.blocked with reason criterion_floor and a failed_criterion", () => {
@@ -2994,7 +3059,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 133 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(133);
+	it("has exactly 134 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(134);
 	});
 });

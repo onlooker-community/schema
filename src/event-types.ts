@@ -35,6 +35,7 @@ export const TRIBUNAL_CONSENSUS_REACHED = "tribunal.consensus.reached" as const;
 export const TRIBUNAL_DISSENT_RECORDED = "tribunal.dissent.recorded" as const;
 export const TRIBUNAL_GATE_PASSED = "tribunal.gate.passed" as const;
 export const TRIBUNAL_GATE_BLOCKED = "tribunal.gate.blocked" as const;
+export const TRIBUNAL_GATE_SKIPPED = "tribunal.gate.skipped" as const;
 
 export const WARDEN_THREAT_DETECTED = "warden.threat.detected" as const;
 export const WARDEN_THREAT_CLEARED = "warden.threat.cleared" as const;
@@ -218,6 +219,7 @@ export const ALL_EVENT_TYPES = [
 	TRIBUNAL_DISSENT_RECORDED,
 	TRIBUNAL_GATE_PASSED,
 	TRIBUNAL_GATE_BLOCKED,
+	TRIBUNAL_GATE_SKIPPED,
 	WARDEN_THREAT_DETECTED,
 	WARDEN_THREAT_CLEARED,
 	WARDEN_GATE_BLOCKED,
