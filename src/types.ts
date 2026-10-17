@@ -327,7 +327,6 @@ export interface TribunalGateSkippedPayload {
 		| "judge_error"
 		| "judge_no_response"
 		| "judge_unparseable";
-	iteration_id?: string;
 }
 
 export interface WardenThreatDetectedPayload {

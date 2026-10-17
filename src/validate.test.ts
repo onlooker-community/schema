@@ -668,14 +668,22 @@ describe("tribunal full-loop events", () => {
 		expect(result.valid).toBe(true);
 	});
 
-	it("accepts a gate.skipped carrying the iteration it abandoned", () => {
+	it("rejects a gate.skipped carrying an iteration_id", () => {
+		// There is no emit site that could populate one. tribunal-stop-gate.sh
+		// mints TASK_ID, ITERATION_ID and JUDGE_ID at :204-206, which is AFTER
+		// every bail that reaches this event -- including the post-dispatch
+		// ones, since the judge runs before the iteration is minted. An
+		// optional field nothing can fill is the dead-config shape ONL-32 and
+		// ecosystem-449.65 were filed for, so the schema refuses it outright.
 		const result = validate(
 			tribunal(TRIBUNAL_GATE_SKIPPED, {
 				reason: "judge_timeout",
 				iteration_id: ITERATION_ID,
-			}),
+			} as unknown as Parameters<
+				typeof createEvent<typeof TRIBUNAL_GATE_SKIPPED>
+			>[0]["payload"]),
 		);
-		expect(result.valid).toBe(true);
+		expect(result.valid).toBe(false);
 	});
 
 	// Each of the three below needs an explicit cast to reach the validator at

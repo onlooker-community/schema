@@ -390,10 +390,6 @@
 						"judge_unparseable"
 					],
 					"description": "Why the Stop gate judged nothing. Without this the only signal is the ABSENCE of tribunal.gate.passed/blocked, which cannot distinguish 'the gate is switched off' from 'the emitter is broken' — and that is not a hypothetical reading: check-plugin-liveness reported tribunal as a broken emitter over 3398 hook runs while stop_hook.enabled was false, and its own suggested remedy of a wider window then reported the plugin healthy on 1076 events that all predated the off-switch (ONL-172). `disabled` is that case and is expected to dominate wherever the gate is off by default. The first six reasons are decided BEFORE any model call and cost nothing. The last four are reached only after a judge was dispatched, so they are the shapes where a Stop spent a model call and produced no verdict — the invisible-spend problem ecosystem-449.32 closed for hook-health, reported here on the bus. judge_timeout is the timeout(1) 124 convention; judge_unparseable means the judge answered but not with a usable verdict object."
-				},
-				"iteration_id": {
-					"type": "string",
-					"description": "Present only for the post-dispatch reasons, where an iteration had already been minted. Absent for the six pre-dispatch ones, which are decided before the gate mints anything."
 				}
 			}
 		},
