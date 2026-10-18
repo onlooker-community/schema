@@ -4,6 +4,18 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0](https://github.com/onlooker-community/schema/compare/v3.0.0...v3.1.0) (2026-10-18)
+
+
+### Features
+
+* **tribunal:** tell a disabled gate from a broken one :mag: ([#90](https://github.com/onlooker-community/schema/issues/90)) ([098b26f](https://github.com/onlooker-community/schema/commit/098b26f557e81bd6fae874f1b69ea649d9982206))
+
+
+### Bug Fixes
+
+* **tribunal:** drop a gate.skipped field nothing can populate :coffin: ([#92](https://github.com/onlooker-community/schema/issues/92)) ([223a948](https://github.com/onlooker-community/schema/commit/223a948a9ec42ac9fd550a2696229ccb13643615))
+
 ## [3.0.0](https://github.com/onlooker-community/schema/compare/v2.28.0...v3.0.0) (2026-10-13)
 
 
