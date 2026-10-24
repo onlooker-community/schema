@@ -124,7 +124,13 @@ export const LIBRARIAN_PROPOSAL_REJECTED =
 export const LIBRARIAN_PROPOSAL_MERGED = "librarian.proposal.merged" as const;
 export const LIBRARIAN_PROPOSAL_SUPERSEDED =
 	"librarian.proposal.superseded" as const;
+export const LIBRARIAN_LESSON_ASSERTED = "librarian.lesson.asserted" as const;
+export const LIBRARIAN_LESSON_JUDGED = "librarian.lesson.judged" as const;
 export const LIBRARIAN_LESSON_PROMOTED = "librarian.lesson.promoted" as const;
+export const LIBRARIAN_LESSON_SHIPPED = "librarian.lesson.shipped" as const;
+export const LIBRARIAN_LESSON_VETOED = "librarian.lesson.vetoed" as const;
+export const LIBRARIAN_AUTOJURY_COMPLETE =
+	"librarian.autojury.complete" as const;
 export const LIBRARIAN_TOMBSTONE_CREATED =
 	"librarian.tombstone.created" as const;
 
@@ -281,7 +287,12 @@ export const ALL_EVENT_TYPES = [
 	LIBRARIAN_PROPOSAL_REJECTED,
 	LIBRARIAN_PROPOSAL_MERGED,
 	LIBRARIAN_PROPOSAL_SUPERSEDED,
+	LIBRARIAN_LESSON_ASSERTED,
+	LIBRARIAN_LESSON_JUDGED,
 	LIBRARIAN_LESSON_PROMOTED,
+	LIBRARIAN_LESSON_SHIPPED,
+	LIBRARIAN_LESSON_VETOED,
+	LIBRARIAN_AUTOJURY_COMPLETE,
 	LIBRARIAN_TOMBSTONE_CREATED,
 	CURATOR_SCAN_STARTED,
 	CURATOR_SCAN_COMPLETE,

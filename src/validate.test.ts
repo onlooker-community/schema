@@ -49,9 +49,14 @@ import {
 	INSPECTOR_CHECK_SKIPPED,
 	INSPECTOR_RUN_COMPLETED,
 	isEventType,
+	LIBRARIAN_AUTOJURY_COMPLETE,
 	LIBRARIAN_CANDIDATE_DROPPED,
 	LIBRARIAN_CANDIDATE_PROPOSED,
+	LIBRARIAN_LESSON_ASSERTED,
+	LIBRARIAN_LESSON_JUDGED,
 	LIBRARIAN_LESSON_PROMOTED,
+	LIBRARIAN_LESSON_SHIPPED,
+	LIBRARIAN_LESSON_VETOED,
 	LIBRARIAN_PROPOSAL_ACCEPTED,
 	LIBRARIAN_SCAN_COMPLETE,
 	LIBRARIAN_SCAN_STARTED,
@@ -1511,6 +1516,218 @@ describe("librarian lifecycle events", () => {
 		} as unknown as Parameters<
 			typeof createEvent<typeof LIBRARIAN_LESSON_PROMOTED>
 		>[0]["payload"]);
+		expect(validate(event).valid).toBe(false);
+	});
+});
+
+// ONL-116. The unattended lesson pipeline (librarian's stage 6) was the only
+// path in librarian invisible to the bus: no event for the model's assertion,
+// the jury, the veto-window hold, the sweep out of it, or a veto. These are
+// what reconstruct "what did the unattended jury do last week" from the log
+// alone. No payload carries free text: refusal and veto reasons are model or
+// human prose about a repository, and they already live on the proposal and
+// in the declined ledger.
+describe("librarian unattended lesson events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const LESSON_ID = "01M5QB0KP91S836FM5642MTXD9";
+
+	function lib<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "librarian",
+			machine_id: MACHINE_ID,
+			session_id: "session-lib-auto",
+			event_type,
+			payload,
+		});
+	}
+
+	function loose<T extends EventType>(event_type: T, payload: unknown) {
+		return lib(
+			event_type,
+			payload as Parameters<typeof createEvent<T>>[0]["payload"],
+		);
+	}
+
+	it("validates every assertion outcome", () => {
+		for (const outcome of ["asserted", "refused", "unavailable"]) {
+			const event = loose(LIBRARIAN_LESSON_ASSERTED, {
+				lesson_id: LESSON_ID,
+				outcome,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	// A bare REFUSE is recorded with a null reason, and "refused without
+	// saying why" is a different finding from "refused, here is why" (ONL-183).
+	it("validates a refusal that records whether a reason was given", () => {
+		const event = lib(LIBRARIAN_LESSON_ASSERTED, {
+			lesson_id: LESSON_ID,
+			outcome: "refused",
+			reason_given: false,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// skipped:not_parked is not an assertion at all, so it has no outcome here.
+	it("rejects an assertion outcome outside the enum", () => {
+		const event = loose(LIBRARIAN_LESSON_ASSERTED, {
+			lesson_id: LESSON_ID,
+			outcome: "not_parked",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects a refusal reason carried as text", () => {
+		const event = loose(LIBRARIAN_LESSON_ASSERTED, {
+			lesson_id: LESSON_ID,
+			outcome: "refused",
+			reason: "the claim names this repo's own plugin",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates a juried verdict from either asserter", () => {
+		for (const asserted_by of ["model", "human"]) {
+			const event = loose(LIBRARIAN_LESSON_JUDGED, {
+				lesson_id: LESSON_ID,
+				outcome: "approved",
+				asserted_by,
+				juried: true,
+				aggregate_score: 0.82,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	// A private lesson passes with reason private_no_jury and no panel, so
+	// approved alone would overstate what was checked.
+	it("validates a private lesson that passed without a jury", () => {
+		const event = lib(LIBRARIAN_LESSON_JUDGED, {
+			lesson_id: LESSON_ID,
+			outcome: "approved",
+			asserted_by: "human",
+			juried: false,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	// Each of these leaves the lesson confirmed, and an unattended scan
+	// re-bills both judges for it next time.
+	it("validates every unjudged reason", () => {
+		for (const unjudged_reason of [
+			"panel_mismatch",
+			"criterion_unscored",
+			"coverage_below_min",
+		]) {
+			const event = loose(LIBRARIAN_LESSON_JUDGED, {
+				lesson_id: LESSON_ID,
+				outcome: "unjudged",
+				asserted_by: "model",
+				juried: true,
+				unjudged_reason,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("rejects a verdict missing asserted_by", () => {
+		const event = loose(LIBRARIAN_LESSON_JUDGED, {
+			lesson_id: LESSON_ID,
+			outcome: "rejected",
+			juried: true,
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects an aggregate score above 1", () => {
+		const event = loose(LIBRARIAN_LESSON_JUDGED, {
+			lesson_id: LESSON_ID,
+			outcome: "approved",
+			asserted_by: "model",
+			juried: true,
+			aggregate_score: 1.4,
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	// Additive: every promotion emitted before this field existed stays valid.
+	it("validates a promotion with and without the held flag", () => {
+		const held = lib(LIBRARIAN_LESSON_PROMOTED, {
+			lesson_id: LESSON_ID,
+			outcome: "approved",
+			duration_ms: 12,
+			held: true,
+		});
+		const bare = lib(LIBRARIAN_LESSON_PROMOTED, {
+			lesson_id: LESSON_ID,
+			outcome: "approved",
+			duration_ms: 12,
+		});
+		expect(validate(held).valid).toBe(true);
+		expect(validate(bare).valid).toBe(true);
+	});
+
+	it("validates a lesson swept out of the hold", () => {
+		const event = lib(LIBRARIAN_LESSON_SHIPPED, {
+			lesson_id: LESSON_ID,
+			held_ms: 259_200_000,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a negative hold duration", () => {
+		const event = loose(LIBRARIAN_LESSON_SHIPPED, {
+			lesson_id: LESSON_ID,
+			held_ms: -1,
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates a veto", () => {
+		const event = lib(LIBRARIAN_LESSON_VETOED, {
+			lesson_id: LESSON_ID,
+			reason_given: true,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a veto reason carried as text", () => {
+		const event = loose(LIBRARIAN_LESSON_VETOED, {
+			lesson_id: LESSON_ID,
+			reason_given: true,
+			reason: "not ready to share",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates a stage summary", () => {
+		const event = lib(LIBRARIAN_AUTOJURY_COMPLETE, {
+			asserted: 2,
+			refused: 5,
+			unavailable: 0,
+			juried: 1,
+			deferred_by_cap: 1,
+			duration_ms: 48_000,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a stage summary missing the cap count", () => {
+		const event = loose(LIBRARIAN_AUTOJURY_COMPLETE, {
+			asserted: 2,
+			refused: 5,
+			unavailable: 0,
+			juried: 1,
+			duration_ms: 48_000,
+		});
 		expect(validate(event).valid).toBe(false);
 	});
 });
@@ -3067,7 +3284,7 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 134 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(134);
+	it("has exactly 139 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(139);
 	});
 });

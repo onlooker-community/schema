@@ -454,6 +454,112 @@
 			"properties": {
 				"lesson_id": { "type": "string" },
 				"outcome": { "type": "string", "enum": ["approved", "rejected"] },
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"held": {
+					"type": "boolean",
+					"description": "True when the lesson went to the veto-window hold rather than straight to approved/. Only a model-asserted approval is held. Absent from emitters older than this field."
+				}
+			}
+		},
+		"librarian.lesson.asserted": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lesson_id", "outcome"],
+			"properties": {
+				"lesson_id": { "type": "string" },
+				"outcome": {
+					"type": "string",
+					"enum": ["asserted", "refused", "unavailable"],
+					"description": "The unattended stage's attempt to have a model justify a parked lesson as version-independent. asserted confirmed it for a jury; refused left it pending for a human; unavailable wrote nothing (no model response, or the proposal could not be read or confirmed). A lesson that was not parked is never asked, so it emits nothing."
+				},
+				"reason_given": {
+					"type": "boolean",
+					"description": "On a refusal, whether the model said why. The reason itself stays on the proposal."
+				}
+			}
+		},
+		"librarian.lesson.judged": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lesson_id", "outcome", "asserted_by", "juried"],
+			"properties": {
+				"lesson_id": { "type": "string" },
+				"outcome": {
+					"type": "string",
+					"enum": ["approved", "rejected", "unjudged"],
+					"description": "unjudged means the panel could not be trusted, so no verdict was recorded and the lesson stays confirmed. An unattended scan re-bills it next time."
+				},
+				"asserted_by": {
+					"type": "string",
+					"enum": ["model", "human"],
+					"description": "Who asserted the lesson's scope. A model assertion is judged against a stricter rubric and, if approved, held for a veto window."
+				},
+				"juried": {
+					"type": "boolean",
+					"description": "False for a private lesson, which passes without a panel. approved alone would overstate what was checked."
+				},
+				"unjudged_reason": {
+					"type": "string",
+					"enum": [
+						"panel_mismatch",
+						"criterion_unscored",
+						"coverage_below_min"
+					],
+					"description": "Present only when outcome is unjudged. panel_mismatch: the verdicts were malformed or their judge types did not match the rubric. criterion_unscored: no judge scored a floored criterion. coverage_below_min: the panel scored too little of the rubric's weight."
+				},
+				"aggregate_score": { "type": "number", "minimum": 0, "maximum": 1 }
+			}
+		},
+		"librarian.lesson.shipped": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lesson_id"],
+			"properties": {
+				"lesson_id": { "type": "string" },
+				"held_ms": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Time from promotion to the sweep that moved the lesson out of the hold into approved/. Absent when the promotion time could not be read."
+				}
+			}
+		},
+		"librarian.lesson.vetoed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lesson_id", "reason_given"],
+			"properties": {
+				"lesson_id": { "type": "string" },
+				"reason_given": {
+					"type": "boolean",
+					"description": "Whether the person vetoing gave a reason. The reason itself stays in the declined ledger."
+				}
+			}
+		},
+		"librarian.autojury.complete": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"asserted",
+				"refused",
+				"unavailable",
+				"juried",
+				"deferred_by_cap",
+				"duration_ms"
+			],
+			"properties": {
+				"asserted": { "type": "integer", "minimum": 0 },
+				"refused": { "type": "integer", "minimum": 0 },
+				"unavailable": { "type": "integer", "minimum": 0 },
+				"juried": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Model-asserted lessons sent to the two-judge panel this scan. Each costs two model calls whatever the verdict."
+				},
+				"deferred_by_cap": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Model-asserted confirmed lessons left for a later scan by max_juries_per_scan."
+				},
 				"duration_ms": { "type": "integer", "minimum": 0 }
 			}
 		},
