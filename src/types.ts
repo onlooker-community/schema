@@ -1119,6 +1119,67 @@ export interface LibrarianLessonPromotedPayload {
 	lesson_id: string;
 	outcome: "approved" | "rejected";
 	duration_ms: number;
+	/**
+	 * True when the lesson went to the veto-window hold instead of straight to
+	 * `approved/`. Only a model-asserted approval is held.
+	 */
+	held?: boolean;
+}
+
+/**
+ * The unattended stage asking a model to justify a parked lesson as
+ * version-independent. A lesson that was not parked is never asked, so it
+ * emits nothing. The refusal reason stays on the proposal; only whether one
+ * was given rides here.
+ */
+export interface LibrarianLessonAssertedPayload {
+	lesson_id: string;
+	outcome: "asserted" | "refused" | "unavailable";
+	reason_given?: boolean;
+}
+
+export type LibrarianUnjudgedReason =
+	| "panel_mismatch"
+	| "criterion_unscored"
+	| "coverage_below_min";
+
+/**
+ * A jury verdict, attended or unattended. `unjudged` records no verdict and
+ * leaves the lesson confirmed, so an unattended scan re-bills it. `juried` is
+ * false for a private lesson, which passes without a panel.
+ */
+export interface LibrarianLessonJudgedPayload {
+	lesson_id: string;
+	outcome: "approved" | "rejected" | "unjudged";
+	asserted_by: "model" | "human";
+	juried: boolean;
+	unjudged_reason?: LibrarianUnjudgedReason;
+	aggregate_score?: number;
+}
+
+/** A held lesson swept out of its veto window into `approved/`. */
+export interface LibrarianLessonShippedPayload {
+	lesson_id: string;
+	held_ms?: number;
+}
+
+/** A held lesson removed before its window elapsed. */
+export interface LibrarianLessonVetoedPayload {
+	lesson_id: string;
+	reason_given: boolean;
+}
+
+/**
+ * One unattended stage's totals. Emitted only when lesson_auto is enabled, so
+ * its absence on a scan means the stage did not run.
+ */
+export interface LibrarianAutojuryCompletePayload {
+	asserted: number;
+	refused: number;
+	unavailable: number;
+	juried: number;
+	deferred_by_cap: number;
+	duration_ms: number;
 }
 
 export type CuratorScanMode = "cheap" | "llm" | "manual";
@@ -1593,7 +1654,12 @@ export interface PayloadMap {
 	"librarian.proposal.rejected": LibrarianProposalRejectedPayload;
 	"librarian.proposal.merged": LibrarianProposalMergedPayload;
 	"librarian.proposal.superseded": LibrarianProposalSupersededPayload;
+	"librarian.lesson.asserted": LibrarianLessonAssertedPayload;
+	"librarian.lesson.judged": LibrarianLessonJudgedPayload;
 	"librarian.lesson.promoted": LibrarianLessonPromotedPayload;
+	"librarian.lesson.shipped": LibrarianLessonShippedPayload;
+	"librarian.lesson.vetoed": LibrarianLessonVetoedPayload;
+	"librarian.autojury.complete": LibrarianAutojuryCompletePayload;
 	"librarian.tombstone.created": LibrarianTombstoneCreatedPayload;
 	"curator.scan.started": CuratorScanStartedPayload;
 	"curator.scan.complete": CuratorScanCompletePayload;
