@@ -1,3 +1,5 @@
+export type { EventRole } from "./event-roles.js";
+export { EVENT_ROLES, EVENT_TYPE_ROLES, roleOf } from "./event-roles.js";
 export type { EventType } from "./event-types.js";
 export {
 	ALL_EVENT_TYPES,
