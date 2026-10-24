@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.1](https://github.com/onlooker-community/schema/compare/v3.3.0...v3.3.1) (2026-10-24)
+
+
+### Bug Fixes
+
+* **exports:** let a browser import the role map :globe_with_meridians: ([#97](https://github.com/onlooker-community/schema/issues/97)) ([f23476e](https://github.com/onlooker-community/schema/commit/f23476ef322b1d574e3c6b8958ded1a3fb653faa))
+
 ## [3.3.0](https://github.com/onlooker-community/schema/compare/v3.2.0...v3.3.0) (2026-10-24)
 
 
