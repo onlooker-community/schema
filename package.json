@@ -13,6 +13,14 @@
 			"import": "./dist/index.js",
 			"types": "./dist/index.d.ts"
 		},
+		"./event-roles": {
+			"types": "./dist/event-roles.d.ts",
+			"import": "./dist/event-roles.js"
+		},
+		"./event-types": {
+			"types": "./dist/event-types.d.ts",
+			"import": "./dist/event-types.js"
+		},
 		"./schemas/*": "./schemas/*"
 	},
 	"files": [
