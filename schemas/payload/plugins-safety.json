@@ -442,6 +442,88 @@
 				}
 			}
 		},
+		"customs.egress.flagged": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["tool", "kinds", "hosts", "decision"],
+			"properties": {
+				"tool": { "type": "string", "enum": ["Bash", "WebFetch"] },
+				"kinds": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 5,
+					"uniqueItems": true,
+					"items": {
+						"type": "string",
+						"enum": [
+							"aws_access_key_id",
+							"github_token",
+							"anthropic_key",
+							"openai_key",
+							"bearer_token"
+						]
+					}
+				},
+				"hosts": {
+					"type": "array",
+					"maxItems": 16,
+					"uniqueItems": true,
+					"items": {
+						"type": "string",
+						"maxLength": 253,
+						"pattern": "^[a-z0-9][a-z0-9.-]*$"
+					}
+				},
+				"decision": { "type": "string", "enum": ["ask", "deny", "none"] }
+			}
+		},
+		"customs.egress.allowed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["tool", "kinds", "hosts"],
+			"properties": {
+				"tool": { "type": "string", "enum": ["Bash", "WebFetch"] },
+				"kinds": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 5,
+					"uniqueItems": true,
+					"items": {
+						"type": "string",
+						"enum": [
+							"aws_access_key_id",
+							"github_token",
+							"anthropic_key",
+							"openai_key",
+							"bearer_token"
+						]
+					}
+				},
+				"hosts": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 16,
+					"uniqueItems": true,
+					"items": {
+						"type": "string",
+						"maxLength": 253,
+						"pattern": "^[a-z0-9][a-z0-9.-]*$"
+					}
+				}
+			}
+		},
+		"customs.check.failed": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["stage"],
+			"properties": {
+				"tool": { "type": "string", "enum": ["Bash", "WebFetch"] },
+				"stage": {
+					"type": "string",
+					"enum": ["input", "detect", "destination", "config"]
+				}
+			}
+		},
 		"compass.check.passed": {
 			"type": "object",
 			"additionalProperties": false,

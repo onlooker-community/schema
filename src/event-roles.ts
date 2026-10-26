@@ -105,6 +105,14 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	"warden.threat.cleared": "output",
 	"warden.gate.blocked": "output",
 
+	// The gate doing its job: it found a secret headed somewhere it should
+	// not go. decision "none" (a record-only kind) is still output - the
+	// plugin noticed something.
+	"customs.egress.flagged": "output",
+	// It ran, found a secret, and the destination was its issuer.
+	"customs.egress.allowed": "skipped",
+	"customs.check.failed": "failed",
+
 	// Not emitted: oracle lives outside the ecosystem repo.
 	"oracle.calibration.requested": "lifecycle",
 	"oracle.calibration.complete": "output",
