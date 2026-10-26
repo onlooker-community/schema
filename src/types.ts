@@ -1450,6 +1450,8 @@ export interface HistorianRetrievalCompletePayload {
 		| "embed_failed";
 	top_similarity?: number;
 	candidates_above_floor?: number;
+	/** Unembedded chunks that matched by term overlap; counted apart from candidates_above_floor. */
+	lexical_candidates?: number;
 	duration_ms?: number;
 }
 
@@ -1458,6 +1460,8 @@ export interface HistorianRetrievalSurfacedPayload {
 	similarity: number;
 	age_days: number;
 	source_session_id?: string;
+	/** vector: cosine match. lexical: term-overlap fallback for a chunk with no embedding. Absent means vector. */
+	match?: "vector" | "lexical";
 }
 
 export interface HistorianPruneCompletePayload {

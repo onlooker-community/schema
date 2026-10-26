@@ -884,6 +884,11 @@
 				},
 				"top_similarity": { "type": "number", "minimum": 0, "maximum": 1 },
 				"candidates_above_floor": { "type": "integer", "minimum": 0 },
+				"lexical_candidates": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Chunks with no embedding that matched the prompt by term overlap (ONL-124). A chunk whose embed failed at indexing time has no vector, and retrieval used to skip it outright, so a partially embedded session vanished instead of degrading. These are counted apart from candidates_above_floor, which stays vector-only, and always rank below every vector match. Absent means none matched."
+				},
 				"duration_ms": { "type": "integer", "minimum": 0 }
 			}
 		},
@@ -895,7 +900,12 @@
 				"chunk_id": { "type": "string" },
 				"similarity": { "type": "number", "minimum": 0, "maximum": 1 },
 				"age_days": { "type": "integer", "minimum": 0 },
-				"source_session_id": { "type": "string" }
+				"source_session_id": { "type": "string" },
+				"match": {
+					"type": "string",
+					"enum": ["vector", "lexical"],
+					"description": "How the chunk was found. vector is a cosine match against the chunk's embedding; lexical is the term-overlap fallback for a chunk stored without one (ONL-124), and its similarity is the fraction of the prompt's terms the chunk contains, not a cosine. Without this field a fallback hit would read as a genuine vector match, which is the silent degradation ONL-123 removed. Absent means vector, the only kind emitted before this field existed."
+				}
 			}
 		},
 		"historian.prune.complete": {
