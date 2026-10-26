@@ -2030,6 +2030,48 @@ describe("historian lifecycle events", () => {
 		expect(validate(event).valid).toBe(true);
 	});
 
+	// ONL-124. A chunk whose embed failed at indexing has no vector, and
+	// retrieval skipped it outright. The fallback finds it by term overlap, and
+	// `match` keeps that hit from reading as a genuine vector match.
+	it("validates retrieval.surfaced from the lexical fallback", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_SURFACED, {
+			chunk_id: "01J0000000000000000000000",
+			similarity: 0.6,
+			age_days: 3,
+			match: "lexical",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates retrieval.surfaced omitting match", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_SURFACED, {
+			chunk_id: "01J0000000000000000000000",
+			similarity: 0.71,
+			age_days: 3,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects retrieval.surfaced with a match outside the enum", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_SURFACED, {
+			chunk_id: "01J0000000000000000000000",
+			similarity: 0.6,
+			age_days: 3,
+			match: "substring",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates retrieval.complete counting lexical candidates", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_COMPLETE, {
+			outcome: "surfaced",
+			candidates_above_floor: 0,
+			lexical_candidates: 2,
+			duration_ms: 120,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
 	it("rejects embedder.failed reporting zero failures", () => {
 		const event = hist(HISTORIAN_EMBEDDER_FAILED, {
 			backend: "ollama",
