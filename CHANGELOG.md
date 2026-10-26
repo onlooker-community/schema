@@ -4,6 +4,14 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0](https://github.com/onlooker-community/schema/compare/v3.3.1...v3.4.0) (2026-10-26)
+
+
+### Features
+
+* **customs:** register the outbound gate's three events :passport_control: ([#99](https://github.com/onlooker-community/schema/issues/99)) ([61fe3e2](https://github.com/onlooker-community/schema/commit/61fe3e21d51d837bfcaa118f4b8ade5aebfb0577))
+* **events:** give every failure a type of its own :rotating_light: ([#101](https://github.com/onlooker-community/schema/issues/101)) ([6c39b41](https://github.com/onlooker-community/schema/commit/6c39b41c84835d639ffadd1895a7470a83e9e7fe))
+
 ## [3.3.1](https://github.com/onlooker-community/schema/compare/v3.3.0...v3.3.1) (2026-10-24)
 
 
