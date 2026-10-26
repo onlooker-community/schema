@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0](https://github.com/onlooker-community/schema/compare/v3.4.0...v3.5.0) (2026-10-26)
+
+
+### Features
+
+* **historian:** tell a fallback retrieval hit from a vector match :mag: ([#102](https://github.com/onlooker-community/schema/issues/102)) ([12ddc3c](https://github.com/onlooker-community/schema/commit/12ddc3cb10cc6b405d01eec55afb2149cc0b815b))
+
 ## [3.4.0](https://github.com/onlooker-community/schema/compare/v3.3.1...v3.4.0) (2026-10-26)
 
 
