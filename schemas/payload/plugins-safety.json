@@ -389,7 +389,25 @@
 						"judge_no_response",
 						"judge_unparseable"
 					],
-					"description": "Why the Stop gate judged nothing. Without this the only signal is the ABSENCE of tribunal.gate.passed/blocked, which cannot distinguish 'the gate is switched off' from 'the emitter is broken' — and that is not a hypothetical reading: check-plugin-liveness reported tribunal as a broken emitter over 3398 hook runs while stop_hook.enabled was false, and its own suggested remedy of a wider window then reported the plugin healthy on 1076 events that all predated the off-switch (ONL-172). `disabled` is that case and is expected to dominate wherever the gate is off by default. The first six reasons are decided BEFORE any model call and cost nothing. The last four are reached only after a judge was dispatched, so they are the shapes where a Stop spent a model call and produced no verdict — the invisible-spend problem ecosystem-449.32 closed for hook-health, reported here on the bus. judge_timeout is the timeout(1) 124 convention; judge_unparseable means the judge answered but not with a usable verdict object."
+					"description": "Why the Stop gate judged nothing. Without this the only signal is the ABSENCE of tribunal.gate.passed/blocked, which cannot distinguish 'the gate is switched off' from 'the emitter is broken' — and that is not a hypothetical reading: check-plugin-liveness reported tribunal as a broken emitter over 3398 hook runs while stop_hook.enabled was false, and its own suggested remedy of a wider window then reported the plugin healthy on 1076 events that all predated the off-switch (ONL-172). `disabled` is that case and is expected to dominate wherever the gate is off by default. The first six reasons are decided BEFORE any model call and cost nothing. The last four are reached only after a judge was dispatched, so they are the shapes where a Stop spent a model call and produced no verdict — the invisible-spend problem ecosystem-449.32 closed for hook-health, reported here on the bus. judge_timeout is the timeout(1) 124 convention; judge_unparseable means the judge answered but not with a usable verdict object. Deprecated since 3.4.0: claude_unavailable and the four judge_* reasons are failures rather than skips, and the gate now reports them as tribunal.gate.errored (ONL-192). They stay in this enum so events from older emitters still validate."
+				}
+			}
+		},
+		"tribunal.gate.errored": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": [
+						"claude_unavailable",
+						"judge_timeout",
+						"judge_error",
+						"judge_no_response",
+						"judge_unparseable"
+					],
+					"description": "Why the Stop gate could not reach a verdict. These used to be reported as tribunal.gate.skipped, which a consumer that keeps only the event type reads as the gate deciding to do nothing (ONL-192). claude_unavailable is decided before any model call; the four judge_* reasons are reached after a judge was dispatched, so each one is a Stop that spent a model call and produced no verdict. judge_timeout is the timeout(1) 124 convention; judge_unparseable means the judge answered but not with a usable verdict object."
 				}
 			}
 		},
@@ -564,7 +582,7 @@
 						"low_confidence_and_high_stddev",
 						"sampler_error"
 					],
-					"description": "Why the write was denied. sampler_error is the case that has no measurement; the other three are thresholds the gate actually distinguishes. Optional so existing emitters keep validating."
+					"description": "Why the write was denied. sampler_error is the case that has no measurement; the other three are thresholds the gate actually distinguishes. Optional so existing emitters keep validating. Deprecated since 3.4.0: sampler_error is a failure of the evaluator, not a finding about the write, and the gate now reports it as compass.check.errored with blocked: true (ONL-192). The null confidence and stddev it needed stay allowed so events from older emitters still validate."
 				},
 				"file_path": { "type": "string" },
 				"tool_name": {
@@ -596,12 +614,34 @@
 						"sampler_error",
 						"circuit_open",
 						"evaluator_budget_exhausted"
-					]
+					],
+					"description": "Deprecated since 3.4.0: sampler_error is a failure rather than a skip, and the gate now reports it as compass.check.errored with blocked: false (ONL-192). It stays in this enum so events from older emitters still validate."
 				},
 				"file_path": { "type": "string" },
 				"tool_name": {
 					"type": "string",
 					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
+				}
+			}
+		},
+		"compass.check.errored": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason", "file_path", "blocked"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": ["sampler_error"],
+					"description": "Why the gate could not evaluate the write. sampler_error means the evaluators produced no usable measurement. It used to be reported as compass.check.skipped when the call was allowed and compass.check.failed when it was denied, so the same fault read as a skip or a verdict depending on the error policy (ONL-192)."
+				},
+				"file_path": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
+				},
+				"blocked": {
+					"type": "boolean",
+					"description": "Whether the error policy denied the tool call. true is fail-closed; false is fail-open, or an open circuit breaker whose open_behavior is fail_open."
 				}
 			}
 		},

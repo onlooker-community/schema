@@ -45,10 +45,11 @@ export type EventRole = (typeof EVENT_ROLES)[number];
  * Where nothing on origin/main emits a type it is marked below, and the role
  * comes from its payload schema and the plugin's design notes instead.
  *
- * One role per type is a simplification some emitters do not honor: a few
- * types carry a payload `reason` or `outcome` that spans two roles. Those are
- * given the role they carry in practice and annotated, because a consumer of
- * session summaries never sees the payload that would tell them apart.
+ * One role per type holds only if no emitter puts a failure under a skipped
+ * or verdict name, because a consumer of session summaries never sees the
+ * payload that would tell them apart. ONL-192 split the six types that did
+ * into `*.errored` types of their own. Older plugin versions still emit the
+ * old shapes, which the payload schemas accept as deprecated.
  *
  * This answers a broader question than the CLI doctor's `writeEvents`
  * (onlooker apps/cli/src/streams.ts), which names only the events whose
@@ -95,10 +96,10 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	"tribunal.dissent.recorded": "output",
 	"tribunal.gate.passed": "output",
 	"tribunal.gate.blocked": "output",
-	// Also carries judge failures (judge_timeout, judge_error,
-	// claude_unavailable). Measured on one machine: 667 of 667 were
-	// `disabled`, so skipped is what it means in practice.
 	"tribunal.gate.skipped": "skipped",
+	// Judge failures and a missing claude CLI, split out of
+	// tribunal.gate.skipped by ONL-192.
+	"tribunal.gate.errored": "failed",
 
 	"warden.threat.detected": "output",
 	// The plugin carrying out a user's /warden clear.
@@ -198,9 +199,10 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	"librarian.scan.started": "lifecycle",
 	"librarian.scan.complete": "lifecycle",
 	"librarian.candidate.proposed": "output",
-	// Also fires when the classifier call failed (reason classified_null).
-	// Measured: 4,032 of 4,106 were filter declines.
 	"librarian.candidate.dropped": "skipped",
+	// A classifier call that never came back, which candidate.dropped used
+	// to record as classified_null (ONL-192).
+	"librarian.classifier.errored": "failed",
 	"librarian.proposal.accepted": "output",
 	"librarian.proposal.rejected": "output",
 	// Not emitted: described in librarian's design notes only.
@@ -219,6 +221,9 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	// Fires on every scan, zero findings included - the findings are the
 	// curator.finding.* types below.
 	"curator.scan.complete": "lifecycle",
+	// Ends a scan that could not resolve the memory store, in place of
+	// curator.scan.complete (ONL-192).
+	"curator.scan.errored": "failed",
 	"curator.finding.date_decayed": "output",
 	"curator.finding.path_broken": "output",
 	// Not emitted: these detectors are not built yet.
@@ -259,14 +264,18 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	// A failed check found a problem: output, not the `failed` role.
 	"inspector.check.passed": "output",
 	"inspector.check.failed": "output",
-	// Also carries tool_missing and timeout, which are failures.
 	"inspector.check.skipped": "skipped",
+	// tool_missing and timeout, split out of inspector.check.skipped by
+	// ONL-192.
+	"inspector.check.errored": "failed",
 	"inspector.run.completed": "lifecycle",
 
 	"compass.check.passed": "output",
-	// Also carries an evaluator error that fails closed (sampler_error).
 	"compass.check.failed": "output",
 	"compass.check.skipped": "skipped",
+	// The evaluator erroring, whichever way the error policy went. It used
+	// to ride on compass.check.skipped or compass.check.failed (ONL-192).
+	"compass.check.errored": "failed",
 	// The user typed "compass: proceed", so nothing was evaluated.
 	"compass.check.overridden": "skipped",
 	// Not emitted: described in compass's design only.

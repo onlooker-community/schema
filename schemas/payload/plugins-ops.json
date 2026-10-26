@@ -816,7 +816,39 @@
 						"tool_missing",
 						"timeout",
 						"total_budget_exhausted"
-					]
+					],
+					"description": "Deprecated since 3.4.0: tool_missing and timeout are failures rather than skips, and inspector now reports them as inspector.check.errored (ONL-192). They stay in this enum so events from older emitters still validate."
+				},
+				"duration_ms": { "type": "integer", "minimum": 0 },
+				"project_key": { "type": "string" }
+			}
+		},
+		"inspector.check.errored": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"file_path",
+				"tool_name",
+				"check_name",
+				"check_kind",
+				"reason"
+			],
+			"properties": {
+				"file_path": { "type": "string" },
+				"file_path_relative": { "type": "string" },
+				"tool_name": {
+					"type": "string",
+					"enum": ["Write", "Edit", "MultiEdit", "Bash"]
+				},
+				"check_name": { "type": "string" },
+				"check_kind": {
+					"type": "string",
+					"enum": ["lint", "typecheck"]
+				},
+				"reason": {
+					"type": "string",
+					"enum": ["tool_missing", "timeout"],
+					"description": "Why a configured check could not run. tool_missing is exit 127, the command not on PATH; timeout is exit 124, the check outliving its per-check limit. Both used to be reported as inspector.check.skipped, which reads as inspector deciding not to check (ONL-192)."
 				},
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"project_key": { "type": "string" }
@@ -844,6 +876,11 @@
 				"checks_passed": { "type": "integer", "minimum": 0 },
 				"checks_failed": { "type": "integer", "minimum": 0 },
 				"checks_skipped": { "type": "integer", "minimum": 0 },
+				"checks_errored": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Checks that could not run, one per inspector.check.errored. Counted in checks_skipped before 3.4.0, so it is optional: an event without it comes from an emitter that did not separate the two."
+				},
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"project_key": { "type": "string" }
 			}

@@ -17,6 +17,7 @@ import {
 	CARTOGRAPHER_AUDIT_COMPLETE,
 	CARTOGRAPHER_ISSUE_FOUND,
 	CARTOGRAPHER_ISSUE_RESOLVED,
+	COMPASS_CHECK_ERRORED,
 	COMPASS_CHECK_FAILED,
 	COUNSEL_BRIEF_GENERATED,
 	CURATOR_FINDING_CONTRADICTION,
@@ -24,6 +25,7 @@ import {
 	CURATOR_FINDING_PATH_BROKEN,
 	CURATOR_FINDING_RESOLVED,
 	CURATOR_SCAN_COMPLETE,
+	CURATOR_SCAN_ERRORED,
 	CURATOR_SCAN_STARTED,
 	CUSTOMS_CHECK_FAILED,
 	CUSTOMS_EGRESS_ALLOWED,
@@ -47,6 +49,7 @@ import {
 	HISTORIAN_RETRIEVAL_COMPLETE,
 	HISTORIAN_RETRIEVAL_STARTED,
 	HISTORIAN_RETRIEVAL_SURFACED,
+	INSPECTOR_CHECK_ERRORED,
 	INSPECTOR_CHECK_FAILED,
 	INSPECTOR_CHECK_PASSED,
 	INSPECTOR_CHECK_SKIPPED,
@@ -55,6 +58,7 @@ import {
 	LIBRARIAN_AUTOJURY_COMPLETE,
 	LIBRARIAN_CANDIDATE_DROPPED,
 	LIBRARIAN_CANDIDATE_PROPOSED,
+	LIBRARIAN_CLASSIFIER_ERRORED,
 	LIBRARIAN_LESSON_ASSERTED,
 	LIBRARIAN_LESSON_JUDGED,
 	LIBRARIAN_LESSON_PROMOTED,
@@ -79,6 +83,7 @@ import {
 	TRIBUNAL_CONSENSUS_REACHED,
 	TRIBUNAL_DISSENT_RECORDED,
 	TRIBUNAL_GATE_BLOCKED,
+	TRIBUNAL_GATE_ERRORED,
 	TRIBUNAL_GATE_PASSED,
 	TRIBUNAL_GATE_SKIPPED,
 	TRIBUNAL_ITERATION_START,
@@ -3281,14 +3286,131 @@ describe("counsel.brief.generated sources_consulted", () => {
 	});
 });
 
+// ONL-192. Six types used to carry a failure under a skipped or verdict name,
+// which a consumer that keeps only the event type cannot tell apart. Each
+// failure now has an errored type of its own; the old reasons stay accepted,
+// deprecated, so older emitters still validate.
+describe("errored event types", () => {
+	const SID = "session-errored-1";
+
+	function emit<T extends EventType>(
+		plugin: string,
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin,
+			machine_id: MACHINE_ID,
+			session_id: SID,
+			event_type,
+			payload,
+		});
+	}
+
+	it("validates tribunal.gate.errored for each judge failure", () => {
+		for (const reason of [
+			"claude_unavailable",
+			"judge_timeout",
+			"judge_error",
+			"judge_no_response",
+			"judge_unparseable",
+		] as const) {
+			const event = emit("tribunal", TRIBUNAL_GATE_ERRORED, { reason });
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("rejects a genuine skip reason on tribunal.gate.errored", () => {
+		const event = emit("tribunal", TRIBUNAL_GATE_ERRORED, {
+			reason: "disabled" as never,
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates inspector.check.errored for a missing tool and a timeout", () => {
+		for (const reason of ["tool_missing", "timeout"] as const) {
+			const event = emit("inspector", INSPECTOR_CHECK_ERRORED, {
+				file_path: "/repo/scripts/deploy.sh",
+				file_path_relative: "scripts/deploy.sh",
+				tool_name: "Edit",
+				check_name: "shellcheck",
+				check_kind: "lint",
+				reason,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("requires the check on inspector.check.errored", () => {
+		const event = emit("inspector", INSPECTOR_CHECK_ERRORED, {
+			file_path: "/repo/scripts/deploy.sh",
+			tool_name: "Edit",
+			reason: "tool_missing",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates compass.check.errored either way the policy went", () => {
+		for (const blocked of [true, false]) {
+			const event = emit("compass", COMPASS_CHECK_ERRORED, {
+				reason: "sampler_error",
+				file_path: "/repo/src/a.ts",
+				tool_name: "Write",
+				blocked,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("requires blocked on compass.check.errored", () => {
+		const event = emit("compass", COMPASS_CHECK_ERRORED, {
+			reason: "sampler_error",
+			file_path: "/repo/src/a.ts",
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates librarian.classifier.errored", () => {
+		const event = emit("librarian", LIBRARIAN_CLASSIFIER_ERRORED, {
+			reason: "no_response",
+			source_artifact_id: "01ARTIFACT0000000000000000",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("validates curator.scan.errored", () => {
+		const event = emit("curator", CURATOR_SCAN_ERRORED, {
+			mode: "cheap",
+			reason: "memory_path_unresolved",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("accepts inspector.run.completed with and without checks_errored", () => {
+		const base = {
+			file_path: "/repo/src/a.ts",
+			tool_name: "Edit" as const,
+			checks_run: 2,
+			checks_passed: 1,
+			checks_failed: 0,
+			checks_skipped: 0,
+		};
+		for (const payload of [base, { ...base, checks_errored: 1 }]) {
+			const event = emit("inspector", "inspector.run.completed", payload);
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+});
+
 describe("ALL_EVENT_TYPES", () => {
 	it("has no duplicates", () => {
 		const set = new Set<EventType>(ALL_EVENT_TYPES);
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 142 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(142);
+	it("has exactly 147 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(147);
 	});
 });
 

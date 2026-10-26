@@ -396,7 +396,21 @@
 						"filter_drop_pattern",
 						"detail_too_short",
 						"retry_cap_exceeded"
-					]
+					],
+					"description": "classified_null means the classifier answered and judged the artifact not memory-worthy. Before 3.4.0 it was also recorded for a classifier call that never came back, which nothing judged; that case is now librarian.classifier.errored (ONL-192)."
+				},
+				"source_artifact_id": { "type": "string" }
+			}
+		},
+		"librarian.classifier.errored": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": ["no_response"],
+					"description": "Why the classifier gave no verdict for this artifact. no_response means the call returned nothing: no CLI on PATH, a timeout, or unparseable output. Emitted once per artifact, and only when another call in the same run did answer; a run where no call answers ends with its queue intact and emits nothing."
 				},
 				"source_artifact_id": { "type": "string" }
 			}
@@ -583,7 +597,11 @@
 			],
 			"properties": {
 				"mode": { "type": "string", "enum": ["cheap", "llm", "manual"] },
-				"outcome": { "type": "string", "enum": ["ok", "skipped"] },
+				"outcome": {
+					"type": "string",
+					"enum": ["ok", "skipped"],
+					"description": "skipped comes with a skip_reason. Before 3.4.0 curator also reported skipped, with no skip_reason, when it could not resolve where the memory store lives; that is a failure and is now curator.scan.errored (ONL-192)."
+				},
 				"skip_reason": {
 					"type": "string",
 					"enum": [
@@ -597,6 +615,19 @@
 				"findings_resolved": { "type": "integer", "minimum": 0 },
 				"duration_ms": { "type": "integer", "minimum": 0 },
 				"pairs_evaluated": { "type": "integer", "minimum": 0 }
+			}
+		},
+		"curator.scan.errored": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["mode", "reason"],
+			"properties": {
+				"mode": { "type": "string", "enum": ["cheap", "llm", "manual"] },
+				"reason": {
+					"type": "string",
+					"enum": ["memory_path_unresolved"],
+					"description": "Why the scan could not run. memory_path_unresolved means curator could not work out where the memory store lives, as distinct from a store that resolves but does not exist yet, which is an ordinary empty scan. Ends a scan in place of curator.scan.complete."
+				}
 			}
 		},
 		"curator.finding.date_decayed": {
