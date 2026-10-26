@@ -353,6 +353,38 @@ export interface WardenGateBlockedPayload {
 	threat_source_type: "web_fetch" | "file_read";
 }
 
+export type CustomsTool = "Bash" | "WebFetch";
+
+export type CustomsSecretKind =
+	| "aws_access_key_id"
+	| "github_token"
+	| "anthropic_key"
+	| "openai_key"
+	| "bearer_token";
+
+// Kind and host only. A customs event about a possible leak must never carry
+// the secret, the command, or the URL path.
+export interface CustomsEgressFlaggedPayload {
+	tool: CustomsTool;
+	kinds: CustomsSecretKind[];
+	// Empty when customs could not read a host, which is itself a reason to ask.
+	hosts: string[];
+	// "none" for a record-only kind (bearer_token by default): seen, not gated.
+	decision: "ask" | "deny" | "none";
+}
+
+export interface CustomsEgressAllowedPayload {
+	tool: CustomsTool;
+	kinds: CustomsSecretKind[];
+	hosts: string[];
+}
+
+export interface CustomsCheckFailedPayload {
+	// Absent when the hook input itself could not be parsed.
+	tool?: CustomsTool;
+	stage: "input" | "detect" | "destination" | "config";
+}
+
 export type CompassToolName = "Write" | "Edit" | "MultiEdit" | "Bash";
 
 export type CompassPrimaryConcern =
@@ -1599,6 +1631,9 @@ export interface PayloadMap {
 	"warden.threat.detected": WardenThreatDetectedPayload;
 	"warden.threat.cleared": WardenThreatClearedPayload;
 	"warden.gate.blocked": WardenGateBlockedPayload;
+	"customs.egress.flagged": CustomsEgressFlaggedPayload;
+	"customs.egress.allowed": CustomsEgressAllowedPayload;
+	"customs.check.failed": CustomsCheckFailedPayload;
 	"oracle.calibration.requested": OracleCalibrationRequestedPayload;
 	"oracle.calibration.complete": OracleCalibrationCompletePayload;
 	"archivist.extract.complete": ArchivistExtractCompletePayload;

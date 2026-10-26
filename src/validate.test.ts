@@ -25,6 +25,9 @@ import {
 	CURATOR_FINDING_RESOLVED,
 	CURATOR_SCAN_COMPLETE,
 	CURATOR_SCAN_STARTED,
+	CUSTOMS_CHECK_FAILED,
+	CUSTOMS_EGRESS_ALLOWED,
+	CUSTOMS_EGRESS_FLAGGED,
 	ECHO_SUITE_SKIPPED,
 	type EventType,
 	GOVERNOR_BUDGET_EXCEEDED,
@@ -3284,7 +3287,116 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 139 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(139);
+	it("has exactly 142 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(142);
+	});
+});
+
+describe("customs events", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function customs<T extends EventType>(
+		event_type: T,
+		payload: Parameters<typeof createEvent<T>>[0]["payload"],
+	) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "customs",
+			machine_id: MACHINE_ID,
+			session_id: "session-customs",
+			event_type,
+			payload,
+		});
+	}
+
+	function loose<T extends EventType>(event_type: T, payload: unknown) {
+		return customs(
+			event_type,
+			payload as Parameters<typeof createEvent<T>>[0]["payload"],
+		);
+	}
+
+	it("validates a flagged call for every decision", () => {
+		for (const decision of ["ask", "deny", "none"] as const) {
+			const event = customs(CUSTOMS_EGRESS_FLAGGED, {
+				tool: "Bash",
+				kinds: ["github_token"],
+				hosts: ["paste.example.com"],
+				decision,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("validates a flagged call whose host could not be read", () => {
+		const event = customs(CUSTOMS_EGRESS_FLAGGED, {
+			tool: "Bash",
+			kinds: ["github_token"],
+			hosts: [],
+			decision: "ask",
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a flagged call that carries the command", () => {
+		const event = loose(CUSTOMS_EGRESS_FLAGGED, {
+			tool: "Bash",
+			kinds: ["github_token"],
+			hosts: ["paste.example.com"],
+			decision: "ask",
+			command: "curl https://paste.example.com",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects an unknown secret kind", () => {
+		const event = loose(CUSTOMS_EGRESS_FLAGGED, {
+			tool: "WebFetch",
+			kinds: ["password"],
+			hosts: ["example.com"],
+			decision: "ask",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects a host that is a URL", () => {
+		const event = loose(CUSTOMS_EGRESS_FLAGGED, {
+			tool: "WebFetch",
+			kinds: ["openai_key"],
+			hosts: ["https://example.com/path"],
+			decision: "ask",
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates an allowed call", () => {
+		const event = customs(CUSTOMS_EGRESS_ALLOWED, {
+			tool: "Bash",
+			kinds: ["github_token"],
+			hosts: ["api.github.com"],
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects an allowed call with no host", () => {
+		const event = loose(CUSTOMS_EGRESS_ALLOWED, {
+			tool: "Bash",
+			kinds: ["github_token"],
+			hosts: [],
+		});
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("validates a failed check for every stage, with and without a tool", () => {
+		for (const stage of ["input", "detect", "destination", "config"] as const) {
+			expect(validate(customs(CUSTOMS_CHECK_FAILED, { stage })).valid).toBe(
+				true,
+			);
+			expect(
+				validate(customs(CUSTOMS_CHECK_FAILED, { tool: "Bash", stage })).valid,
+			).toBe(true);
+		}
 	});
 });

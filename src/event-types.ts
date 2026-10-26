@@ -41,6 +41,10 @@ export const WARDEN_THREAT_DETECTED = "warden.threat.detected" as const;
 export const WARDEN_THREAT_CLEARED = "warden.threat.cleared" as const;
 export const WARDEN_GATE_BLOCKED = "warden.gate.blocked" as const;
 
+export const CUSTOMS_EGRESS_FLAGGED = "customs.egress.flagged" as const;
+export const CUSTOMS_EGRESS_ALLOWED = "customs.egress.allowed" as const;
+export const CUSTOMS_CHECK_FAILED = "customs.check.failed" as const;
+
 export const ORACLE_CALIBRATION_REQUESTED =
 	"oracle.calibration.requested" as const;
 export const ORACLE_CALIBRATION_COMPLETE =
@@ -229,6 +233,9 @@ export const ALL_EVENT_TYPES = [
 	WARDEN_THREAT_DETECTED,
 	WARDEN_THREAT_CLEARED,
 	WARDEN_GATE_BLOCKED,
+	CUSTOMS_EGRESS_FLAGGED,
+	CUSTOMS_EGRESS_ALLOWED,
+	CUSTOMS_CHECK_FAILED,
 	ORACLE_CALIBRATION_REQUESTED,
 	ORACLE_CALIBRATION_COMPLETE,
 	ARCHIVIST_EXTRACT_COMPLETE,
