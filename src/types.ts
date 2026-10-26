@@ -329,6 +329,21 @@ export interface TribunalGateSkippedPayload {
 		| "judge_unparseable";
 }
 
+/**
+ * The Stop gate could not reach a verdict. These reasons used to ride on
+ * `tribunal.gate.skipped`, which a type-only consumer reads as the gate
+ * choosing to do nothing (ONL-192). They remain accepted there, deprecated,
+ * so events from older emitters still validate.
+ */
+export interface TribunalGateErroredPayload {
+	reason:
+		| "claude_unavailable"
+		| "judge_timeout"
+		| "judge_error"
+		| "judge_no_response"
+		| "judge_unparseable";
+}
+
 export interface WardenThreatDetectedPayload {
 	source_type: "web_fetch" | "file_read";
 	threat_type:
@@ -453,6 +468,19 @@ export interface CompassCheckOverriddenPayload {
 	user_acknowledgment: true;
 	confidence?: number;
 	stddev?: number;
+}
+
+/**
+ * The evaluators produced no usable measurement. Used to be reported as
+ * `compass.check.skipped` when the error policy allowed the call and as
+ * `compass.check.failed` when it denied it (ONL-192).
+ */
+export interface CompassCheckErroredPayload {
+	reason: "sampler_error";
+	file_path: string;
+	/** Whether the error policy denied the tool call: true is fail-closed. */
+	blocked: boolean;
+	tool_name?: CompassToolName;
 }
 
 export interface CompassCheckCanceledPayload {
@@ -1111,6 +1139,16 @@ export interface LibrarianCandidateDroppedPayload {
 	source_artifact_id?: string;
 }
 
+/**
+ * A classifier call that returned nothing, so no verdict exists for this
+ * artifact. Recorded as `librarian.candidate.dropped` with `classified_null`
+ * before ONL-192, which claimed a judgment nobody made.
+ */
+export interface LibrarianClassifierErroredPayload {
+	reason: "no_response";
+	source_artifact_id?: string;
+}
+
 export interface LibrarianProposalAcceptedPayload {
 	proposal_id: string;
 	final_filename: string;
@@ -1232,6 +1270,17 @@ export interface CuratorScanCompletePayload {
 	findings_resolved: number;
 	duration_ms: number;
 	pairs_evaluated?: number;
+}
+
+/**
+ * The scan could not run. Ends a scan in place of `curator.scan.complete`,
+ * which reported this as `outcome: "skipped"` with no skip_reason before
+ * ONL-192.
+ */
+export interface CuratorScanErroredPayload {
+	mode: CuratorScanMode;
+	/** curator could not work out where the memory store lives. */
+	reason: "memory_path_unresolved";
 }
 
 export interface CuratorFindingDateDecayedPayload {
@@ -1487,6 +1536,9 @@ export type InspectorSkipReason =
 	| "timeout"
 	| "total_budget_exhausted";
 
+/** Exit 127 (not on PATH) and exit 124 (outlived its per-check limit). */
+export type InspectorErrorReason = "tool_missing" | "timeout";
+
 export interface InspectorCheckPassedPayload {
 	file_path: string;
 	tool_name: InspectorToolName;
@@ -1524,6 +1576,21 @@ export interface InspectorCheckSkippedPayload {
 	project_key?: string;
 }
 
+/**
+ * A configured check could not run. Reported as `inspector.check.skipped`
+ * before ONL-192, which reads as inspector deciding not to check.
+ */
+export interface InspectorCheckErroredPayload {
+	file_path: string;
+	tool_name: InspectorToolName;
+	check_name: string;
+	check_kind: InspectorCheckKind;
+	reason: InspectorErrorReason;
+	file_path_relative?: string;
+	duration_ms?: number;
+	project_key?: string;
+}
+
 export interface InspectorRunCompletedPayload {
 	file_path: string;
 	tool_name: InspectorToolName;
@@ -1531,6 +1598,8 @@ export interface InspectorRunCompletedPayload {
 	checks_passed: number;
 	checks_failed: number;
 	checks_skipped: number;
+	/** One per inspector.check.errored. Absent from emitters before ONL-192. */
+	checks_errored?: number;
 	file_path_relative?: string;
 	duration_ms?: number;
 	project_key?: string;
@@ -1628,6 +1697,7 @@ export interface PayloadMap {
 	"tribunal.gate.passed": TribunalGatePassedPayload;
 	"tribunal.gate.blocked": TribunalGateBlockedPayload;
 	"tribunal.gate.skipped": TribunalGateSkippedPayload;
+	"tribunal.gate.errored": TribunalGateErroredPayload;
 	"warden.threat.detected": WardenThreatDetectedPayload;
 	"warden.threat.cleared": WardenThreatClearedPayload;
 	"warden.gate.blocked": WardenGateBlockedPayload;
@@ -1685,6 +1755,7 @@ export interface PayloadMap {
 	"librarian.scan.complete": LibrarianScanCompletePayload;
 	"librarian.candidate.proposed": LibrarianCandidateProposedPayload;
 	"librarian.candidate.dropped": LibrarianCandidateDroppedPayload;
+	"librarian.classifier.errored": LibrarianClassifierErroredPayload;
 	"librarian.proposal.accepted": LibrarianProposalAcceptedPayload;
 	"librarian.proposal.rejected": LibrarianProposalRejectedPayload;
 	"librarian.proposal.merged": LibrarianProposalMergedPayload;
@@ -1698,6 +1769,7 @@ export interface PayloadMap {
 	"librarian.tombstone.created": LibrarianTombstoneCreatedPayload;
 	"curator.scan.started": CuratorScanStartedPayload;
 	"curator.scan.complete": CuratorScanCompletePayload;
+	"curator.scan.errored": CuratorScanErroredPayload;
 	"curator.finding.date_decayed": CuratorFindingDateDecayedPayload;
 	"curator.finding.path_broken": CuratorFindingPathBrokenPayload;
 	"curator.finding.symbol_missing": CuratorFindingSymbolMissingPayload;
@@ -1728,11 +1800,13 @@ export interface PayloadMap {
 	"compass.check.passed": CompassCheckPassedPayload;
 	"compass.check.failed": CompassCheckFailedPayload;
 	"compass.check.skipped": CompassCheckSkippedPayload;
+	"compass.check.errored": CompassCheckErroredPayload;
 	"compass.check.overridden": CompassCheckOverriddenPayload;
 	"compass.check.canceled": CompassCheckCanceledPayload;
 	"inspector.check.passed": InspectorCheckPassedPayload;
 	"inspector.check.failed": InspectorCheckFailedPayload;
 	"inspector.check.skipped": InspectorCheckSkippedPayload;
+	"inspector.check.errored": InspectorCheckErroredPayload;
 	"inspector.run.completed": InspectorRunCompletedPayload;
 	"onlooker.currency.checked": OnlookerCurrencyCheckedPayload;
 	"onlooker.currency.stale": OnlookerCurrencyStalePayload;

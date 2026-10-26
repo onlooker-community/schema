@@ -36,6 +36,7 @@ export const TRIBUNAL_DISSENT_RECORDED = "tribunal.dissent.recorded" as const;
 export const TRIBUNAL_GATE_PASSED = "tribunal.gate.passed" as const;
 export const TRIBUNAL_GATE_BLOCKED = "tribunal.gate.blocked" as const;
 export const TRIBUNAL_GATE_SKIPPED = "tribunal.gate.skipped" as const;
+export const TRIBUNAL_GATE_ERRORED = "tribunal.gate.errored" as const;
 
 export const WARDEN_THREAT_DETECTED = "warden.threat.detected" as const;
 export const WARDEN_THREAT_CLEARED = "warden.threat.cleared" as const;
@@ -121,6 +122,8 @@ export const LIBRARIAN_CANDIDATE_PROPOSED =
 	"librarian.candidate.proposed" as const;
 export const LIBRARIAN_CANDIDATE_DROPPED =
 	"librarian.candidate.dropped" as const;
+export const LIBRARIAN_CLASSIFIER_ERRORED =
+	"librarian.classifier.errored" as const;
 export const LIBRARIAN_PROPOSAL_ACCEPTED =
 	"librarian.proposal.accepted" as const;
 export const LIBRARIAN_PROPOSAL_REJECTED =
@@ -140,6 +143,7 @@ export const LIBRARIAN_TOMBSTONE_CREATED =
 
 export const CURATOR_SCAN_STARTED = "curator.scan.started" as const;
 export const CURATOR_SCAN_COMPLETE = "curator.scan.complete" as const;
+export const CURATOR_SCAN_ERRORED = "curator.scan.errored" as const;
 export const CURATOR_FINDING_DATE_DECAYED =
 	"curator.finding.date_decayed" as const;
 export const CURATOR_FINDING_PATH_BROKEN =
@@ -188,11 +192,13 @@ export const ASSAYER_AUDIT_COMPLETE = "assayer.audit.complete" as const;
 export const INSPECTOR_CHECK_PASSED = "inspector.check.passed" as const;
 export const INSPECTOR_CHECK_FAILED = "inspector.check.failed" as const;
 export const INSPECTOR_CHECK_SKIPPED = "inspector.check.skipped" as const;
+export const INSPECTOR_CHECK_ERRORED = "inspector.check.errored" as const;
 export const INSPECTOR_RUN_COMPLETED = "inspector.run.completed" as const;
 
 export const COMPASS_CHECK_PASSED = "compass.check.passed" as const;
 export const COMPASS_CHECK_FAILED = "compass.check.failed" as const;
 export const COMPASS_CHECK_SKIPPED = "compass.check.skipped" as const;
+export const COMPASS_CHECK_ERRORED = "compass.check.errored" as const;
 export const COMPASS_CHECK_OVERRIDDEN = "compass.check.overridden" as const;
 export const COMPASS_CHECK_CANCELED = "compass.check.canceled" as const;
 
@@ -230,6 +236,7 @@ export const ALL_EVENT_TYPES = [
 	TRIBUNAL_GATE_PASSED,
 	TRIBUNAL_GATE_BLOCKED,
 	TRIBUNAL_GATE_SKIPPED,
+	TRIBUNAL_GATE_ERRORED,
 	WARDEN_THREAT_DETECTED,
 	WARDEN_THREAT_CLEARED,
 	WARDEN_GATE_BLOCKED,
@@ -290,6 +297,7 @@ export const ALL_EVENT_TYPES = [
 	LIBRARIAN_SCAN_COMPLETE,
 	LIBRARIAN_CANDIDATE_PROPOSED,
 	LIBRARIAN_CANDIDATE_DROPPED,
+	LIBRARIAN_CLASSIFIER_ERRORED,
 	LIBRARIAN_PROPOSAL_ACCEPTED,
 	LIBRARIAN_PROPOSAL_REJECTED,
 	LIBRARIAN_PROPOSAL_MERGED,
@@ -303,6 +311,7 @@ export const ALL_EVENT_TYPES = [
 	LIBRARIAN_TOMBSTONE_CREATED,
 	CURATOR_SCAN_STARTED,
 	CURATOR_SCAN_COMPLETE,
+	CURATOR_SCAN_ERRORED,
 	CURATOR_FINDING_DATE_DECAYED,
 	CURATOR_FINDING_PATH_BROKEN,
 	CURATOR_FINDING_SYMBOL_MISSING,
@@ -333,11 +342,13 @@ export const ALL_EVENT_TYPES = [
 	COMPASS_CHECK_PASSED,
 	COMPASS_CHECK_FAILED,
 	COMPASS_CHECK_SKIPPED,
+	COMPASS_CHECK_ERRORED,
 	COMPASS_CHECK_OVERRIDDEN,
 	COMPASS_CHECK_CANCELED,
 	INSPECTOR_CHECK_PASSED,
 	INSPECTOR_CHECK_FAILED,
 	INSPECTOR_CHECK_SKIPPED,
+	INSPECTOR_CHECK_ERRORED,
 	INSPECTOR_RUN_COMPLETED,
 ] as const;
 
