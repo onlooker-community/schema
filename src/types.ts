@@ -1433,7 +1433,7 @@ export interface HistorianEmbedderFailedPayload {
 
 export interface HistorianRetrievalStartedPayload {
 	prompt_chars: number;
-	/** Characters sent to the embedder when the query was fitted to max_input_chars; absent when the whole prompt was embedded. */
+	/** Query length as fitted to max_input_chars, decided before the embed is attempted; present even if the embed never happens. Absent when the whole prompt fit. */
 	embed_chars?: number;
 }
 
