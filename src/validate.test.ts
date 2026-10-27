@@ -1939,7 +1939,7 @@ describe("historian lifecycle events", () => {
 	// and retrieval returned an empty context block — 93 of 246 live retrievals.
 	// Fitting the query to the limit fixes that, but a truncated query that looks
 	// identical to a complete one is the same silent degradation ONL-123 removed.
-	// embed_chars is what was actually sent, so embed_chars < prompt_chars is the
+	// embed_chars is the query as fitted, so embed_chars < prompt_chars is the
 	// truncation, readable from the one event without knowing the config.
 	it("validates retrieval.started reporting a truncated query", () => {
 		const event = hist(HISTORIAN_RETRIEVAL_STARTED, {
