@@ -2072,6 +2072,31 @@ describe("historian lifecycle events", () => {
 		expect(validate(event).valid).toBe(true);
 	});
 
+	it("validates retrieval.complete searched by term overlap when the query had no vector", () => {
+		for (const query_unembedded of [
+			"embedder_unavailable",
+			"embed_failed",
+		] as const) {
+			const event = hist(HISTORIAN_RETRIEVAL_COMPLETE, {
+				outcome: "surfaced",
+				candidates_above_floor: 0,
+				lexical_candidates: 1,
+				query_unembedded,
+				duration_ms: 2100,
+			});
+			expect(validate(event).valid).toBe(true);
+		}
+	});
+
+	it("rejects retrieval.complete with a query_unembedded outside the enum", () => {
+		const event = hist(HISTORIAN_RETRIEVAL_COMPLETE, {
+			outcome: "empty",
+			query_unembedded: "oversized",
+			duration_ms: 2100,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
 	it("rejects embedder.failed reporting zero failures", () => {
 		const event = hist(HISTORIAN_EMBEDDER_FAILED, {
 			backend: "ollama",

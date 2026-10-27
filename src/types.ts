@@ -1452,6 +1452,8 @@ export interface HistorianRetrievalCompletePayload {
 	candidates_above_floor?: number;
 	/** Unembedded chunks that matched by term overlap; counted apart from candidates_above_floor. */
 	lexical_candidates?: number;
+	/** The query could not be embedded, so the search ran on term overlap alone. */
+	query_unembedded?: "embedder_unavailable" | "embed_failed";
 	duration_ms?: number;
 }
 
