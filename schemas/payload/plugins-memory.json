@@ -889,6 +889,11 @@
 					"minimum": 0,
 					"description": "Chunks with no embedding that matched the prompt by term overlap (ONL-124). A chunk whose embed failed at indexing time has no vector, and retrieval used to skip it outright, so a partially embedded session vanished instead of degrading. These are counted apart from candidates_above_floor, which stays vector-only, and always rank below every vector match. Absent means none matched."
 				},
+				"query_unembedded": {
+					"type": "string",
+					"enum": ["embedder_unavailable", "embed_failed"],
+					"description": "Present when the prompt itself could not be embedded and the search ran on term overlap alone (ONL-213), with the same meanings as the skip_reason values of the same name. Before this, either failure ended the retrieval as skipped with nothing searched, though every chunk was on disk. With no query vector, every chunk is scored by term overlap, so candidates_above_floor is 0, top_similarity is absent, and any hit is lexical_candidates. The accompanying historian.embedder.unavailable or historian.embedder.failed still reports the failure."
+				},
 				"duration_ms": { "type": "integer", "minimum": 0 }
 			}
 		},
