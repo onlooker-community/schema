@@ -795,9 +795,32 @@ export interface BursarRollupSkippedPayload {
 	project_key?: string;
 }
 
-export interface LineageChangeRecordedPayload {
+/**
+ * A change attributed to the session that made it, or (ONL-26) one no session
+ * can be shown to have made. An unknown record carries the observing session
+ * in its own field and no `session_id`, so it never names the observer as the
+ * author.
+ */
+export type LineageChangeRecordedPayload = LineageChangeRecordedBase &
+	(
+		| {
+				session_id: string;
+				authorship?: "session";
+		  }
+		| {
+				session_id?: never;
+				authorship: "unknown";
+				/**
+				 * `predates_call`: the file changed before the command whose
+				 * hook observed it had started.
+				 */
+				authorship_reason: "predates_call";
+				observed_by_session_id: string;
+		  }
+	);
+
+export interface LineageChangeRecordedBase {
 	project_key: string;
-	session_id: string;
 	file_path: string;
 	tool: "Edit" | "Write" | "MultiEdit" | "Bash";
 	operation: "create" | "overwrite" | "edit" | "multi_edit" | "shell_edit";
