@@ -1240,6 +1240,80 @@ describe("lineage provenance events", () => {
 		expect(validate(event).valid).toBe(true);
 	});
 
+	// ONL-26. A change no session can be shown to have made is recorded as
+	// unknown rather than under whichever session happened to observe it, so
+	// the observer travels in its own field and session_id, the author, is
+	// absent.
+	it("validates a change record whose authorship is unknown", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			file_path: "docs/plan.md",
+			tool: "Bash",
+			operation: "shell_edit",
+			authorship: "unknown",
+			authorship_reason: "predates_call",
+			observed_by_session_id: SID,
+		});
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects an unknown-authorship record that still names an author", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			session_id: SID,
+			file_path: "docs/plan.md",
+			tool: "Bash",
+			operation: "shell_edit",
+			authorship: "unknown",
+			authorship_reason: "predates_call",
+			observed_by_session_id: SID,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
+	it("rejects an unknown-authorship record with no reason or observer", () => {
+		for (const missing of ["authorship_reason", "observed_by_session_id"]) {
+			const payload: Record<string, unknown> = {
+				project_key: PROJECT_KEY,
+				file_path: "docs/plan.md",
+				tool: "Bash",
+				operation: "shell_edit",
+				authorship: "unknown",
+				authorship_reason: "predates_call",
+				observed_by_session_id: SID,
+			};
+			delete payload[missing];
+			const event = lineage(LINEAGE_CHANGE_RECORDED, payload as never);
+			expect(validate(event).valid, `without ${missing}`).toBe(false);
+		}
+	});
+
+	it("still requires session_id when authorship is not unknown", () => {
+		for (const authorship of [undefined, "session"]) {
+			const event = lineage(LINEAGE_CHANGE_RECORDED, {
+				project_key: PROJECT_KEY,
+				file_path: "docs/plan.md",
+				tool: "Bash",
+				operation: "shell_edit",
+				...(authorship ? { authorship } : {}),
+			} as never);
+			expect(validate(event).valid, `authorship ${authorship}`).toBe(false);
+		}
+	});
+
+	it("rejects an unknown authorship_reason", () => {
+		const event = lineage(LINEAGE_CHANGE_RECORDED, {
+			project_key: PROJECT_KEY,
+			file_path: "docs/plan.md",
+			tool: "Bash",
+			operation: "shell_edit",
+			authorship: "unknown",
+			authorship_reason: "guessed",
+			observed_by_session_id: SID,
+		} as never);
+		expect(validate(event).valid).toBe(false);
+	});
+
 	it("rejects an unknown provenance_kind", () => {
 		const event = lineage(LINEAGE_CHANGE_RECORDED, {
 			project_key: PROJECT_KEY,

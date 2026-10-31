@@ -283,16 +283,40 @@
 		"lineage.change.recorded": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": [
-				"project_key",
-				"session_id",
-				"file_path",
-				"tool",
-				"operation"
+			"required": ["project_key", "file_path", "tool", "operation"],
+			"allOf": [
+				{
+					"if": {
+						"required": ["authorship"],
+						"properties": { "authorship": { "const": "unknown" } }
+					},
+					"then": {
+						"required": ["authorship_reason", "observed_by_session_id"],
+						"not": { "required": ["session_id"] }
+					},
+					"else": { "required": ["session_id"] }
+				}
 			],
 			"properties": {
 				"project_key": { "type": "string" },
-				"session_id": { "type": "string" },
+				"session_id": {
+					"type": "string",
+					"description": "The session that made the change. Absent when authorship is unknown, so an unattributable change never names a session as its author."
+				},
+				"authorship": {
+					"type": "string",
+					"enum": ["session", "unknown"],
+					"description": "Whether session_id is the change's author. Absent means session."
+				},
+				"authorship_reason": {
+					"type": "string",
+					"enum": ["predates_call"],
+					"description": "Why authorship is unknown. predates_call: the file changed before the command whose hook observed it had started, so that command cannot have made it."
+				},
+				"observed_by_session_id": {
+					"type": "string",
+					"description": "The session whose hook observed an unattributable change. Not its author."
+				},
 				"file_path": { "type": "string" },
 				"tool": {
 					"type": "string",
