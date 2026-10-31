@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0](https://github.com/onlooker-community/schema/compare/v3.6.0...v3.7.0) (2026-10-31)
+
+
+### Features
+
+* **lineage:** let a change record say no session made it :ghost: ([#107](https://github.com/onlooker-community/schema/issues/107)) ([ba379f7](https://github.com/onlooker-community/schema/commit/ba379f7502b36c8a18b89b1fb963eb4ead5b5f73))
+
 ## [3.6.0](https://github.com/onlooker-community/schema/compare/v3.5.0...v3.6.0) (2026-10-27)
 
 
