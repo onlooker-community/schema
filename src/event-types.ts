@@ -63,6 +63,7 @@ export const RELAY_HANDOFF_INJECTED = "relay.handoff.injected" as const;
 export const SCRIBE_CAPTURE_COMPLETE = "scribe.capture.complete" as const;
 export const SCRIBE_DISTILL_COMPLETE = "scribe.distill.complete" as const;
 export const SCRIBE_DISTILL_SKIPPED = "scribe.distill.skipped" as const;
+export const SCRIBE_DISTILL_ERRORED = "scribe.distill.errored" as const;
 
 export const PROMPT_RULE_MATCHED = "prompt_rule.matched" as const;
 export const PROMPT_RULE_APPLIED = "prompt_rule.applied" as const;
@@ -255,6 +256,7 @@ export const ALL_EVENT_TYPES = [
 	SCRIBE_CAPTURE_COMPLETE,
 	SCRIBE_DISTILL_COMPLETE,
 	SCRIBE_DISTILL_SKIPPED,
+	SCRIBE_DISTILL_ERRORED,
 	PROMPT_RULE_MATCHED,
 	PROMPT_RULE_APPLIED,
 	GOVERNOR_GATE_CHECKED,

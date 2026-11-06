@@ -147,6 +147,22 @@
 				}
 			}
 		},
+		"scribe.distill.errored": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": [
+						"extraction_failed",
+						"output_dir_unwritable",
+						"write_failed"
+					],
+					"description": "Why a pass that set out to write an intent document did not. extraction_failed means the model pass returned nothing usable; output_dir_unwritable and write_failed mean the document could not be put on disk. Without this a broken pass emitted nothing, and on the bus looked the same as a Stop hook that never fired (ONL-120). A deliberate decline is scribe.distill.skipped instead."
+				}
+			}
+		},
 		"oracle.calibration.requested": {
 			"type": "object",
 			"additionalProperties": false,
