@@ -585,6 +585,19 @@ export interface ScribeDistillSkippedPayload {
 	threshold?: number;
 }
 
+export type ScribeDistillErrorReason =
+	| "extraction_failed"
+	| "output_dir_unwritable"
+	| "write_failed";
+
+/**
+ * A pass that set out to write an intent document and did not. A deliberate
+ * decline is scribe.distill.skipped instead (ONL-120).
+ */
+export interface ScribeDistillErroredPayload {
+	reason: ScribeDistillErrorReason;
+}
+
 export interface PromptRuleMatchedPayload {
 	rule_id: string;
 	match_type: "regex" | "vocabulary" | "semantic";
@@ -1745,6 +1758,7 @@ export interface PayloadMap {
 	"scribe.capture.complete": ScribeCaptureCompletePayload;
 	"scribe.distill.complete": ScribeDistillCompletePayload;
 	"scribe.distill.skipped": ScribeDistillSkippedPayload;
+	"scribe.distill.errored": ScribeDistillErroredPayload;
 	"prompt_rule.matched": PromptRuleMatchedPayload;
 	"prompt_rule.applied": PromptRuleAppliedPayload;
 	"governor.gate.checked": GovernorGateCheckedPayload;

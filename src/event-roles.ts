@@ -133,6 +133,8 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	"scribe.capture.complete": "lifecycle",
 	"scribe.distill.complete": "output",
 	"scribe.distill.skipped": "skipped",
+	// A pass that broke: extraction, or writing the document (ONL-120).
+	"scribe.distill.errored": "failed",
 
 	// Fires on every match, including one fire-once then suppresses; `applied`
 	// is the guidance actually injected.

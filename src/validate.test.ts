@@ -75,6 +75,7 @@ import {
 	ONLOOKER_CURRENCY_SKIPPED,
 	ONLOOKER_CURRENCY_STALE,
 	ONLOOKER_WATCH_UNMATCHED,
+	SCRIBE_DISTILL_ERRORED,
 	SCRIBE_DISTILL_SKIPPED,
 	SENTINEL_BLOCKED,
 	SESSION_START,
@@ -3205,6 +3206,58 @@ describe("scribe.distill.skipped", () => {
 			validate(skipped({ reason: "below_min_turns", turn_count: -1 })).valid,
 		).toBe(false);
 	});
+
+	// A failure is not a skip. The hosted feed keeps only event types, so a
+	// failure under a skipped name would count as a deliberate decline.
+	it("rejects a failure reason", () => {
+		expect(validate(skipped({ reason: "extraction_failed" })).valid).toBe(
+			false,
+		);
+	});
+});
+
+// ONL-120. Scribe's three failure returns emitted nothing, so on the bus a pass
+// that broke looked the same as a Stop hook that never fired.
+describe("scribe.distill.errored", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function errored(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "scribe",
+			machine_id: MACHINE_ID,
+			session_id: "session-scribe-1",
+			event_type: SCRIBE_DISTILL_ERRORED,
+			payload: payload as never,
+		});
+	}
+
+	it("validates each named failure reason", () => {
+		const reasons = [
+			"extraction_failed",
+			"output_dir_unwritable",
+			"write_failed",
+		] as const;
+		for (const reason of reasons) {
+			expect(validate(errored({ reason })).valid).toBe(true);
+		}
+	});
+
+	it("rejects a failure with no reason", () => {
+		expect(validate(errored({})).valid).toBe(false);
+	});
+
+	it("rejects a skip reason", () => {
+		expect(validate(errored({ reason: "below_min_turns" })).valid).toBe(false);
+	});
+
+	it("rejects an unregistered property", () => {
+		expect(
+			validate(errored({ reason: "write_failed", path: "/tmp/x.md" })).valid,
+		).toBe(false);
+	});
 });
 
 describe("historian.indexing.complete skip reasons", () => {
@@ -3550,8 +3603,8 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 147 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(147);
+	it("has exactly 148 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(148);
 	});
 });
 
