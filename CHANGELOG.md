@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.0](https://github.com/onlooker-community/schema/compare/v3.7.0...v3.8.0) (2026-11-06)
+
+
+### Features
+
+* **events:** give a broken scribe pass a type of its own :rotating_light: ([#109](https://github.com/onlooker-community/schema/issues/109)) ([83e0e57](https://github.com/onlooker-community/schema/commit/83e0e572d58d4cdceac55fdcb83490e6df4e8e4d))
+
 ## [3.7.0](https://github.com/onlooker-community/schema/compare/v3.6.0...v3.7.0) (2026-10-31)
 
 
