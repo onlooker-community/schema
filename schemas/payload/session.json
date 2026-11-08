@@ -12,7 +12,20 @@
 				"working_directory": { "type": "string" },
 				"git_branch": { "type": "string" },
 				"git_commit": { "type": "string" },
-				"resume_of_session_id": { "type": "string" }
+				"resume_of_session_id": { "type": "string" },
+				"source": {
+					"type": "string",
+					"minLength": 1,
+					"description": "The kind of start, passed through from the runtime's SessionStart input: startup, resume or clear for Claude Code. Not an enum, so a source the runtime adds later still validates."
+				},
+				"parent_session_id": {
+					"type": "string",
+					"description": "The session that spawned this one, such as a `claude -p` run from another session's shell. Absent when no spawning session was found, which includes a person starting the session. Distinct from resume_of_session_id, which names the session this one continues."
+				},
+				"attended": {
+					"type": "boolean",
+					"description": "Whether a person is driving the session. False for a headless run (`claude -p`), including one with no parent_session_id, such as a run started by cron or a script."
+				}
 			}
 		},
 		"session.end": {
