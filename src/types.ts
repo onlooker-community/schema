@@ -12,6 +12,12 @@ export interface SessionStartPayload {
 	git_branch?: string;
 	git_commit?: string;
 	resume_of_session_id?: string;
+	/** The runtime's kind of start: startup, resume or clear for Claude Code. */
+	source?: string;
+	/** The session that spawned this one. Absent when none was found. */
+	parent_session_id?: string;
+	/** False for a headless run, whether or not it has a parent session. */
+	attended?: boolean;
 }
 
 export interface SessionEndPayload {

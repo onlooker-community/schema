@@ -141,6 +141,49 @@ describe("validate", () => {
 		expect(result.valid).toBe(true);
 	});
 
+	it("accepts a session.start that says what kind of start it was", () => {
+		const event = baseValid();
+		event.payload = {
+			working_directory: "/tmp",
+			source: "startup",
+			parent_session_id: "77b3175b-c0a4-48bd-ad21-63857788a318",
+			attended: false,
+		};
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("passes through a session.start source Claude Code adds later", () => {
+		const event = baseValid();
+		event.payload = { working_directory: "/tmp", source: "fork" };
+		expect(validate(event).valid).toBe(true);
+	});
+
+	it("rejects a session.start whose attended is not a boolean", () => {
+		const event = baseValid() as unknown as {
+			payload: Record<string, unknown>;
+		};
+		event.payload = { working_directory: "/tmp", attended: "1" };
+		const result = validate(event);
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors.some((e) => e.path.includes("attended"))).toBe(true);
+		}
+	});
+
+	it("rejects a null parent_session_id, which must be absent instead", () => {
+		const event = baseValid() as unknown as {
+			payload: Record<string, unknown>;
+		};
+		event.payload = { working_directory: "/tmp", parent_session_id: null };
+		const result = validate(event);
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(
+				result.errors.some((e) => e.path.includes("parent_session_id")),
+			).toBe(true);
+		}
+	});
+
 	it("rejects missing required fields", () => {
 		const event = baseValid() as unknown as Record<string, unknown>;
 		delete event.session_id;
