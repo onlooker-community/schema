@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.9.0](https://github.com/onlooker-community/schema/compare/v3.8.0...v3.9.0) (2026-11-08)
+
+
+### Features
+
+* **session:** say what kind of start a session.start was :baby: ([#111](https://github.com/onlooker-community/schema/issues/111)) ([4439042](https://github.com/onlooker-community/schema/commit/443904284ce21f18a8be9e8a6c475fb1566d3721))
+
 ## [3.8.0](https://github.com/onlooker-community/schema/compare/v3.7.0...v3.8.0) (2026-11-06)
 
 
