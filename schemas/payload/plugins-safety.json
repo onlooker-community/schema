@@ -411,6 +411,48 @@
 				}
 			}
 		},
+		"tribunal.nudge.shown": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["trigger", "session_files", "sensitive_files"],
+			"properties": {
+				"trigger": {
+					"type": "string",
+					"enum": ["size", "sensitive", "grew"],
+					"description": "What made the Stop-time nudge suggest /tribunal. size: this session edited at least nudge.min_files files. sensitive: it edited a file matching nudge.sensitive_globs (wins when both apply). grew: a nudge was already shown this session, and since then a new sensitive file appeared or the file count doubled. The nudge makes no model call."
+				},
+				"session_files": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Files this session's transcript shows it editing inside the worktree, committed or not, after nudge.ignore_globs."
+				},
+				"sensitive_files": {
+					"type": "array",
+					"maxItems": 20,
+					"items": { "type": "string" },
+					"description": "Worktree-relative paths that matched nudge.sensitive_globs, capped at 20."
+				}
+			}
+		},
+		"tribunal.nudge.skipped": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["reason"],
+			"properties": {
+				"reason": {
+					"type": "string",
+					"enum": [
+						"gate_enabled",
+						"no_project_context",
+						"no_transcript",
+						"tribunal_ran",
+						"below_threshold",
+						"unchanged"
+					],
+					"description": "Why the Stop-time nudge stayed quiet. Each reason is emitted at most once per session, so a typical session costs one or two emissions rather than one per Stop. gate_enabled: tribunal.stop_hook.enabled is on, so the paid gate already judges editing Stops. tribunal_ran: /tribunal already ran in this session. below_threshold: neither trigger tripped. unchanged: a nudge was shown and nothing has grown since. There is deliberately no disabled reason: turning the nudge off is read from config, and emitting it would cost an opted-out user a node exec on every Stop."
+				}
+			}
+		},
 		"warden.threat.detected": {
 			"type": "object",
 			"additionalProperties": false,

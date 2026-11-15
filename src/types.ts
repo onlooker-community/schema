@@ -350,6 +350,31 @@ export interface TribunalGateErroredPayload {
 		| "judge_unparseable";
 }
 
+/**
+ * The Stop-time nudge suggested /tribunal. It makes no model call; this is
+ * the record that it spoke, and why.
+ */
+export interface TribunalNudgeShownPayload {
+	trigger: "size" | "sensitive" | "grew";
+	session_files: number;
+	/** Worktree-relative, at most 20. */
+	sensitive_files: string[];
+}
+
+/**
+ * The Stop-time nudge stayed quiet, at most once per session per reason.
+ * There is no `disabled`: that is read from config.
+ */
+export interface TribunalNudgeSkippedPayload {
+	reason:
+		| "gate_enabled"
+		| "no_project_context"
+		| "no_transcript"
+		| "tribunal_ran"
+		| "below_threshold"
+		| "unchanged";
+}
+
 export interface WardenThreatDetectedPayload {
 	source_type: "web_fetch" | "file_read";
 	threat_type:
@@ -1746,6 +1771,8 @@ export interface PayloadMap {
 	"tribunal.gate.blocked": TribunalGateBlockedPayload;
 	"tribunal.gate.skipped": TribunalGateSkippedPayload;
 	"tribunal.gate.errored": TribunalGateErroredPayload;
+	"tribunal.nudge.shown": TribunalNudgeShownPayload;
+	"tribunal.nudge.skipped": TribunalNudgeSkippedPayload;
 	"warden.threat.detected": WardenThreatDetectedPayload;
 	"warden.threat.cleared": WardenThreatClearedPayload;
 	"warden.gate.blocked": WardenGateBlockedPayload;

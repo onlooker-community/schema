@@ -107,6 +107,8 @@
 				"tribunal.gate.blocked",
 				"tribunal.gate.skipped",
 				"tribunal.gate.errored",
+				"tribunal.nudge.shown",
+				"tribunal.nudge.skipped",
 				"warden.threat.detected",
 				"warden.threat.cleared",
 				"warden.gate.blocked",
