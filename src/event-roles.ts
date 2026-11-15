@@ -100,6 +100,10 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	// Judge failures and a missing claude CLI, split out of
 	// tribunal.gate.skipped by ONL-192.
 	"tribunal.gate.errored": "failed",
+	// The Stop-time nudge toward /tribunal. Suggesting is its job, so shown is
+	// output; staying quiet below threshold is a deliberate skip.
+	"tribunal.nudge.shown": "output",
+	"tribunal.nudge.skipped": "skipped",
 
 	"warden.threat.detected": "output",
 	// The plugin carrying out a user's /warden clear.

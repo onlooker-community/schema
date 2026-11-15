@@ -92,6 +92,8 @@ import {
 	TRIBUNAL_JURY_EMPANELED,
 	TRIBUNAL_META_COMPLETE,
 	TRIBUNAL_META_START,
+	TRIBUNAL_NUDGE_SHOWN,
+	TRIBUNAL_NUDGE_SKIPPED,
 	TRIBUNAL_SESSION_COMPLETE,
 	TRIBUNAL_SESSION_START,
 	TRIBUNAL_VERDICT,
@@ -841,6 +843,123 @@ describe("tribunal full-loop events", () => {
 			);
 			expect(result.valid).toBe(true);
 		}
+	});
+});
+
+// The Stop-time nudge toward /tribunal. It makes no model call; these record
+// that it spoke, or why it stayed quiet, so an idle nudge is distinguishable
+// from a broken one (ONL-172).
+describe("tribunal.nudge.shown", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function shown(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "tribunal",
+			machine_id: MACHINE_ID,
+			session_id: "session-nudge-1",
+			event_type: TRIBUNAL_NUDGE_SHOWN,
+			payload: payload as never,
+		});
+	}
+
+	it("validates each trigger", () => {
+		for (const trigger of ["size", "sensitive", "grew"] as const) {
+			expect(
+				validate(
+					shown({
+						trigger,
+						session_files: 9,
+						sensitive_files: [".github/workflows/ci.yml"],
+					}),
+				).valid,
+			).toBe(true);
+		}
+	});
+
+	it("rejects an unknown trigger", () => {
+		expect(
+			validate(
+				shown({ trigger: "vibes", session_files: 9, sensitive_files: [] }),
+			).valid,
+		).toBe(false);
+	});
+
+	it("rejects more than 20 sensitive files", () => {
+		const files = Array.from({ length: 21 }, (_, i) => `auth/${i}.ts`);
+		expect(
+			validate(
+				shown({
+					trigger: "sensitive",
+					session_files: 21,
+					sensitive_files: files,
+				}),
+			).valid,
+		).toBe(false);
+	});
+
+	it("rejects a negative file count", () => {
+		expect(
+			validate(
+				shown({ trigger: "size", session_files: -1, sensitive_files: [] }),
+			).valid,
+		).toBe(false);
+	});
+
+	it("rejects an unregistered property", () => {
+		expect(
+			validate(
+				shown({
+					trigger: "size",
+					session_files: 9,
+					sensitive_files: [],
+					message: "x",
+				}),
+			).valid,
+		).toBe(false);
+	});
+});
+
+describe("tribunal.nudge.skipped", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function skipped(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "tribunal",
+			machine_id: MACHINE_ID,
+			session_id: "session-nudge-1",
+			event_type: TRIBUNAL_NUDGE_SKIPPED,
+			payload: payload as never,
+		});
+	}
+
+	it("validates each reason", () => {
+		const reasons = [
+			"gate_enabled",
+			"no_project_context",
+			"no_transcript",
+			"tribunal_ran",
+			"below_threshold",
+			"unchanged",
+		] as const;
+		for (const reason of reasons) {
+			expect(validate(skipped({ reason })).valid).toBe(true);
+		}
+	});
+
+	// Turning the nudge off is a config fact, read from config. Emitting it
+	// would cost every opted-out Stop a node exec forever.
+	it("rejects disabled", () => {
+		expect(validate(skipped({ reason: "disabled" })).valid).toBe(false);
+	});
+
+	it("rejects a skip with no reason", () => {
+		expect(validate(skipped({})).valid).toBe(false);
 	});
 });
 
@@ -3646,8 +3765,8 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 148 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(148);
+	it("has exactly 150 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(150);
 	});
 });
 

@@ -37,6 +37,8 @@ export const TRIBUNAL_GATE_PASSED = "tribunal.gate.passed" as const;
 export const TRIBUNAL_GATE_BLOCKED = "tribunal.gate.blocked" as const;
 export const TRIBUNAL_GATE_SKIPPED = "tribunal.gate.skipped" as const;
 export const TRIBUNAL_GATE_ERRORED = "tribunal.gate.errored" as const;
+export const TRIBUNAL_NUDGE_SHOWN = "tribunal.nudge.shown" as const;
+export const TRIBUNAL_NUDGE_SKIPPED = "tribunal.nudge.skipped" as const;
 
 export const WARDEN_THREAT_DETECTED = "warden.threat.detected" as const;
 export const WARDEN_THREAT_CLEARED = "warden.threat.cleared" as const;
@@ -238,6 +240,8 @@ export const ALL_EVENT_TYPES = [
 	TRIBUNAL_GATE_BLOCKED,
 	TRIBUNAL_GATE_SKIPPED,
 	TRIBUNAL_GATE_ERRORED,
+	TRIBUNAL_NUDGE_SHOWN,
+	TRIBUNAL_NUDGE_SKIPPED,
 	WARDEN_THREAT_DETECTED,
 	WARDEN_THREAT_CLEARED,
 	WARDEN_GATE_BLOCKED,
