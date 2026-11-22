@@ -9,6 +9,7 @@ import {
 	EVENT_TYPE_ROLES,
 	type EventRole,
 	roleOf,
+	TRIBUNAL_SESSION_RESOLVED,
 } from "./index.js";
 
 describe("EVENT_TYPE_ROLES", () => {
@@ -51,6 +52,12 @@ describe("tribunal.session.resolved", () => {
 	// app, once for every keep, discard and retry (ONL-308).
 	it("is lifecycle, not output", () => {
 		expect(roleOf("tribunal.session.resolved")).toBe("lifecycle");
+	});
+
+	// A constant registered but not re-exported is unreachable from the
+	// package root, which is all a consumer can import.
+	it("is exported from the package entry point", () => {
+		expect(TRIBUNAL_SESSION_RESOLVED).toBe("tribunal.session.resolved");
 	});
 });
 
