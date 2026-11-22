@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.11.0](https://github.com/onlooker-community/schema/compare/v3.10.0...v3.11.0) (2026-11-22)
+
+
+### Features
+
+* **events:** record what happens after tribunal rejects work :scales: ([#115](https://github.com/onlooker-community/schema/issues/115)) ([4c1b0c9](https://github.com/onlooker-community/schema/commit/4c1b0c958953fcef09d8df9449b2bc61083b8e12))
+
 ## [3.10.0](https://github.com/onlooker-community/schema/compare/v3.9.0...v3.10.0) (2026-11-15)
 
 
