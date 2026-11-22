@@ -23,6 +23,7 @@ export const SENTINEL_REVIEWED = "sentinel.reviewed" as const;
 
 export const TRIBUNAL_SESSION_START = "tribunal.session.start" as const;
 export const TRIBUNAL_SESSION_COMPLETE = "tribunal.session.complete" as const;
+export const TRIBUNAL_SESSION_RESOLVED = "tribunal.session.resolved" as const;
 export const TRIBUNAL_ITERATION_START = "tribunal.iteration.start" as const;
 export const TRIBUNAL_ACTOR_START = "tribunal.actor.start" as const;
 export const TRIBUNAL_ACTOR_COMPLETE = "tribunal.actor.complete" as const;
@@ -226,6 +227,7 @@ export const ALL_EVENT_TYPES = [
 	SENTINEL_REVIEWED,
 	TRIBUNAL_SESSION_START,
 	TRIBUNAL_SESSION_COMPLETE,
+	TRIBUNAL_SESSION_RESOLVED,
 	TRIBUNAL_ITERATION_START,
 	TRIBUNAL_ACTOR_START,
 	TRIBUNAL_ACTOR_COMPLETE,

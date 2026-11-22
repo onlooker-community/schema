@@ -88,6 +88,37 @@
 				"total_duration_ms": { "type": "integer", "minimum": 0 }
 			}
 		},
+		"tribunal.session.resolved": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["task_id", "outcome", "decision"],
+			"properties": {
+				"task_id": {
+					"type": "string",
+					"description": "The run being resolved. Joins to its tribunal.session.start and tribunal.session.complete."
+				},
+				"outcome": {
+					"type": "string",
+					"enum": ["rejected", "exhausted_iterations"],
+					"description": "How the run ended. Only a run the jury did not accept is asked about; accepted and aborted never are."
+				},
+				"decision": {
+					"type": "string",
+					"enum": ["kept", "discarded", "retried"],
+					"description": "What the person chose for the actor's changes. kept is the override: work the jury rejected stays. discarded restores the files the run changed that were clean when it started. retried starts a new run, with its own task_id. A non-accepted run with no resolved event went unanswered."
+				},
+				"files_restored": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Discard only. Files restored to HEAD or, if the run created them, deleted."
+				},
+				"files_left": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Discard only. Files that were already dirty before the run and that the actor changed again. They are left alone."
+				}
+			}
+		},
 		"tribunal.iteration.start": {
 			"type": "object",
 			"additionalProperties": false,

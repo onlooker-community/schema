@@ -45,6 +45,15 @@ describe("EVENT_TYPE_ROLES", () => {
 	});
 });
 
+describe("tribunal.session.resolved", () => {
+	// A person's answer after a rejection, not something tribunal produced. As
+	// "output" it would count toward the plugin's "Produced" line in the web
+	// app, once for every keep, discard and retry (ONL-308).
+	it("is lifecycle, not output", () => {
+		expect(roleOf("tribunal.session.resolved")).toBe("lifecycle");
+	});
+});
+
 describe("roleOf", () => {
 	it("returns the role of a registered type", () => {
 		expect(roleOf("session.start")).toBe(EVENT_TYPE_ROLES["session.start"]);
