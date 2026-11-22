@@ -95,6 +95,7 @@ import {
 	TRIBUNAL_NUDGE_SHOWN,
 	TRIBUNAL_NUDGE_SKIPPED,
 	TRIBUNAL_SESSION_COMPLETE,
+	TRIBUNAL_SESSION_RESOLVED,
 	TRIBUNAL_SESSION_START,
 	TRIBUNAL_VERDICT,
 } from "./event-types.js";
@@ -960,6 +961,97 @@ describe("tribunal.nudge.skipped", () => {
 
 	it("rejects a skip with no reason", () => {
 		expect(validate(skipped({})).valid).toBe(false);
+	});
+});
+
+// What the person did after a /tribunal run the jury did not accept. A
+// rejection with no resolved event is one nobody answered (ONL-308).
+describe("tribunal.session.resolved", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function resolved(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "tribunal",
+			machine_id: MACHINE_ID,
+			session_id: "session-resolved-1",
+			event_type: TRIBUNAL_SESSION_RESOLVED,
+			payload: payload as never,
+		});
+	}
+
+	it("validates each decision for each outcome it resolves", () => {
+		for (const outcome of ["rejected", "exhausted_iterations"] as const) {
+			for (const decision of ["kept", "discarded", "retried"] as const) {
+				expect(
+					validate(resolved({ task_id: "t", outcome, decision })).valid,
+				).toBe(true);
+			}
+		}
+	});
+
+	it("validates a discard's file counts", () => {
+		expect(
+			validate(
+				resolved({
+					task_id: "t",
+					outcome: "rejected",
+					decision: "discarded",
+					files_restored: 3,
+					files_left: 1,
+				}),
+			).valid,
+		).toBe(true);
+	});
+
+	it("rejects a missing decision", () => {
+		expect(
+			validate(resolved({ task_id: "t", outcome: "rejected" })).valid,
+		).toBe(false);
+	});
+
+	it("rejects an unknown decision", () => {
+		expect(
+			validate(
+				resolved({ task_id: "t", outcome: "rejected", decision: "ignored" }),
+			).valid,
+		).toBe(false);
+	});
+
+	// Only a run the jury did not accept is asked about.
+	it.each(["accepted", "aborted"])("rejects the %s outcome", (outcome) => {
+		expect(
+			validate(resolved({ task_id: "t", outcome, decision: "kept" })).valid,
+		).toBe(false);
+	});
+
+	it("rejects a negative count", () => {
+		expect(
+			validate(
+				resolved({
+					task_id: "t",
+					outcome: "rejected",
+					decision: "discarded",
+					files_restored: -1,
+				}),
+			).valid,
+		).toBe(false);
+	});
+
+	// Counts, never paths: the event says nothing about the person's code.
+	it("rejects an unregistered property", () => {
+		expect(
+			validate(
+				resolved({
+					task_id: "t",
+					outcome: "rejected",
+					decision: "discarded",
+					file_paths: ["src/a.ts"],
+				}),
+			).valid,
+		).toBe(false);
 	});
 });
 
@@ -3765,8 +3857,8 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 150 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(150);
+	it("has exactly 151 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(151);
 	});
 });
 

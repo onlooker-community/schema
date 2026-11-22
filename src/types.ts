@@ -188,6 +188,21 @@ export interface TribunalSessionCompletePayload {
 	total_duration_ms?: number;
 }
 
+/**
+ * What the person did after a /tribunal run ended without acceptance. Emitted
+ * once they answer, so a rejection with none went unanswered.
+ */
+export interface TribunalSessionResolvedPayload {
+	task_id: string;
+	outcome: "rejected" | "exhausted_iterations";
+	/** `kept` is the override: work the jury rejected stays. */
+	decision: "kept" | "discarded" | "retried";
+	/** Discard only: files restored to HEAD, or deleted if the run created them. */
+	files_restored?: number;
+	/** Discard only: files dirty before the run that the actor changed again. */
+	files_left?: number;
+}
+
 export interface TribunalIterationStartPayload {
 	task_id: string;
 	iteration_id: string;
@@ -1757,6 +1772,7 @@ export interface PayloadMap {
 	"sentinel.reviewed": SentinelReviewedPayload;
 	"tribunal.session.start": TribunalSessionStartPayload;
 	"tribunal.session.complete": TribunalSessionCompletePayload;
+	"tribunal.session.resolved": TribunalSessionResolvedPayload;
 	"tribunal.iteration.start": TribunalIterationStartPayload;
 	"tribunal.actor.start": TribunalActorStartPayload;
 	"tribunal.actor.complete": TribunalActorCompletePayload;

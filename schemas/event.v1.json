@@ -93,6 +93,7 @@
 				"sentinel.reviewed",
 				"tribunal.session.start",
 				"tribunal.session.complete",
+				"tribunal.session.resolved",
 				"tribunal.iteration.start",
 				"tribunal.actor.start",
 				"tribunal.actor.complete",

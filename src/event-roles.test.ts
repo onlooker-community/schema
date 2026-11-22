@@ -9,6 +9,7 @@ import {
 	EVENT_TYPE_ROLES,
 	type EventRole,
 	roleOf,
+	TRIBUNAL_SESSION_RESOLVED,
 } from "./index.js";
 
 describe("EVENT_TYPE_ROLES", () => {
@@ -42,6 +43,21 @@ describe("EVENT_TYPE_ROLES", () => {
 		expect(Object.keys(EVENT_TYPE_ROLES).sort()).toEqual(
 			[...envelope.properties.event_type.enum].sort(),
 		);
+	});
+});
+
+describe("tribunal.session.resolved", () => {
+	// A person's answer after a rejection, not something tribunal produced. As
+	// "output" it would count toward the plugin's "Produced" line in the web
+	// app, once for every keep, discard and retry (ONL-308).
+	it("is lifecycle, not output", () => {
+		expect(roleOf("tribunal.session.resolved")).toBe("lifecycle");
+	});
+
+	// A constant registered but not re-exported is unreachable from the
+	// package root, which is all a consumer can import.
+	it("is exported from the package entry point", () => {
+		expect(TRIBUNAL_SESSION_RESOLVED).toBe("tribunal.session.resolved");
 	});
 });
 

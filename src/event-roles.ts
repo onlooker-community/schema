@@ -83,6 +83,8 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	// emitted only by the model following the /tribunal skill's prompt.
 	"tribunal.session.start": "lifecycle",
 	"tribunal.session.complete": "lifecycle",
+	// A person's answer after a rejected run, not something tribunal produced.
+	"tribunal.session.resolved": "lifecycle",
 	"tribunal.iteration.start": "lifecycle",
 	"tribunal.actor.start": "lifecycle",
 	// The Actor's work is input to the jury, not tribunal's own verdict.
