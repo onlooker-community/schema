@@ -1290,6 +1290,18 @@ export interface LibrarianLessonAssertedPayload {
 	reason_given?: boolean;
 }
 
+/**
+ * The unattended stage checking its own version-independence justification
+ * before the jury (ONL-311). A failure leaves the lesson pending and is never
+ * a decline. The reason stays on the proposal; only whether one was given
+ * rides here.
+ */
+export interface LibrarianLessonSelfCheckedPayload {
+	lesson_id: string;
+	outcome: "passed" | "failed" | "unavailable";
+	reason_given?: boolean;
+}
+
 export type LibrarianUnjudgedReason =
 	| "panel_mismatch"
 	| "criterion_unscored"
@@ -1331,6 +1343,8 @@ export interface LibrarianAutojuryCompletePayload {
 	unavailable: number;
 	juried: number;
 	deferred_by_cap: number;
+	/** Absent from emitters older than ONL-311. */
+	self_check_failed?: number;
 	duration_ms: number;
 }
 
@@ -1853,6 +1867,7 @@ export interface PayloadMap {
 	"librarian.proposal.merged": LibrarianProposalMergedPayload;
 	"librarian.proposal.superseded": LibrarianProposalSupersededPayload;
 	"librarian.lesson.asserted": LibrarianLessonAssertedPayload;
+	"librarian.lesson.self_checked": LibrarianLessonSelfCheckedPayload;
 	"librarian.lesson.judged": LibrarianLessonJudgedPayload;
 	"librarian.lesson.promoted": LibrarianLessonPromotedPayload;
 	"librarian.lesson.shipped": LibrarianLessonShippedPayload;

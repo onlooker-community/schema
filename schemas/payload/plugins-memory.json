@@ -508,6 +508,23 @@
 				}
 			}
 		},
+		"librarian.lesson.self_checked": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lesson_id", "outcome"],
+			"properties": {
+				"lesson_id": { "type": "string" },
+				"outcome": {
+					"type": "string",
+					"enum": ["passed", "failed", "unavailable"],
+					"description": "The unattended stage's check of its own version-independence justification, before the jury. passed confirmed the candidate; failed left it pending, with the reason on the proposal and no decline; unavailable wrote nothing (no model response, or one that was neither PASS nor FAIL). A candidate held by an earlier failure under the same prompts and model is not asked again and emits nothing."
+				},
+				"reason_given": {
+					"type": "boolean",
+					"description": "On a failure, whether the model said why. The reason itself stays on the proposal."
+				}
+			}
+		},
 		"librarian.lesson.judged": {
 			"type": "object",
 			"additionalProperties": false,
@@ -589,6 +606,11 @@
 					"type": "integer",
 					"minimum": 0,
 					"description": "Model-asserted confirmed lessons left for a later scan by max_juries_per_scan."
+				},
+				"self_check_failed": {
+					"type": "integer",
+					"minimum": 0,
+					"description": "Candidates whose justification failed the self-check on this scan. A candidate held by an earlier failure is not counted again. Absent from emitters older than this field."
 				},
 				"duration_ms": { "type": "integer", "minimum": 0 }
 			}

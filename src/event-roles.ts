@@ -218,6 +218,7 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	"librarian.proposal.superseded": "output",
 	// Both carry an outcome that can mean the panel was unavailable.
 	"librarian.lesson.asserted": "output",
+	"librarian.lesson.self_checked": "output",
 	"librarian.lesson.judged": "output",
 	"librarian.lesson.promoted": "output",
 	"librarian.lesson.shipped": "output",

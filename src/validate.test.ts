@@ -62,6 +62,7 @@ import {
 	LIBRARIAN_LESSON_ASSERTED,
 	LIBRARIAN_LESSON_JUDGED,
 	LIBRARIAN_LESSON_PROMOTED,
+	LIBRARIAN_LESSON_SELF_CHECKED,
 	LIBRARIAN_LESSON_SHIPPED,
 	LIBRARIAN_LESSON_VETOED,
 	LIBRARIAN_PROPOSAL_ACCEPTED,
@@ -3857,8 +3858,8 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 151 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(151);
+	it("has exactly 152 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(152);
 	});
 });
 
@@ -3968,5 +3969,103 @@ describe("customs events", () => {
 				validate(customs(CUSTOMS_CHECK_FAILED, { tool: "Bash", stage })).valid,
 			).toBe(true);
 		}
+	});
+});
+
+// The unattended stage's check of its own justification, before the jury
+// (ONL-311). The reason stays on the proposal; only whether one was given
+// rides here.
+describe("librarian.lesson.self_checked", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function selfChecked(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "librarian",
+			machine_id: MACHINE_ID,
+			session_id: "session-self-check-1",
+			event_type: LIBRARIAN_LESSON_SELF_CHECKED,
+			payload: payload as never,
+		});
+	}
+
+	it("validates each outcome", () => {
+		for (const outcome of ["passed", "failed", "unavailable"] as const) {
+			expect(
+				validate(
+					selfChecked({ lesson_id: "01M6FJ2S6P2M9EAAEB2VD8SWMG", outcome }),
+				).valid,
+			).toBe(true);
+		}
+	});
+
+	it("accepts reason_given on a failure", () => {
+		expect(
+			validate(
+				selfChecked({
+					lesson_id: "01M6FJ2S6P2M9EAAEB2VD8SWMG",
+					outcome: "failed",
+					reason_given: true,
+				}),
+			).valid,
+		).toBe(true);
+	});
+
+	it("rejects an unknown outcome", () => {
+		expect(
+			validate(selfChecked({ lesson_id: "x", outcome: "refused" })).valid,
+		).toBe(false);
+	});
+
+	it("rejects the reason text itself", () => {
+		expect(
+			validate(
+				selfChecked({ lesson_id: "x", outcome: "failed", reason: "leaks" }),
+			).valid,
+		).toBe(false);
+	});
+});
+
+describe("librarian.autojury.complete self_check_failed", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	const base = {
+		asserted: 1,
+		refused: 0,
+		unavailable: 0,
+		juried: 1,
+		deferred_by_cap: 0,
+		duration_ms: 40,
+	};
+
+	function complete(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "librarian",
+			machine_id: MACHINE_ID,
+			session_id: "session-self-check-1",
+			event_type: LIBRARIAN_AUTOJURY_COMPLETE,
+			payload: payload as never,
+		});
+	}
+
+	it("still validates without it, as older emitters send", () => {
+		expect(validate(complete(base)).valid).toBe(true);
+	});
+
+	it("validates with it", () => {
+		expect(validate(complete({ ...base, self_check_failed: 2 })).valid).toBe(
+			true,
+		);
+	});
+
+	it("rejects a negative count", () => {
+		expect(validate(complete({ ...base, self_check_failed: -1 })).valid).toBe(
+			false,
+		);
 	});
 });
