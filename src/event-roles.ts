@@ -216,10 +216,10 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	// Not emitted: described in librarian's design notes only.
 	"librarian.proposal.merged": "output",
 	"librarian.proposal.superseded": "output",
-	// Both carry an outcome that can mean the panel was unavailable.
+	// All three carry an outcome that can mean the model or panel was unavailable.
 	"librarian.lesson.asserted": "output",
-	"librarian.lesson.self_checked": "output",
 	"librarian.lesson.judged": "output",
+	"librarian.lesson.self_checked": "output",
 	"librarian.lesson.promoted": "output",
 	"librarian.lesson.shipped": "output",
 	"librarian.lesson.vetoed": "output",

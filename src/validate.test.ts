@@ -4014,17 +4014,28 @@ describe("librarian.lesson.self_checked", () => {
 	});
 
 	it("rejects an unknown outcome", () => {
-		expect(
-			validate(selfChecked({ lesson_id: "x", outcome: "refused" })).valid,
-		).toBe(false);
+		const result = validate(
+			selfChecked({ lesson_id: "x", outcome: "refused" }),
+		);
+		expect(result.valid).toBe(false);
+		expect(result.errors.some((e) => e.path.includes("outcome"))).toBe(true);
 	});
 
 	it("rejects the reason text itself", () => {
+		const result = validate(
+			selfChecked({ lesson_id: "x", outcome: "failed", reason: "leaks" }),
+		);
+		expect(result.valid).toBe(false);
+		// The validator reports the keyword, not the property name, so the
+		// control below proves `reason` is the only thing wrong.
 		expect(
-			validate(
-				selfChecked({ lesson_id: "x", outcome: "failed", reason: "leaks" }),
-			).valid,
-		).toBe(false);
+			result.errors.some((e) =>
+				e.message.includes("must NOT have additional properties"),
+			),
+		).toBe(true);
+		expect(
+			validate(selfChecked({ lesson_id: "x", outcome: "failed" })).valid,
+		).toBe(true);
 	});
 });
 
@@ -4064,8 +4075,10 @@ describe("librarian.autojury.complete self_check_failed", () => {
 	});
 
 	it("rejects a negative count", () => {
-		expect(validate(complete({ ...base, self_check_failed: -1 })).valid).toBe(
-			false,
-		);
+		const result = validate(complete({ ...base, self_check_failed: -1 }));
+		expect(result.valid).toBe(false);
+		expect(
+			result.errors.some((e) => e.path.includes("self_check_failed")),
+		).toBe(true);
 	});
 });
