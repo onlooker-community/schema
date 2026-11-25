@@ -4,6 +4,13 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.12.0](https://github.com/onlooker-community/schema/compare/v3.11.0...v3.12.0) (2026-11-25)
+
+
+### Features
+
+* **events:** give the librarian self-check an event type :mag_right: ([#117](https://github.com/onlooker-community/schema/issues/117)) ([9dc3851](https://github.com/onlooker-community/schema/commit/9dc385157ee4b5cd4c6c417edc2b3d116d1d2b4d))
+
 ## [3.11.0](https://github.com/onlooker-community/schema/compare/v3.10.0...v3.11.0) (2026-11-22)
 
 
