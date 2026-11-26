@@ -1295,6 +1295,10 @@ export interface LibrarianLessonAssertedPayload {
  * before the jury (ONL-311). A failure leaves the lesson pending and is never
  * a decline. The reason stays on the proposal; only whether one was given
  * rides here.
+ *
+ * @deprecated Retired before any emitter shipped it. The self-check was
+ * measured as unable to separate vetoed lessons from approved ones, and it
+ * did not ship (ONL-311). Nothing emits this event.
  */
 export interface LibrarianLessonSelfCheckedPayload {
 	lesson_id: string;

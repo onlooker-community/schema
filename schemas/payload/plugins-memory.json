@@ -509,6 +509,7 @@
 			}
 		},
 		"librarian.lesson.self_checked": {
+			"description": "Retired in 3.12.1, before any emitter shipped it. The self-check it reports was measured as unable to separate vetoed lessons from approved ones, and it did not ship (ONL-311). No released librarian emits this event. It stays registered so the published 3.12.0 contract keeps validating.",
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["lesson_id", "outcome"],
