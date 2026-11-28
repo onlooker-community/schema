@@ -1334,6 +1334,17 @@ export interface LibrarianLessonVetoedPayload {
 }
 
 /**
+ * A person kept a lesson local (ONL-315): its claim and rationale went to the
+ * typed memory store as an accepted proposal instead of being shared.
+ */
+export interface LibrarianLessonKeptLocalPayload {
+	lesson_id: string;
+	/** The proposal written from the lesson, accepted in the same step. */
+	proposal_id: string;
+	memory_type: "user" | "feedback" | "project" | "reference";
+}
+
+/**
  * One unattended stage's totals. Emitted only when lesson_auto is enabled, so
  * its absence on a scan means the stage did not run.
  */
@@ -1872,6 +1883,7 @@ export interface PayloadMap {
 	"librarian.lesson.promoted": LibrarianLessonPromotedPayload;
 	"librarian.lesson.shipped": LibrarianLessonShippedPayload;
 	"librarian.lesson.vetoed": LibrarianLessonVetoedPayload;
+	"librarian.lesson.kept_local": LibrarianLessonKeptLocalPayload;
 	"librarian.autojury.complete": LibrarianAutojuryCompletePayload;
 	"librarian.tombstone.created": LibrarianTombstoneCreatedPayload;
 	"curator.scan.started": CuratorScanStartedPayload;

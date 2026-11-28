@@ -582,6 +582,22 @@
 				}
 			}
 		},
+		"librarian.lesson.kept_local": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["lesson_id", "proposal_id", "memory_type"],
+			"properties": {
+				"lesson_id": { "type": "string" },
+				"proposal_id": {
+					"type": "string",
+					"description": "The memory proposal written from the lesson's claim and rationale, and accepted in the same step because a person chose it."
+				},
+				"memory_type": {
+					"type": "string",
+					"enum": ["user", "feedback", "project", "reference"]
+				}
+			}
+		},
 		"librarian.autojury.complete": {
 			"type": "object",
 			"additionalProperties": false,

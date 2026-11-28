@@ -223,6 +223,7 @@ export const EVENT_TYPE_ROLES: Readonly<Record<EventType, EventRole>> = {
 	"librarian.lesson.promoted": "output",
 	"librarian.lesson.shipped": "output",
 	"librarian.lesson.vetoed": "output",
+	"librarian.lesson.kept_local": "output",
 	"librarian.autojury.complete": "lifecycle",
 	"librarian.tombstone.created": "output",
 
