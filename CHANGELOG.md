@@ -4,6 +4,18 @@ All notable changes to `@onlooker-community/schema` will be documented in this f
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.13.0](https://github.com/onlooker-community/schema/compare/v3.12.0...v3.13.0) (2026-11-28)
+
+
+### Features
+
+* **events:** record a lesson a person kept local :house: ([#120](https://github.com/onlooker-community/schema/issues/120)) ([6bdd879](https://github.com/onlooker-community/schema/commit/6bdd8797e0e0e9dbf8d4956b6e38a4c19bfee500))
+
+
+### Bug Fixes
+
+* **events:** mark the self-check event retired before it shipped :wave: ([#119](https://github.com/onlooker-community/schema/issues/119)) ([edd516d](https://github.com/onlooker-community/schema/commit/edd516d80dba3f03f4f7755ce6f036bd815ce51b))
+
 ## [3.12.0](https://github.com/onlooker-community/schema/compare/v3.11.0...v3.12.0) (2026-11-25)
 
 
