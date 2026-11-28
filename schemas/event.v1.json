@@ -184,6 +184,7 @@
 				"librarian.lesson.promoted",
 				"librarian.lesson.shipped",
 				"librarian.lesson.vetoed",
+				"librarian.lesson.kept_local",
 				"librarian.autojury.complete",
 				"curator.scan.started",
 				"curator.scan.complete",

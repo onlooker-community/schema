@@ -142,6 +142,8 @@ export const LIBRARIAN_LESSON_JUDGED = "librarian.lesson.judged" as const;
 export const LIBRARIAN_LESSON_PROMOTED = "librarian.lesson.promoted" as const;
 export const LIBRARIAN_LESSON_SHIPPED = "librarian.lesson.shipped" as const;
 export const LIBRARIAN_LESSON_VETOED = "librarian.lesson.vetoed" as const;
+export const LIBRARIAN_LESSON_KEPT_LOCAL =
+	"librarian.lesson.kept_local" as const;
 export const LIBRARIAN_AUTOJURY_COMPLETE =
 	"librarian.autojury.complete" as const;
 export const LIBRARIAN_TOMBSTONE_CREATED =
@@ -318,6 +320,7 @@ export const ALL_EVENT_TYPES = [
 	LIBRARIAN_LESSON_PROMOTED,
 	LIBRARIAN_LESSON_SHIPPED,
 	LIBRARIAN_LESSON_VETOED,
+	LIBRARIAN_LESSON_KEPT_LOCAL,
 	LIBRARIAN_AUTOJURY_COMPLETE,
 	LIBRARIAN_TOMBSTONE_CREATED,
 	CURATOR_SCAN_STARTED,

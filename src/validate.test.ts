@@ -61,6 +61,7 @@ import {
 	LIBRARIAN_CLASSIFIER_ERRORED,
 	LIBRARIAN_LESSON_ASSERTED,
 	LIBRARIAN_LESSON_JUDGED,
+	LIBRARIAN_LESSON_KEPT_LOCAL,
 	LIBRARIAN_LESSON_PROMOTED,
 	LIBRARIAN_LESSON_SELF_CHECKED,
 	LIBRARIAN_LESSON_SHIPPED,
@@ -3858,8 +3859,8 @@ describe("ALL_EVENT_TYPES", () => {
 		expect(set.size).toBe(ALL_EVENT_TYPES.length);
 	});
 
-	it("has exactly 152 entries", () => {
-		expect(ALL_EVENT_TYPES.length).toBe(152);
+	it("has exactly 153 entries", () => {
+		expect(ALL_EVENT_TYPES.length).toBe(153);
 	});
 });
 
@@ -4086,5 +4087,73 @@ describe("librarian.autojury.complete self_check_failed", () => {
 				result.errors.some((e) => e.path.includes("self_check_failed")),
 			).toBe(true);
 		}
+	});
+});
+
+// A person kept a lesson local: its claim went to the typed memory store
+// instead of being shared (ONL-315).
+describe("librarian.lesson.kept_local", () => {
+	beforeEach(() => {
+		_resetSequence();
+	});
+
+	function keptLocal(payload: unknown) {
+		return createEvent({
+			runtime: "claude-code",
+			plugin: "librarian",
+			machine_id: MACHINE_ID,
+			session_id: "session-kept-local-1",
+			event_type: LIBRARIAN_LESSON_KEPT_LOCAL,
+			payload: payload as never,
+		});
+	}
+
+	const valid = {
+		lesson_id: "01M6FJ2S6P2M9EAAEB2VD8SWMG",
+		proposal_id: "01M6FJ2S6P2M9EAAEB2VD8SWMH",
+		memory_type: "project",
+	};
+
+	it("validates a kept-local lesson", () => {
+		expect(validate(keptLocal(valid)).valid).toBe(true);
+	});
+
+	it("rejects a memory_type outside the typed store", () => {
+		const result = validate(keptLocal({ ...valid, memory_type: "lesson" }));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(
+				result.errors.some((e) => e.message.includes("allowed values")),
+			).toBe(true);
+			expect(result.errors.some((e) => e.path.includes("memory_type"))).toBe(
+				true,
+			);
+		}
+	});
+
+	it("rejects a missing proposal_id", () => {
+		const { proposal_id: _omit, ...rest } = valid;
+		const result = validate(keptLocal(rest));
+		expect(result.valid).toBe(false);
+		if (!result.valid) {
+			expect(result.errors.some((e) => e.message.includes("proposal_id"))).toBe(
+				true,
+			);
+		}
+	});
+
+	it("rejects the claim text itself", () => {
+		const result = validate(keptLocal({ ...valid, claim: "leaks" }));
+		expect(result.valid).toBe(false);
+		// The validator reports the keyword, not the property name, so the
+		// control proves `claim` is the only thing wrong.
+		if (!result.valid) {
+			expect(
+				result.errors.some((e) =>
+					e.message.includes("must NOT have additional properties"),
+				),
+			).toBe(true);
+		}
+		expect(validate(keptLocal(valid)).valid).toBe(true);
 	});
 });
